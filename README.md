@@ -11,7 +11,7 @@ between "Back Channel 1 and "Back Channel 2"
 
 But "Front Channels" are meant to have multiple instances living on different servers/processes all communicating with its sibling "Back Channel"
 
-When I say sibling I'm just describing the topology of a channel in laymens terms.
+When I say sibling I'm just describing the topology of a channel in layman's terms.
 
 A "Channel" is simply just made up of many "Front Channels" and a single "Back Channel" where they all share a unique identifier.
 All of the "Front Channels" with the ID of "randomChannel123" are sibilings of the SINGLE "Back Channel" "randomChannel123" and vice versa.
