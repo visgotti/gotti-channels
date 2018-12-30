@@ -1,5 +1,5 @@
-import { Channel } from './base/Channel';
-import { StateData } from './base/ChannelState';
+import { Channel } from './Channel/Channel';
+import { StateData } from './types';
 import { Centrum } from '../../lib/Centrum';
 export declare class BackChannel extends Channel {
     constructor(id: any, centrum: Centrum);

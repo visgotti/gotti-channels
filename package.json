@@ -9,6 +9,7 @@
   "author": "visgotti",
   "license": "MIT",
   "dependencies": {
+    "observable-membrane": "^0.26.0",
     "zeromq": "^5.1.0"
   },
   "devDependencies": {

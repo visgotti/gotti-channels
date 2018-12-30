@@ -55,6 +55,20 @@ describe('Channel', function() {
         }, 200);
     });
 
+    after((done) => {
+        for(let i = 0; i < frontChannels.length; i++) {
+            frontChannels[i].close();
+        }
+        for(let i = 0; i < backChannels.length; i++) {
+            backChannels[i].close();
+        }
+        frontChannels.length = 0;
+        backChannels.length = 0;
+        setTimeout(() => {
+            done();
+        }, 1000);
+    });
+
     it('tests integration of frontChannel.onBackStateUpdate, backChannel.setState, and backChannel.broadcastState', function(done) {
         let broadcastsProcessed = 0;
 
@@ -71,9 +85,9 @@ describe('Channel', function() {
 
         setTimeout(() => {
             assert.strictEqual(broadcastsProcessed, 20);
+            done();
         }, 300);
 
-       done();
     });
 
     it('tests integration of backChannel.onFrontStateUpdate, frontChannel.setState, and frontChannel.broadcastState', function(done) {
@@ -91,9 +105,99 @@ describe('Channel', function() {
         });
 
         setTimeout(() => {
-            assert.strictEqual(broadcastsProcessed, 10);
+            assert.strictEqual(broadcastsProcessed, 20);
+            done();
         }, 300);
 
-        done();
+    });
+
+    it('tests updateState and updateState from front to back', function(done) {
+        let broadcastsProcessed = 0;
+
+        frontChannels.forEach(frontChannel => {
+            frontChannel.setState({});
+            frontChannel.updateState(1, 'increment');
+            frontChannel.broadcastState();
+        });
+
+        backChannels.forEach(backChannel => {
+            backChannel.setState({});
+
+            backChannel.onFrontStateUpdate((state) => {
+                backChannel.updateState(state);
+                broadcastsProcessed+=state.increment;
+            });
+        });
+
+        setTimeout(() => {
+            assert.strictEqual(broadcastsProcessed, 20);
+            done();
+        }, 300);
+    });
+
+
+    it('tests updateState and updateState from back to front', function(done) {
+        let broadcastsProcessed = 0;
+
+        frontChannels.forEach(frontChannel => {
+            frontChannel.onBackStateUpdate((state) => {
+                broadcastsProcessed+=state.increment;
+            });
+        });
+
+        backChannels.forEach(backChannel => {
+            backChannel.setState({});
+            backChannel.updateState(1, 'increment');
+            backChannel.broadcastState();
+        });
+
+        setTimeout(() => {
+            assert.strictEqual(broadcastsProcessed, 20);
+            done();
+        }, 300);
+    });
+
+    it('tests frontChannel.removeState removes state and automatically removes it from backChannel as well', function(done) {
+        let broadcastsProcessed = 0;
+        let removedIncrementsProcessed = 0;
+
+        frontChannels.forEach(frontChannel => {
+            frontChannel.setState({});
+            frontChannel.updateState(1, 'increment');
+            frontChannel.broadcastState();
+        });
+
+        // a little later delete half of the front states
+        // so the backChannel should wind up only receiving 30
+        // incrementations
+        let i = 0;
+        frontChannels.forEach(frontChannel => {
+            if(i < 10) {
+                frontChannel.removeState('increment');
+            } else {
+            }
+            frontChannel.broadcastState();
+            i++;
+        });
+
+        backChannels.forEach(backChannel => {
+            backChannel.onFrontStateUpdate((state) => {
+                backChannel.setState(state);
+                const backStateData = backChannel.getStateData();
+                if(backStateData.increment) {
+                    broadcastsProcessed+=backStateData.increment
+                } else {
+                    // backstate data should have removed increment since the front server did
+                    removedIncrementsProcessed++;
+                    assert.deepStrictEqual(backStateData, {});
+                }
+            });
+        });
+
+        setTimeout(() => {
+            assert.strictEqual(broadcastsProcessed, 30);
+            assert.strictEqual(removedIncrementsProcessed, 10);
+            done();
+        }, 300);
     });
 });

@@ -1,6 +1,6 @@
-export type StateData = Object | number | string;
+import { StateData } from '../types';
 
-export class ChannelState {
+export class ClientState {
     private _data: StateData;
 
     constructor() {
