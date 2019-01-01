@@ -1,18 +1,14 @@
 import * as fossilDelta from 'fossil-delta';
 import * as msgpack from 'notepack.io';
 
-import { FrontChannel } from '../FrontChannel';
-import { StateData } from '../types';
-import { ClientState } from './ClientState';
-
+import { FrontChannel } from './FrontChannel';
 
 export class Client {
     readonly uid: string;
     public state: any;
+    private connectedChannel: FrontChannel;
     private _previousState: any;
     private _previousStateEncoded: any;
-f
-    private connectedChannel: FrontChannel;
 
     constructor(uid) {
         this.uid = uid;
@@ -21,7 +17,18 @@ f
         this._previousStateEncoded = {};
     }
 
-    public addMessage()
+    public addMessage(message) {
+        if(!(this.connectChannel)) {
+            throw new Error('Client must be connected to a channel to add messages.');
+        }
+
+        const data = {
+            uid: this.uid,
+            message,
+        };
+
+        this.connectedChannel.addMessage(data);
+    }
 
     /**
      * Sets connected channel of client also links it.
@@ -45,7 +52,7 @@ f
      * @param channelId
      */
     public unlinkChannel(channelId: string) {
-        delete this.linkedState[channelId];
+        delete this.state[channelId];
     }
 
     public patchState() : any {

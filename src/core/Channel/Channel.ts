@@ -1,5 +1,4 @@
-import { ChannelState } from './ChannelState';
-import { StateData, StateDatum } from '../types';
+import { State, StateData } from '../types';
 import { Centrum } from '../../../lib/Centrum';
 
 export enum ChannelType {
@@ -8,30 +7,33 @@ export enum ChannelType {
 }
 
 export class Channel {
+
+    readonly id: string;
     protected centrum: Centrum;
 
-    protected _setState: Function;
-    protected _patchState: Function;
-
-    private channelState: ChannelState;
+    private _state: State;
 
     constructor(id, centrum) {
         this.id = id;
         this.centrum = centrum;
-
-        this.channelState = new ChannelState();
-
-        // inherit all methods from state and make sure they stay bound to state object.
-        this._setState = this.channelState.setState.bind(this.channelState);
-        this._patchState = this.channelState.patchState.bind(this.channelState);
+        this._state = {
+            data: {} as StateData,
+        };
     }
 
-    protected _onStateUpdate(stateData: StateData, removedStates?: Array<string>): void {
-        throw new Error(`Unimplemented onStateUpdate handler in channel`);
+    get state () : State {
+        return this._state;
+    }
+
+    protected _setState (newState: StateData) {
+        this._state.data = newState;
+    }
+
+    protected patchState(patches) {
+        //this.channelState.patchState(patches);
     }
 
     public close() {
         this.centrum.close();
     }
-
 }

@@ -1,6 +1,5 @@
-import { Channel, ChannelType } from './Channel/Channel';
-import { ChannelState } from './Channel/ChannelState';
-import { State, StateData } from './types';
+import { Channel } from './Channel/Channel';
+import { StateData } from './types';
 
 import { Centrum } from '../../lib/Centrum';
 
@@ -11,23 +10,15 @@ export class FrontChannel extends Channel {
     constructor(id, centrum: Centrum) {
         super(id, centrum);
         this.queuedMessages = [];
-
         this.initializeCentrumMessengers();
     }
 
-    /**
-     * Function used to register a handler on Back Channel state updates.
-     * @param callback
-     */
-    public onBackStateUpdate(callback: (stateData: StateData) => void) {
-        this._onStateUpdate = (stateData: StateData) => {
-            this._backState.setState(stateData);
-            callback(stateData);
-        }
+    public addMessage(message) {
+        this.queuedMessages.push(message);
     }
 
-    public addMessage(message) {
-    }
+    public onSetState(stateData: StateData) {};
+    public onPatchState(any: any) {};
 
     private initializeCentrumMessengers() {
         // front channels subscribe to back channel for JUST state data updates not removals since
@@ -60,10 +51,11 @@ export class FrontChannel extends Channel {
     }
 
     private _onStatePatch(patches: any) {
-        this._patchState(patches);
+        this.onPatchState(patches);
     }
 
     private _onStateSet(stateData: StateData) {
         this._setState(stateData);
+        this.onSetState(stateData);
     }
 }

@@ -11,14 +11,16 @@ export class BackChannel extends Channel {
     public broadcastState: Function;
     public broadcastPatch: Function;
 
-    private _previousStateEncoded = any;
+    private _previousStateEncoded: any;
 
     constructor(id, centrum: Centrum) {
         super(id, centrum);
         this.initializeCentrumMessengers();
     }
 
-    public onMessage(message: any) { throw new Error `Unimplimented onMessage for backChannel id${this.id}` };
+    public onMessage(message: any) { throw new Error (`Unimplimented onMessage for backChannel id${this.id}`) };
+    public onSetState(stateData: StateData) {};
+    public onPatchState(any: any) {};
 
     // back channels subscription can receive data that includes removed front states,
     // first we use this to remove states from the back before continuing to
@@ -48,23 +50,12 @@ export class BackChannel extends Channel {
     private broadcastPatchHandler() {
     }
 
-    /**
-     * Since the front server dictates what the backState has
-     * the front channel will send a second parameter with
-     * state removals so the back channel does not continue to process it.
-     * @param callback
-     */
-    public onFrontStateUpdate(callback: (stateData: StateData) => void) {
-        this._onStateUpdate = callback
+    public setState(stateData: StateData) {
+        this._setState(stateData);
+        this._onStateSet(stateData);
     }
 
-    public updateState(stateData: StateData, key: string) {
-        this._updateState(stateData, key);
-    }
-    public removeState(key) {
-        this._removeState(key);
-    }
-    public setState(state: State) {
-        this._setState(state);
+    private _onStateSet(stateData: StateData) {
+        this.onSetState(stateData);
     }
 }
