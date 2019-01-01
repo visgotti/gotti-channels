@@ -5,21 +5,12 @@ import { State, StateData } from './types';
 import { Centrum } from '../../lib/Centrum';
 
 export class FrontChannel extends Channel {
-    public broadcastState: Function;
-
-    private _backState: ChannelState;
-    public removedStates: Array<string>;
+    public forwardMessages: Function;
+    private queuedMessages: Array<any>;
 
     constructor(id, centrum: Centrum) {
-        super(id, centrum, ChannelType.FRONT);
-        this.removedStates = [];
-        this._backState = new ChannelState();
-
-        // front channels want to always store backState regardless of onBackStateUpdate
-        // ever registering a callback.
-        this._onStateUpdate = (stateData: StateData) => {
-            this._backState.setState(stateData);
-        };
+        super(id, centrum);
+        this.queuedMessages = [];
 
         this.initializeCentrumMessengers();
     }
@@ -35,49 +26,44 @@ export class FrontChannel extends Channel {
         }
     }
 
-    get backState(): Object {
-        return this._backState.state;
+    public addMessage(message) {
     }
 
     private initializeCentrumMessengers() {
         // front channels subscribe to back channel for JUST state data updates not removals since
         // the backState in a front channel just blindly takes shape each update from the sibling BackChannel
-        this.centrum.createSubscription(this.subscribeStateName, (stateData: StateData) => {
-            this._onStateUpdate(stateData);
+        const statePatchSubName = `statePatch${this.id}`;
+        this.centrum.createSubscription(statePatchSubName, (patches: any) => {
+            this._onStatePatch(patches);
         });
 
-        this.centrum.createPublish(this.publishStateFunctionName, this.publishHandler.bind(this), this.clearRemovedStates.bind(this));
-        this.broadcastState = this.centrum.publish[this.publishStateFunctionName];
+        const stateSetSubName = `stateSet${this.id}`;
+        this.centrum.createSubscription(stateSetSubName, (stateData: StateData) => {
+            this._onStateSet(stateData);
+        });
+
+        const forwardMessageName = `${this.id}-forwardMessages`;
+        this.centrum.createPublish(forwardMessageName, this.forwardMessagesHandler.bind(this), this.clearQueuedMessages.bind(this));
+        this.forwardMessages = this.centrum.publish[forwardMessageName].bind(this);
     };
 
-    private publishHandler() {
-        if(this.removedStates.length === 0) {
-            // if theres no removals just send over the state data
-            return { stateData: this.getStateData() };
+    private forwardMessagesHandler() {
+        if(this.queuedMessages.length > 0) {
+            return this.queuedMessages;
         } else {
-            return {
-                stateData: this.getStateData(),
-                removedStates: this.removedStates
-            }
+            return null;
         }
     }
 
-    private clearRemovedStates() {
-        this.removedStates.length = 0;
+    private clearQueuedMessages() {
+        this.queuedMessages.length = 0;
     }
 
-    public removeState(key: string) {
-        this._removeState(key);
-        this.removedStates.push(key);
+    private _onStatePatch(patches: any) {
+        this._patchState(patches);
     }
 
-    public setState(state: State) {
-        this._setState(state);
+    private _onStateSet(stateData: StateData) {
+        this._setState(stateData);
     }
-
-    public updateState(stateData: StateData, key: string) {
-        this._updateState(stateData, key);
-    }
-
-
 }

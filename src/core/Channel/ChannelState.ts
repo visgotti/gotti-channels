@@ -22,19 +22,9 @@ export class ChannelState {
     }
 
     /**
-     * used to update a particular key of the state
-     * @param newData
-     * @param key
+     * Used to change the state
      */
-    public updateState(newData: StateDatum, key: string) {
-        this._state.data[key] = newData;
-    }
+    public patchState(patches: any) {
 
-    /**
-     * removes key of state
-     * @param key
-     */
-    public removeState(key: string) {
-        delete this._state.data[key];
     }
 }

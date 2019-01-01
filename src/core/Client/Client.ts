@@ -1,3 +1,6 @@
+import * as fossilDelta from 'fossil-delta';
+import * as msgpack from 'notepack.io';
+
 import { FrontChannel } from '../FrontChannel';
 import { StateData } from '../types';
 import { ClientState } from './ClientState';
@@ -5,50 +8,36 @@ import { ClientState } from './ClientState';
 
 export class Client {
     readonly uid: string;
-    private linkedBackState: any;
+    public state: any;
+    private _previousState: any;
+    private _previousStateEncoded: any;
+f
     private connectedChannel: FrontChannel;
-    private state: ClientState;
 
     constructor(uid) {
         this.uid = uid;
         this.connectedChannel = null;
-        this.linkedBackState = {};
-        this.state = new ClientState();
+        this.state = null;
+        this._previousStateEncoded = {};
     }
+
+    public addMessage()
 
     /**
      * Sets connected channel of client also links it.
-     * if the client is already connected then we need
-     * to remove it from the state so its not sending
-     * to the wrong backserver.
      * @param channel
      */
     public connectChannel(channel: FrontChannel) {
-        if(this.connectedChannel) {
-            this.connectedChannel.removeState(this.uid);
-        }
         this.linkChannel(channel);
         this.connectedChannel = channel;
-        this.connectedChannel.updateState(this.state.data, this.uid);
     }
 
     /**
-     * Updates the client's state and also updates
-     * it inside the client's connectedChannel to relay
-     * to the backChannel.
-     * @param newState
-     */
-    public setState(newState: StateData) {
-        this.state.data = newState;
-        this.connectedChannel.updateState(newState, this.uid);
-    }
-
-    /**
-     * adds linkage to a front channel's BackChannel sibling state.
+     * adds linkage of client to a channel state.
      * @param channel
      */
     public linkChannel(channel: FrontChannel) {
-        this.linkedBackState[channel.id] = channel.backState;
+        this.state[channel.id] = channel.state;
     }
 
     /**
@@ -56,18 +45,22 @@ export class Client {
      * @param channelId
      */
     public unlinkChannel(channelId: string) {
-        delete this.linkedBackState[channelId];
+        delete this.linkedState[channelId];
     }
 
-    /**
-     * Returns all the linked channel states the client needs
-     * @returns {any}
-     */
-    public getLinkedStates() {
-        return this.linkedBackState
+    public patchState() : any {
+        const currentState = this.state;
+        const currentStateEncoded = msgpack.encode( currentState );
+        // skip if state has not changed.
+        if ( currentStateEncoded.equals( this._previousStateEncoded ) ) {
+            return false;
+        }
+        const patches = fossilDelta.create( this._previousStateEncoded, currentStateEncoded );
+        this._previousStateEncoded = currentStateEncoded;
+        return patches;
     }
 
-    public getState() {
-        return this.state.data;
+    get previousStateEncoded() {
+        return this._previousStateEncoded
     }
 }
