@@ -41,7 +41,7 @@ describe('Client', function() {
             // each front server needs all channels
             for(let j = 0; j < frontServers.length; j++) {
                 let frontServer = frontServers[j];
-                frontChannels.push(new FrontChannel(i, frontServer));
+                frontChannels.push(new FrontChannel(i, j, frontServer));
             }
 
             // split channels evenly amongst back servers

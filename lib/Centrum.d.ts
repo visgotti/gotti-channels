@@ -88,7 +88,7 @@ export declare class Centrum {
     createPublish(name: string, beforeHook?: Hook, afterHandler?: Handler): void;
     removePublish(name: any): void;
     createSubscription(name: string, handler: Handler): void;
-    removeSubscription(name: any): void;
+    removeSubscription(name: string, index?: number): void;
     private _createSubscription;
     private _removeSubscription;
     private _createPublish;

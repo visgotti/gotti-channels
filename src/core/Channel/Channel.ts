@@ -1,20 +1,15 @@
-import { State, StateData } from '../types';
+import { State, StateData, MSG_CODES } from '../types';
 import { Centrum } from '../../../lib/Centrum';
 
-export enum ChannelType {
-    BACK = "BACK",
-    FRONT = "TYPE"
-}
 
 export class Channel {
-
-    readonly id: string;
+    readonly channelId: string;
     protected centrum: Centrum;
 
     private _state: State;
 
-    constructor(id, centrum) {
-        this.id = id;
+    constructor(channelId, centrum) {
+        this.channelId = channelId;
         this.centrum = centrum;
         this._state = {
             data: {} as StateData,
@@ -29,8 +24,17 @@ export class Channel {
         this._state.data = newState;
     }
 
-    protected patchState(patches) {
+    protected patchState(patches) : StateData {
         //this.channelState.patchState(patches);
+        return this._state.data;
+    }
+
+    protected protocol(code: MSG_CODES, id?: string) : string {
+        // in case we need custom logic for certain codes we can use switch statement.
+        switch(code[i]) {
+            default:
+                return id ? `${code.toString()}-${id}` : code.toString();
+        }
     }
 
     public close() {
