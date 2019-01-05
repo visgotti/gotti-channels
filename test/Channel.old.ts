@@ -1,5 +1,5 @@
 import { FrontChannel } from '../src/core/FrontChannel';
-import { BackChannel } from '../src/core/BackChannel';
+import { BackChannel } from '../src/core/BackChannel/BackChannel';
 
 const { Centrum } = require('../lib/Centrum.js');
 

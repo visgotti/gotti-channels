@@ -1,16 +1,21 @@
-import { State, StateData, MSG_CODES } from '../types';
+const EventEmitter = require('events');
+
+import { State, StateData } from '../types';
 import { Centrum } from '../../../lib/Centrum';
 
 
-export class Channel {
+export class Channel extends EventEmitter{
     readonly channelId: string;
+    readonly serverId: string;
     protected centrum: Centrum;
 
     private _state: State;
 
     constructor(channelId, centrum) {
+        super();
         this.channelId = channelId;
         this.centrum = centrum;
+        this.serverId = centrum.serverId;
         this._state = {
             data: {} as StateData,
         };
@@ -27,14 +32,6 @@ export class Channel {
     protected patchState(patches) : StateData {
         //this.channelState.patchState(patches);
         return this._state.data;
-    }
-
-    protected protocol(code: MSG_CODES, id?: string) : string {
-        // in case we need custom logic for certain codes we can use switch statement.
-        switch(code[i]) {
-            default:
-                return id ? `${code.toString()}-${id}` : code.toString();
-        }
     }
 
     public close() {

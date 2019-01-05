@@ -1,50 +1,27 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const ChannelState_1 = require("./ChannelState");
-var ChannelType;
-(function (ChannelType) {
-    ChannelType["BACK"] = "BACK";
-    ChannelType["FRONT"] = "TYPE";
-})(ChannelType = exports.ChannelType || (exports.ChannelType = {}));
-class Channel {
-    constructor(id, centrum, channelType) {
-        this.id = id;
+const EventEmitter = require('events');
+class Channel extends EventEmitter {
+    constructor(channelId, centrum) {
+        super();
+        this.channelId = channelId;
         this.centrum = centrum;
-        // depending on the type of channel it is, these will be inversed.
-        // we want to subscribe to front if back, and subscribe to back if we're front.
-        this.publishStateFunctionName = channelType === ChannelType.BACK ?
-            ChannelType.BACK + this.id :
-            ChannelType.FRONT + this.id;
-        this.subscribeStateName = channelType === ChannelType.BACK ?
-            ChannelType.FRONT + this.id :
-            ChannelType.BACK + this.id;
-        this.state = new ChannelState_1.ChannelState();
-        this.initializeCentrumMessengers();
+        this._state = {
+            data: {},
+        };
     }
-    initializeCentrumMessengers() {
-        // front channels subscribe to back channel for state updates.
-        this.centrum.createSubscription(this.subscribeStateName, (state) => {
-            this._onStateUpdate(state);
-        });
-        this.centrum.createPublish(this.publishStateFunctionName, this.getState.bind(this));
-        this.broadcastState = this.centrum.publish[this.publishStateFunctionName];
+    get state() {
+        return this._state;
     }
-    _onStateUpdate(stateData) {
-        throw new Error(`Unimplemented onStateUpdate handler in channel`);
+    _setState(newState) {
+        this._state.data = newState;
     }
-    setState(newState, key) {
-        if (key) {
-            this.state.data[key] = newState;
-        }
-        else {
-            this.state.data = newState;
-        }
+    patchState(patches) {
+        //this.channelState.patchState(patches);
+        return this._state.data;
     }
-    removeState(key) {
-        delete this.state.data[key];
-    }
-    getState() {
-        return this.state.data;
+    close() {
+        this.centrum.close();
     }
 }
 exports.Channel = Channel;

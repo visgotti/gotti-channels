@@ -1,17 +1,9 @@
-import { Channel } from './Channel/Channel';
-import { StateData, FrontToBackMessage, FrontConnectMessage, MSG_CODES } from './types';
+import { Centrum } from '../../../lib/Centrum';
 
-import { Centrum } from '../../lib/Centrum';
+import { Channel } from '../Channel/Channel';
+import { Protocol } from '../Channel/Messages';
 
-type FrontUid = string;
-type FrontServerIndex = number;
-
-interface FrontHandlerMap {
-    send: Function,
-}
-
-type FrontServerLookup = Map <FrontUid, FrontServerIndex>
-type ChannelHandlers = Map <FrontUid, FrontHandlerMap>
+import { StateData, FrontServerLookup, FrontToBackMessage, FrontConnectMessage, ChannelHandlers } from '../types';
 
 export class BackChannel extends Channel {
     // publish handlers
@@ -22,10 +14,12 @@ export class BackChannel extends Channel {
     private sendPatchedStateHandler: Function;
 
     private frontServerLookup: FrontServerLookup;
-    private mirroredChannels: MirroredChannels;
 
-    constructor() {
+    constructor(channelId, centrum: Centrum) {
+        super(channelId, centrum);
+
         this.frontServerLookup = new Map() as FrontServerLookup;
+        this.channelMessageHandlers = new Map() as ChannelHandlers;
 
         this.initializePreConnectSubs();
         this.initializePreConnectPubs();
@@ -50,10 +44,10 @@ export class BackChannel extends Channel {
     /**
      * sends message to specific front channel based on frontUid
      * @param message - data sent to back channel.
-     * @param backChannelId - id of back channel to send message to
+     * @param frontUid - uid of front channel to send message to
      */
-    public send(message: any, frontUid) : void {
-        this.channelMessageHandlers[backChannelId].send(message);
+    public send(message: any, frontUid: string) : void {
+        this.channelMessageHandlers.get(frontUid).send(this.channelId, message);
     }
 
     /**
@@ -67,7 +61,7 @@ export class BackChannel extends Channel {
                 this.send(message, frontUid);
             });
         } else {
-            this.broadcastAllHandler(message)
+            this.broadcastAllHandler(this.channelId, message)
         }
     }
 
@@ -99,19 +93,18 @@ export class BackChannel extends Channel {
      */
     private initializePreConnectSubs() : void {
         // registers sub that handles a front channel connection request.
-        let handlerName = this.protocol(MSG_CODES.CONNECT, this.frontServerIndex);
-        this.centrum.createSubscription(handlerName, (data: FrontConnectMessage) => {
+        // since back channels share instance of centrum we use createOrAddSubscription
+        // to add the backChannels instance methods as handlers.
+        this.centrum.createOrAddSubscription(Protocol.CONNECT(), this.channelId, (data: FrontConnectMessage) => {
             this.onFrontChannelConnected(data);
         });
 
-        handlerName = this.protocol(MSG_CODES.SEND_BACK, this.frontUid);
-        this.centrum.createSubscription(handlerName, (data: FrontToBackMessage) => {
+        this.centrum.createOrAddSubscription(Protocol.BROADCAST_ALL_BACK(), this.channelId, (data: FrontToBackMessage) => {
             const { message, frontUid } = data;
             this._onMessage(message, frontUid);
         });
 
-        handlerName = this.protocol(MSG_CODES.BROADCAST_ALL_BACK);
-        this.centrum.createSubscription(handlerName, (data: FrontToBackMessage) => {
+        this.centrum.createSubscription(Protocol.SEND_BACK(this.channelId), this.channelId, (data: FrontToBackMessage) => {
             const { message, frontUid } = data;
             this._onMessage(message, frontUid);
         });
@@ -121,18 +114,15 @@ export class BackChannel extends Channel {
      * publications that we want to be able to send out before channels start connecting.
      */
     private initializePreConnectPubs() : void {
-        const protocol = this.protocol;
-
-        let handlerName = this.protocol(MSG_CODES.BROADCAST_ALL_FRONTS);
-        this.broadcastAllHandler = this.centrum.createPublish(handlerName, (message: any) => {
+        // handler that broadcasts instance already exists on centrum before creating it if its not the first backChannel instantiated
+        this.broadcastAllHandler = this.centrum.getOrCreatePublish(Protocol.BROADCAST_ALL_FRONTS(), (fromChannelId, message: any) => {
             return {
-                channelId: this.channelId,
+                channelId: fromChannelId,
                 message,
             }
         });
 
-        handlerName = this.protocol(MSG_CODES.BROADCAST_MIRROR_FRONTS, this.channelId);
-        this.broadcastAllHandler = this.centrum.createPublish(handlerName);
+        this.broadcastMirrorHandler = this.centrum.createPublish(Protocol.BROADCAST_MIRROR_FRONTS(this.channelId));
     }
 
     /**
@@ -141,32 +131,31 @@ export class BackChannel extends Channel {
      */
     private onFrontChannelConnected(frontData: FrontConnectMessage) {
         const { channelId, frontUid, frontServerIndex } = frontData;
-        let handlerName;
-
         if(channelId === this.channelId) {
-            handlerName = this.protocol(MSG_CODES.SEND_QUEUED, frontUid);
-            this.centrum.createSubscription(handlerName, (messages => {
-                this.onMessageHandler(messages, frontUid);
+            // channelId of connecting frontChannel was the same so register pub/subs meant for mirrored channels.
+            this.centrum.createSubscription(Protocol.SEND_QUEUED(frontUid), frontUid, (messages => {
+                for(let i = 0; i < messages.length; i++) {
+                    this.onMessageHandler(messages[i], frontUid);
+                }
             }));
         }
 
         this.frontServerLookup.set(frontUid, frontServerIndex);
-        this.channelMessageHandlers.set(frontUid, new Map() as FrontHandlerMap);
 
-        const handlerMap = this.channelMessageHandlers.get(frontUid);
-        const sendHandler = this.centrum.createPublish(this.protocol(MSG_CODES.SEND_FRONT, frontUid), message => {
-            return {
-                channelId: this.channelId,
-                message,
-            }
+        this.channelMessageHandlers.set(frontUid, {
+            'send':  this.centrum.getOrCreatePublish(Protocol.SEND_FRONT(frontUid), (backChannelId, message) => {
+                return {
+                    channelId: backChannelId,
+                    message,
+                }
+            })
         });
-        handlerMap.set('send', sendHandler);
 
         // create the confirm request publisher, send the message, then remove publisher since it wont
         // be used again unless it disconnects and connects again, then it will do same process.
-        let handlerName = this.protocol(MSG_CODES.CONNECT_SUCCESS, frontUid);
-        this.centrum.createPublish(handlerName);
-        this.centrum.publish[handlerName];
-        this.centrum.removePublish(handlerName);
+        let _connectSuccessProtocol = Protocol.CONNECT_SUCCESS(frontUid);
+        this.centrum.createPublish(_connectSuccessProtocol);
+        this.centrum.publish[_connectSuccessProtocol](this.channelId);
+        this.centrum.removePublish(_connectSuccessProtocol);
     }
 }

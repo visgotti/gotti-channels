@@ -6,7 +6,7 @@ export interface FrontConnectMessage {
     channelId: string,
     frontUid: string,
     frontServerIndex: number
-};
+}
 
 export interface BackToFrontMessage {
     message: any,
@@ -18,20 +18,17 @@ export interface FrontToBackMessage {
     frontUid: string,
 }
 
-export enum MSG_CODES {
-    // FRONT -> BACK
-    CONNECT,
-    DISCONNECT,
-    SEND_QUEUED,
-    SEND_BACK,
-    BROADCAST_ALL_BACK,
+export type FrontUid = string;
+export type FrontServerIndex = number;
+export type ChannelId = string;
 
-    // BACK -> FRONT
-    CONNECT_SUCCESS,
-    CONNECT_FAILED,
-    BROADCAST_MIRROR_FRONTS,
-    BROADCAST_ALL_FRONTS,
-    SEND_FRONT,
-    SET_STATE,
-    PATCH_STATE,
-};
+export type FrontServerLookup = Map<FrontUid, FrontServerIndex>;
+
+export type ChannelHandlers = Map <ChannelId, ChannelHandlerMap>
+export type SubscriptionHandlerIds = Map <string, number>
+
+export interface ChannelHandlerMap {
+    send: Function,
+    disconnect?: Function,
+}
+
