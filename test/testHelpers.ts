@@ -1,100 +1,11 @@
-const { Centrum } = require('../lib/Centrum.js');
-
-import { FrontChannel } from '../src/core/FrontChannel/FrontChannel';
-import { BackChannel } from '../src/core/BackChannel/BackChannel';
-
-
-export function createChannels(options) {
-    const { FRONT_SERVERS, BACK_SERVERS, TOTAL_CHANNELS, STARTING_BACK_PUB_PORT, STARTING_FRONT_PUB_PORT } = options;
-
-    let frontServers = [];
-    let frontChannels = [];
-
-    let backServers = [];
-    let backChannels = [];
-
-    const BACK_SERVER_PUB_URIS = [];
-    const FRONT_SERVER_PUB_URIS = [];
-
-    for(let i = 0; i < BACK_SERVERS; i++) {
-        BACK_SERVER_PUB_URIS.push('tcp://127.0.0.1:'+(STARTING_BACK_PUB_PORT + i));
-    }
-    for(let i = 0; i < FRONT_SERVERS; i++) {
-        FRONT_SERVER_PUB_URIS.push('tcp://127.0.0.1:'+(STARTING_FRONT_PUB_PORT + i));
-    }
-
-    for(let i = 0; i < BACK_SERVERS; i++) {
-        const backServerOptions = {
-            id: `backServer${i}`,
-            publish: {
-                pubSocketURI: BACK_SERVER_PUB_URIS[i],
-            },
-            subscribe: {
-                pubSocketURIs: FRONT_SERVER_PUB_URIS
-            }
-        };
-        backServers.push(new Centrum(backServerOptions));
-    }
-
-    for(let i = 0; i < FRONT_SERVERS; i++) {
-        const frontServerOptions = {
-            id: `frontServer${i}`,
-            publish: {
-                pubSocketURI: FRONT_SERVER_PUB_URIS[i],
-            },
-            subscribe: {
-                pubSocketURIs: BACK_SERVER_PUB_URIS
-            }
-        };
-        frontServers.push(new Centrum(frontServerOptions));
-    }
-
-    const backChannelsPerServer = TOTAL_CHANNELS / BACK_SERVERS;
-    const frontChannelsPerServer = TOTAL_CHANNELS;
-
-    for(let i = 0; i < FRONT_SERVERS; i++) {
-        for(let j = 0; j < frontChannelsPerServer; j++) {
-            frontChannels.push(new FrontChannel(j, i, TOTAL_CHANNELS, frontServers[i]));
-        }
-    }
-
-    let j = 0;
-    let serverIndex = 0;
-    for(let i = 0; i < TOTAL_CHANNELS; i++) {
-        backChannels.push(new BackChannel(i, backServers[serverIndex]));
-        j++;
-        if(j > backChannelsPerServer - 1) {
-            j = 0;
-            serverIndex++;
-        }
-    }
-
-    let channelsById = {};
-
-    for(let i = 0; i < frontChannels.length; i++) {
-        const frontChannel = frontChannels[i];
-        if(!(channelsById[frontChannel.channelId])) {
-            channelsById[frontChannel.channelId] = { "fronts": [], "back": null, channelId: frontChannel.channelId };
-        }
-        channelsById[frontChannel.channelId].fronts.push(frontChannels[i]);
-    }
-    for(let i = 0; i < backChannels.length; i++) {
-        const backChannel = backChannels[i];
-        if(!(channelsById[backChannel.channelId])) {
-           throw "Channel Id should exist."
-        }
-        channelsById[backChannel.channelId].back = backChannel;
-
-    }
-
-    return {
-        frontServers,
-        backServers,
-        frontChannels,
-        backChannels,
-        channelsById,
-    }
-}
+export const TEST_CLUSTER_OPTIONS = {
+    frontServers: 5,
+    backServers: 10,
+    totalChannels: 150,
+    startingBackPort: 4000,
+    startingFrontPort: 5000,
+    host: 'tcp://127.0.0.1:',
+};
 
 
 export function makeRandomMessages(
