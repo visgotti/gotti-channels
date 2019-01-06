@@ -1,6 +1,7 @@
 const EventEmitter = require('events');
 
 import { State, StateData } from '../types';
+import { PublishProtocol, SubscribeProtocol, PushProtocol } from './Messages';
 import { Centrum } from '../../../lib/Centrum';
 
 

@@ -2,9 +2,6 @@ import { Protocol, PublishProtocol, SubscribeProtocol, ChannelMessages } from '.
 import { FrontToBackMessage } from '../types';
 import { BackChannel } from './BackChannel';
 
-type onMessageCallback = (message: any, channelId: string) => void;
-type onConnectedCallback = (channelId: string) => void;
-
 export class BackMessages extends ChannelMessages {
     public SEND_QUEUED: SubscribeProtocol;
     public CONNECT: SubscribeProtocol;

@@ -1,8 +1,6 @@
 import { Channel } from '../Channel/Channel';
 import { Centrum } from '../../../lib/Centrum';
-import { FrontMessages } from './FrontMessages';
-
-import { Protocol } from '../Channel/Messages';
+import { FrontMessages, FrontPubs, FrontSubs, FrontPushes } from './FrontMessages';
 
 import { StateData, ChannelHandlers, BackToFrontMessage } from '../types';
 
@@ -20,20 +18,21 @@ enum CONNECTION_CHANGE {
 }
 
 export class FrontChannel extends Channel {
-    public forwardMessages: Function;
-
     private connectedChannelIds: Set<string>;
     private _connectionInfo: any;
 
-    private frontMessages: FrontMessages;
-
     private queuedMessages: Array<any>;
 
-    readonly frontUid : string;
-    readonly frontServerIndex: number;
+    private pub: FrontPubs;
+    private sub: FrontSubs;
+    private push: FrontPushes;
 
     private CONNECTION_STATUS: CONNECTION_STATUS;
 
+    // unique id to identify front channel based on channelId and frontServerIndex
+    readonly frontUid : string;
+    // index of server in cluster front channel lives on
+    readonly frontServerIndex: number;
     // count of total the front channel can be communicating with
     readonly totalChannels: number;
 
@@ -51,10 +50,9 @@ export class FrontChannel extends Channel {
         this.frontServerIndex = frontServerIndex;
         this.totalChannels = totalChannels;
 
-        this.frontMessages = new FrontMessages(centrum, this);
-
-        this.initializePreConnectedPubs();
-        this.initializePreConnectSubs();
+        this.initializeMessageFactories();
+        this.registerPreConnectedSubs();
+        this.registerPreConnectedPubs();
     };
 
     /**
@@ -95,7 +93,7 @@ export class FrontChannel extends Channel {
      * used to publish all queued messages to mirror back channel queuedMessages is emptied when called.
      */
     public sendQueued() : void {
-        this.frontMessages.SEND_QUEUED(this.queuedMessages);
+        this.pub.SEND_QUEUED(this.queuedMessages);
         this.clearQueued();
     };
 
@@ -106,7 +104,7 @@ export class FrontChannel extends Channel {
      */
     public send(message: any, backChannelId=this.channelId) : void {
         let data = { message,  frontUid: this.frontUid };
-        this.frontMessages.SEND_BACK[backChannelId](data);
+        this.push.SEND_BACK[backChannelId](data);
     }
 
     /**
@@ -123,7 +121,7 @@ export class FrontChannel extends Channel {
         // no backChannels were given so use broadcastAll handler/protocol
         } else {
             //this.broadcastAllHandler({ frontUid: this.frontUid, message });
-            this.frontMessages.BROADCAST_ALL_BACK({ frontUid: this.frontUid, message  })
+            this.pub.BROADCAST_ALL_BACK({ frontUid: this.frontUid, message  })
         }
     }
 
@@ -140,7 +138,7 @@ export class FrontChannel extends Channel {
                 reject(validated.error);
             }
 
-            this.frontMessages.CONNECT({
+            this.pub.CONNECT({
                 frontUid: this.frontUid,
                 frontServerIndex: this.frontServerIndex,
                 channelId: this.channelId
@@ -218,6 +216,36 @@ export class FrontChannel extends Channel {
         throw new Error(`Unimplemented onMessageHandler in front channel ${this.channelId} Use frontChannel.onMessage to implement.`);
     }
 
+    /**
+     * initializes centrum pub and subs when connected
+     * @param backChannelId
+     */
+    private onConnected(backChannelId) {
+        // channelId of connected backChannel was the same so register pub/subs meant for mirrored channels.
+        if(backChannelId === this.channelId) {
+            this.sub.BROADCAST_MIRROR_FRONTS.register(data => {
+                this._onMessage(data.message, data.channelId);
+            });
+            this.pub.SEND_QUEUED.register();
+        }
+
+        this.push.SEND_BACK.register(backChannelId);
+        this.push.DISCONNECT.register(backChannelId);
+
+        this.emit('connected', backChannelId);
+    }
+
+    private onDisconnected(backChannelId) {
+        // channelId of connected backChannel was the same so register pub/subs meant for mirrored channels.
+        if(backChannelId === this.channelId) {
+         this.pub.SEND_QUEUED.unregister();
+        //  this.sub.PATCH_STATE.remove();
+        }
+
+        this.push.DISCONNECT.unregister();
+        this.push.SEND_BACK.unregister();
+    }
+
     private validateConnectAction(REQUEST_STATUS: CONNECTION_STATUS) : { success: boolean, error?: string } {
         let validated = { success: true, error: null };
         if(this.CONNECTION_STATUS === CONNECTION_STATUS.CONNECTING) {
@@ -245,41 +273,30 @@ export class FrontChannel extends Channel {
     /**
      * subscriptions that we want to register pre connection.
      */
-    private initializePreConnectSubs() : void {
+    private registerPreConnectedSubs() : void {
         //todo: create some sort of front SERVER class wrapper so we can optimaly handle backChannel -> front SERVER messages (things that not every channel need to handle)
-        this.frontMessages.SEND_FRONT.createSub(data => {
+        this.sub.SEND_FRONT.register(data => {
             this._onMessage(data.message, data.channelId);
         });
 
-        this.frontMessages.CONNECT_SUCCESS.createSub(this.onConnected.bind(this));
+        this.sub.CONNECT_SUCCESS.register(this.onConnected.bind(this));
     }
 
     /**
      * Publications we initialize before connections are made.
      */
-    private initializePreConnectedPubs() : void {
-        this.frontMessages.CONNECT.createPub();
-        this.frontMessages.BROADCAST_ALL_BACK.createPub();
+    private registerPreConnectedPubs() : void {
+        this.pub.CONNECT.register();
+        this.pub.BROADCAST_ALL_BACK.register();
     }
 
     /**
-     * initializes centrum pub and subs when connected
-     * @param backChannelId
+     * initializes needed message factories for front channels.
      */
-    private onConnected(backChannelId) {
-        // channelId of connected backChannel was the same so register pub/subs meant for mirrored channels.
-        if(backChannelId === this.channelId) {
-            this.frontMessages.BROADCAST_MIRROR_FRONTS.createSub(data => {
-                this._onMessage(data.message, data.channelId);
-            });
-            this.frontMessages.SEND_QUEUED.createPub();
-        }
-
-        this.frontMessages.SEND_BACK.createMultiPub(backChannelId);
-        //this.frontMessages.DISCONNECT.createPub();
-
-        this.emit('connected', backChannelId);
+    initializeMessageFactories() {
+        const { pub, push, sub } = new FrontMessages(this.centrum, this);
+        this.pub = pub;
+        this.push = push;
+        this.sub = sub;
     }
-
-    private onDisconnected(backChannelId) {}
 }

@@ -3,7 +3,7 @@ import { Centrum } from '../../../lib/Centrum';
 import { Channel } from '../Channel/Channel';
 import { Protocol } from '../Channel/Messages';
 
-import { StateData, FrontServerLookup, FrontToBackMessage, FrontConnectMessage, ChannelHandlers } from '../types';
+import { FrontServerLookup, FrontToBackMessage, FrontConnectMessage, ChannelHandlers } from '../types';
 
 export class BackChannel extends Channel {
     // publish handlers
