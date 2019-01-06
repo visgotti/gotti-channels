@@ -1,4 +1,4 @@
-import { Protocol, PublishProtocol, SubscribeProtocol, PushProtocol, PullProtocol, ChannelMessages } from '../Channel/Messages'
+import { Protocol, PublishProtocol, SubscribeProtocol, PushProtocol, PullProtocol, MessageFactory } from '../Channel/MessageFactory'
 import { FrontChannel } from './FrontChannel';
 
 
@@ -22,7 +22,7 @@ export interface FrontPushes {
 export interface FrontPulls {
 }
 
-export class FrontMessages extends ChannelMessages {
+export class FrontMessages extends MessageFactory {
     public SEND_QUEUED: PublishProtocol;
     public CONNECT: PublishProtocol;
     public BROADCAST_ALL_BACK: PublishProtocol;

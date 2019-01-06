@@ -1,7 +1,7 @@
 import { Centrum } from '../../../lib/Centrum';
 
 import { Channel } from '../Channel/Channel';
-import { Protocol } from '../Channel/Messages';
+import { Protocol } from '../Channel/MessageFactory';
 
 import { FrontServerLookup, FrontToBackMessage, FrontConnectMessage, ChannelHandlers } from '../types';
 

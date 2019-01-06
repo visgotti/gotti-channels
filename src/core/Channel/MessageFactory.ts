@@ -64,7 +64,7 @@ export class Protocol {
 /**
  * helper class with functions to make sure protocol codes stay synchronized between front and back channels.
  */
-export abstract class ChannelMessages {
+export abstract class MessageFactory {
     // FRONT -> BACKS
     public abstract CONNECT: PublishProtocol | SubscribeProtocol;
     public abstract SEND_QUEUED: PublishProtocol | SubscribeProtocol;

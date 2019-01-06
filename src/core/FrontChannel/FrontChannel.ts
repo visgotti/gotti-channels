@@ -2,7 +2,7 @@ import { Channel } from '../Channel/Channel';
 import { Centrum } from '../../../lib/Centrum';
 import { FrontMessages, FrontPubs, FrontSubs, FrontPushes } from './FrontMessages';
 
-import { StateData, ChannelHandlers, BackToFrontMessage } from '../types';
+import { StateData, BackToFrontMessage } from '../types';
 
 import {clearTimeout} from "timers";
 

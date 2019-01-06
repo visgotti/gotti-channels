@@ -1,8 +1,8 @@
-import { Protocol, PublishProtocol, SubscribeProtocol, ChannelMessages } from '../Channel/Messages'
+import { Protocol, PublishProtocol, SubscribeProtocol, MessageFactory } from '../Channel/MessageFactory'
 import { FrontToBackMessage } from '../types';
 import { BackChannel } from './BackChannel';
 
-export class BackMessages extends ChannelMessages {
+export class BackMessages extends MessageFactory {
     public SEND_QUEUED: SubscribeProtocol;
     public CONNECT: SubscribeProtocol;
     public BROADCAST_ALL_BACK: SubscribeProtocol;
