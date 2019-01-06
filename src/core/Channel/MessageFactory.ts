@@ -62,7 +62,10 @@ export class Protocol {
 }
 
 /**
- * helper class with functions to make sure protocol codes stay synchronized between front and back channels.
+ * Class that implements logic to create needed message functions for a channel.
+ * It uses a channel instance when creating said functions, so theres no need
+ * to keep track of passing in parameters when wanting to register/unregister/call
+ * a message since the factory keeps all of that in its scope when instantiated.
  */
 export abstract class MessageFactory {
     // FRONT -> BACKS
