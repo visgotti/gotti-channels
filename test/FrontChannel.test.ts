@@ -114,23 +114,53 @@ describe('FrontChannel', function() {
             });
         });
 
-        it('tests asynchronous connection of the rest of the channels', (done) => {
-            for(let i = 1; i < frontChannels.length; i++) {
+        it('tests asynchronous connection of the rest of the channels besides last one', (done) => {
+
+            // all front channels besides the last one at the end of this test should be connected.
+            const expectedConnections = options.TOTAL_CHANNELS * (frontChannels.length - 1);
+
+            for(let i = 1; i < frontChannels.length - 1; i++) {
                 frontChannels[i].connect().then(connected => {
                     connections+=connected.size;
                     assert.strictEqual(connected.size, options.TOTAL_CHANNELS);
-                    // when connections hits the number it should, we wait 300 seconds then check again
-                    // and make sure the number didnt change.
-                    if(connections === options.TOTAL_CHANNELS * frontChannels.length) {
+                    if(connections === expectedConnections){
+                        // reached total connections, wait a bit then check its still correct.
                         setTimeout(() => {
-                            assert.strictEqual(connections, options.TOTAL_CHANNELS * frontChannels.length);
+                            assert.strictEqual(connections, expectedConnections);
                             done();
-                        }, 300);
+                        }, 50);
                     }
                 });
             }
         }).timeout(100000)
     });
+
+    describe('frontChannel.onConnect', () => {
+        it('tests handler gets called on successful connection', (done) => {
+
+            // gets last unconnected front channel we didnt connect in previous tests
+            const frontChannel = frontChannels[frontChannels.length - 1];
+            let connectionsHandled = 0;
+
+            frontChannel.onConnected(() => {
+                connectionsHandled++;
+            });
+
+            frontChannels[frontChannels.length - 1].connect().then(connected => {
+                // should have been ran once for each back channel it connected to.'
+                // connections handled should match connected size
+                assert.strictEqual(connectionsHandled, connected.size);
+                assert.strictEqual(connectionsHandled, options.TOTAL_CHANNELS);
+
+                // just wait a bit and make sure no more handlers are triggered.
+                setTimeout(() => {
+                    assert.strictEqual(connectionsHandled, options.TOTAL_CHANNELS);
+                    done();
+                }, 50);
+            });
+        });
+    });
+
     describe('frontChannel.disconnect', () => {
         it('is unimplemented', (done) => {
             assert.doesNotThrow(() => { frontChannels[0].disconnect() });

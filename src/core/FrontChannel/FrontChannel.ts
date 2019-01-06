@@ -57,6 +57,14 @@ export class FrontChannel extends Channel {
     };
 
     /**
+     * sets the onConnectedHandler function
+     * @param handler - function that gets executed when a channel succesfully connects to a backChannel.
+     */
+    public onConnected(handler: (newState: StateData) => void) : void {
+        this.onConnectedHandler = handler;
+    };
+
+    /**
      * sets the setStateHandler function
      * @param handler - function that gets executed when mirror back channel sends whole state
      */
@@ -217,13 +225,14 @@ export class FrontChannel extends Channel {
     }
 
     /**
-     * initializes centrum pub and subs when connected
+     * registers needed pub and subs when connected and runs handler passed into onConnected(optional)
      * @param backChannelId
      */
-    private onConnected(backChannelId) {
+    private _onConnected(backChannelId) {
         // channelId of connected backChannel was the same so register pub/subs meant for mirrored channels.
         if(backChannelId === this.channelId) {
             this.sub.BROADCAST_MIRROR_FRONTS.register(data => {
+                //TODO: maybe this should be handled in a seperate onMirroredMessage or something similar.. will do if it seems needed.
                 this._onMessage(data.message, data.channelId);
             });
             this.pub.SEND_QUEUED.register();
@@ -232,8 +241,11 @@ export class FrontChannel extends Channel {
         this.push.SEND_BACK.register(backChannelId);
         this.push.DISCONNECT.register(backChannelId);
 
+        this.onConnectedHandler(backChannelId);
+
         this.emit('connected', backChannelId);
     }
+    private onConnectedHandler(channelId) : void {};
 
     private onDisconnected(backChannelId) {
         // channelId of connected backChannel was the same so register pub/subs meant for mirrored channels.
@@ -250,7 +262,7 @@ export class FrontChannel extends Channel {
         let validated = { success: true, error: null };
         if(this.CONNECTION_STATUS === CONNECTION_STATUS.CONNECTING) {
             validated.success = true;
-            validated.error = 'Channel is in the process of connecting';
+            validated.error = 'Channel is in the process of connecting.';
         }
 
         if(this.CONNECTION_STATUS === CONNECTION_STATUS.DISCONNECTING) {
@@ -279,7 +291,7 @@ export class FrontChannel extends Channel {
             this._onMessage(data.message, data.channelId);
         });
 
-        this.sub.CONNECT_SUCCESS.register(this.onConnected.bind(this));
+        this.sub.CONNECT_SUCCESS.register(this._onConnected.bind(this));
     }
 
     /**
