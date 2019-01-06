@@ -50,43 +50,44 @@ export class FrontMessages extends ChannelMessages {
         this.centrum = centrum;
         this.frontUid = channel.frontUid;
         this.channelId = channel.channelId;
-        this.initializePublishProtocols();
-        this.initializePushProtocols();
-        this.initializeSubscribeProtocols();
+
+        this.pub = this.initializePubs();
+        this.push = this.initializePushes();
+        this.sub = this.initializeSubs();
     }
 
-    private initializePublishProtocols() {
+    private initializePubs() : FrontPubs {
         this.CONNECT = this.pubCreator(Protocol.CONNECT());
         this.SEND_QUEUED = this.pubCreator(Protocol.SEND_QUEUED(this.frontUid));
         this.BROADCAST_ALL_BACK = this.pubCreator(Protocol.BROADCAST_ALL_BACK());
 
         //todo figure out cleanest way to do this inside parent class implicitly
-        this.pub = {
+        return {
             CONNECT: this.CONNECT,
             SEND_QUEUED: this.SEND_QUEUED,
             BROADCAST_ALL_BACK: this.BROADCAST_ALL_BACK,
-        } as FrontPubs
+        }
     }
 
-    private initializePushProtocols() {
+    private initializePushes() : FrontPushes {
         this.SEND_BACK = this.pushCreator(Protocol.SEND_BACK);
         this.DISCONNECT = this.pushCreator(Protocol.DISCONNECT);
 
-        this.push = {
+        return {
             SEND_BACK: this.SEND_BACK,
             DISCONNECT: this.DISCONNECT,
-        } as FrontPushes;
+        }
     }
 
-    private initializeSubscribeProtocols() {
+    private initializeSubs() : FrontSubs{
         this.CONNECT_SUCCESS = this.subCreator(Protocol.CONNECT_SUCCESS(this.frontUid), this.frontUid);
         this.SEND_FRONT = this.subCreator(Protocol.SEND_FRONT(this.frontUid), this.frontUid);
         this.BROADCAST_MIRROR_FRONTS = this.subCreator(Protocol.BROADCAST_MIRROR_FRONTS(this.channelId), this.frontUid);
 
-        this.sub = {
+        return {
             CONNECT_SUCCESS: this.CONNECT_SUCCESS,
             SEND_FRONT: this.SEND_FRONT,
             BROADCAST_MIRROR_FRONTS: this.BROADCAST_MIRROR_FRONTS,
-        } as FrontSubs
+        }
     }
 }
