@@ -16,7 +16,7 @@ enum MSG_CODES {
     SEND_FRONT,
     SET_STATE,
     PATCH_STATE,
-};
+}
 
 export type PublishProtocol = any;
 export type PushProtocol = any;
@@ -77,7 +77,6 @@ export abstract class MessageFactory {
     public abstract SEND_BACK: PushProtocol | SubscribeProtocol;
     public abstract DISCONNECT: PushProtocol | SubscribeProtocol;
 
-
     // BACK -> FRONT
     public abstract CONNECT_SUCCESS: PublishProtocol | SubscribeProtocol;
     public abstract CONNECT_FAILED: PublishProtocol | SubscribeProtocol;
@@ -99,6 +98,7 @@ export abstract class MessageFactory {
 
     protected pubCreator(protocol) {
         let pub: any = {};
+
         pub = (function (...args) {
             if (pub.publisher) {
                 pub.publisher(...args);
@@ -106,6 +106,7 @@ export abstract class MessageFactory {
                 throw new Error('Unitialized');
             }
         });
+
         pub.register = () => {
             pub.publisher = this.centrum.getOrCreatePublish(protocol);
 
@@ -113,6 +114,7 @@ export abstract class MessageFactory {
                 this.centrum.removePublish(protocol);
             };
         };
+
         return pub;
     }
 
@@ -123,6 +125,7 @@ export abstract class MessageFactory {
      */
     protected pushCreator(protocolFactory: Function) {
         let push: any = {};
+
         push = (function (to, ...args) {
             if (push[to]) {
                 push[to](to, ...args);
@@ -130,6 +133,7 @@ export abstract class MessageFactory {
                 throw new Error('Unitialized');
             }
         });
+
         push.register = (to, ...args) => {
             push[to] = this.centrum.getOrCreatePublish(protocolFactory(to), ...args);
 
@@ -138,6 +142,7 @@ export abstract class MessageFactory {
                 delete push[to];
             };
         };
+
         return push;
     }
 

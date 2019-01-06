@@ -12,6 +12,7 @@ enum CONNECTION_STATUS {
     CONNECTING = 'CONNECTING',
     CONNECTED = 'CONNECTED',
 }
+
 enum CONNECTION_CHANGE {
     CONNECTED = CONNECTION_STATUS.CONNECTED,
     DISCONNECTED = CONNECTION_CHANGE.DISCONNECTED,
@@ -168,7 +169,6 @@ export class FrontChannel extends Channel {
      */
     public async disconnect(channelIds?: Array<string>, timeout=15000) {
         const awaitingChannelIds =  new Set(channelIds) || this.connectedChannelIds;
-        const disconnectionsLength = awaitingChannelIds.size;
         return new Promise((resolve, reject) => {
 
             const validated = this.validateConnectAction(CONNECTION_STATUS.DISCONNECTING);

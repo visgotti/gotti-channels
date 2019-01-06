@@ -1,9 +1,7 @@
 const EventEmitter = require('events');
 
 import { State, StateData } from '../types';
-import { PublishProtocol, SubscribeProtocol, PushProtocol } from './MessageFactory';
 import { Centrum } from '../../../lib/Centrum';
-
 
 export class Channel extends EventEmitter{
     readonly channelId: string;

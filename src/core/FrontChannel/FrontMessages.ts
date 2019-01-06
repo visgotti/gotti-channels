@@ -1,7 +1,6 @@
 import { Protocol, PublishProtocol, SubscribeProtocol, PushProtocol, PullProtocol, MessageFactory } from '../Channel/MessageFactory'
 import { FrontChannel } from './FrontChannel';
 
-
 export interface FrontPubs {
     CONNECT: PublishProtocol,
     SEND_QUEUED: PublishProtocol,
@@ -19,8 +18,7 @@ export interface FrontPushes {
     DISCONNECT: PushProtocol,
 }
 
-export interface FrontPulls {
-}
+export interface FrontPulls {}
 
 export class FrontMessages extends MessageFactory {
     public SEND_QUEUED: PublishProtocol;
