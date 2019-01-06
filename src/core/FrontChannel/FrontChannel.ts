@@ -293,7 +293,7 @@ export class FrontChannel extends Channel {
     /**
      * initializes needed message factories for front channels.
      */
-    initializeMessageFactories() {
+    private initializeMessageFactories() {
         const { pub, push, sub } = new FrontMessages(this.centrum, this);
         this.pub = pub;
         this.push = push;
