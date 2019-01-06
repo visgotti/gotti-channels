@@ -85,7 +85,7 @@ export abstract class ChannelMessages {
         this.centrum = centrum;
     }
 
-    protected pubCreator(createHandler?, removeHandler?) {
+    protected pubCreator(protocol) {
         let pub: any = {};
         pub = (function (...args) {
             if (pub.publisher) {
@@ -94,25 +94,18 @@ export abstract class ChannelMessages {
                 throw new Error('Unitialized');
             }
         });
-        pub.createPublish = (protocol, ...args) => {
-            pub.publisher = this.centrum.getOrCreatePublish(protocol, ...args);
+        pub.createPub = () => {
+            pub.publisher = this.centrum.getOrCreatePublish(protocol);
 
-            if (createHandler) {
-                createHandler(...args);
-            }
-
-            pub.removePublish = (...args) => {
+            pub.removePub = (...args) => {
                 this.centrum.removePublish(protocol);
-                if (removeHandler) {
-                    removeHandler(...args);
-                }
             };
         };
 
         return pub;
     }
 
-    protected multiPubCreator() {
+    protected multiPubCreator(protocolFactory: Function) {
         let pub: any = {};
         pub = (function (to, ...args) {
             if (pub[to]) {
@@ -121,31 +114,30 @@ export abstract class ChannelMessages {
                 throw new Error('Unitialized');
             }
         });
-        pub.createMultiPublish = (protocol, to, ...args) => {
-            pub[to] = this.centrum.getOrCreatePublish(protocol, ...args);
+        pub.createMultiPub = (to, ...args) => {
+            pub[to] = this.centrum.getOrCreatePublish(protocolFactory(to), ...args);
 
-            pub.removePublish = () => {
-                this.centrum.removePublish(protocol);
+            pub.removePub = () => {
+                this.centrum.removePublish(protocolFactory(to));
                 delete pub[to];
             };
         };
-
         return pub;
     }
 
-    protected subCreator(id) {
+    protected subCreator(protocol, id) {
         let sub: any = {};
-        sub.createSubscribe = (protocol, onSubscriptionHandler: SubscriptionHandler) => {
+        sub.createSub = (onSubscriptionHandler: SubscriptionHandler) => {
             sub.subscriber = this.centrum.createOrAddSubscription(protocol, id, onSubscriptionHandler);
             sub.removeSubscribe = () => {
                 this.centrum.removeSubscriptionById(protocol, id);
             };
         };
-        sub.createSubscribeOnce = (protocol, onSubscriptionHandler: SubscriptionHandler) => {
-            if(!(this.centrum.subscriptions[protocol()])) {
+        sub.createSub = (onSubscriptionHandler: SubscriptionHandler) => {
+            if(!(this.centrum.subscriptions[protocol])) {
                 sub.subscriber = this.centrum.createSubscription(protocol, id, onSubscriptionHandler)
             }
-            sub.removeSubscribe = () => {
+            sub.removeSub = () => {
                 this.centrum.removeSubscriptionById(protocol, id);
             };
         };

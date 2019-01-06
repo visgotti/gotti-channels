@@ -7,14 +7,13 @@ type onConnectedCallback = (channelId: string) => void;
 
 export class FrontMessages extends ChannelMessages {
     public SEND_QUEUED: PublishProtocol;
-    public CONNECT: any;
+    public CONNECT: PublishProtocol;
     public BROADCAST_ALL_BACK: PublishProtocol;
     public SEND_BACK: PublishProtocol;
     public DISCONNECT: PublishProtocol;
 
     public SEND_FRONT: SubscribeProtocol;
     public CONNECT_SUCCESS: SubscribeProtocol;
-
     public CONNECT_FAILED: SubscribeProtocol;
     public BROADCAST_MIRROR_FRONTS: SubscribeProtocol;
     public BROADCAST_ALL_FRONTS: SubscribeProtocol;
@@ -34,14 +33,16 @@ export class FrontMessages extends ChannelMessages {
     }
 
     private initializePublishProtocols() {
-        this.CONNECT = this.pubCreator();
-        this.SEND_QUEUED = this.pubCreator();
-        this.BROADCAST_ALL_BACK = this.pubCreator();
-        this.SEND_BACK = this.multiPubCreator();
+        this.CONNECT = this.pubCreator(Protocol.CONNECT());
+        this.SEND_QUEUED = this.pubCreator(Protocol.SEND_QUEUED(this.frontUid));
+        this.BROADCAST_ALL_BACK = this.pubCreator(Protocol.BROADCAST_ALL_BACK());
+        this.SEND_BACK = this.multiPubCreator(Protocol.SEND_BACK);
         this.DISCONNECT = {};
     }
 
     private initializeSubscribeProtocols() {
-        this.CONNECT_SUCCESS = this.subCreator(this.frontUid);
+        this.CONNECT_SUCCESS = this.subCreator(Protocol.CONNECT_SUCCESS(this.frontUid), this.frontUid);
+        this.SEND_FRONT = this.subCreator(Protocol.SEND_FRONT(this.frontUid), this.frontUid);
     }
+
 }

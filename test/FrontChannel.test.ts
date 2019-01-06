@@ -106,7 +106,7 @@ describe('FrontChannel', function() {
 
     describe('frontChannel.connect', () => {
         let connections = 0;
-        it.only('tests asynchronous connection of 1 channel', (done) => {
+        it('tests asynchronous connection of 1 channel', (done) => {
             frontChannels[0].connect().then(connected => {
                 connections += connected.size;
                 assert.strictEqual(connected.size, options.TOTAL_CHANNELS);
@@ -114,7 +114,7 @@ describe('FrontChannel', function() {
             });
         });
 
-        it.only('tests asynchronous connection of the rest of the channels', (done) => {
+        it('tests asynchronous connection of the rest of the channels', (done) => {
             for(let i = 1; i < frontChannels.length; i++) {
                 frontChannels[i].connect().then(connected => {
                     connections+=connected.size;
@@ -153,14 +153,14 @@ describe('FrontChannel', function() {
         });
     });
     describe('frontChannel.addMessage', () => {
-        it.only('correctly adds message to queue', (done) => {
+        it('correctly adds message to queue', (done) => {
             assert.strictEqual(frontChannels[0].addMessage({"foo": "bar"}), 1);
             frontChannels[0].clearQueued();
             done();
         });
     });
     describe('frontChannel.sendQueued', () => {
-        it.only('All front channels correctly send all queued messages to back mirror channel', (done) => {
+        it('All front channels correctly send all queued messages to back mirror channel', (done) => {
             const STATIC_TEST_MESSAGES = [{"foo": "bar"}, {"baz": "foo"}, {"bar": "baz"}];
 
             let byteSizes = [];
@@ -281,7 +281,7 @@ describe('FrontChannel', function() {
     });
 
     describe('frontChannel.send', () => {
-        it.only('sends to mirrored back channel when no backChannelId is passed in as a param', (done) => {
+        it('sends to mirrored back channel when no backChannelId is passed in as a param', (done) => {
             const CHANNELS_COUNT = 10;
 
             let expectedTotalReceived = 0;
@@ -395,7 +395,7 @@ describe('FrontChannel', function() {
             })
         }).timeout(100000);
 
-        it.only('sends to correct back channel when backChannelId is specified', (done) => {
+        it('sends to correct back channel when backChannelId is specified', (done) => {
             let randomChannels = getRandomChannelIds(channelsById, 2);
 
             let expectedReceived = 0;
@@ -465,7 +465,7 @@ describe('FrontChannel', function() {
         })
     });
     describe('frontChannel.broadcast', () => {
-        it.only('sends to all back channels if no backChannelIds were passed in as second param', (done) => {
+        it('sends to all back channels if no backChannelIds were passed in as second param', (done) => {
             let expectedReceived = options.TOTAL_CHANNELS;
             let actualReceived = 0;
             const randomMessage = messageFactory(1, 1)[0];
@@ -484,7 +484,7 @@ describe('FrontChannel', function() {
             }
             frontChannels[0].broadcast(randomMessage);
         });
-        it.only('sends to all specified channels if backChannelIds were passed in as second param', (done) => {
+        it('sends to all specified channels if backChannelIds were passed in as second param', (done) => {
             const randomMessage = messageFactory(1, 1)[0];
 
             let backChannelIds = [backChannels[0].channelId, backChannels[3].channelId, backChannels[5].channelId];

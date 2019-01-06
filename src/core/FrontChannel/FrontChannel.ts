@@ -25,7 +25,7 @@ export class FrontChannel extends Channel {
     private connectedChannelIds: Set<string>;
     private _connectionInfo: any;
 
-    private messageHandlers: FrontMessages;
+    private frontMessages: FrontMessages;
 
     private queuedMessages: Array<any>;
 
@@ -51,7 +51,7 @@ export class FrontChannel extends Channel {
         this.frontServerIndex = frontServerIndex;
         this.totalChannels = totalChannels;
 
-        this.messageHandlers = new FrontMessages(centrum, this);
+        this.frontMessages = new FrontMessages(centrum, this);
 
         this.initializePreConnectedPubs();
         this.initializePreConnectSubs();
@@ -95,7 +95,7 @@ export class FrontChannel extends Channel {
      * used to publish all queued messages to mirror back channel queuedMessages is emptied when called.
      */
     public sendQueued() : void {
-        this.messageHandlers.SEND_QUEUED(this.queuedMessages);
+        this.frontMessages.SEND_QUEUED(this.queuedMessages);
         this.clearQueued();
     };
 
@@ -106,7 +106,7 @@ export class FrontChannel extends Channel {
      */
     public send(message: any, backChannelId=this.channelId) : void {
         let data = { message,  frontUid: this.frontUid };
-        this.messageHandlers.SEND_BACK[backChannelId](data);
+        this.frontMessages.SEND_BACK[backChannelId](data);
     }
 
     /**
@@ -123,7 +123,7 @@ export class FrontChannel extends Channel {
         // no backChannels were given so use broadcastAll handler/protocol
         } else {
             //this.broadcastAllHandler({ frontUid: this.frontUid, message });
-            this.messageHandlers.BROADCAST_ALL_BACK({ frontUid: this.frontUid, message  })
+            this.frontMessages.BROADCAST_ALL_BACK({ frontUid: this.frontUid, message  })
         }
     }
 
@@ -132,7 +132,7 @@ export class FrontChannel extends Channel {
      * when all replied the promise gets resolved and the connection timeout gets cleared.
      * @param timeout - time in milliseconds to wait for all back channels to reply before throwing an error.
      */
-    public async connect(timeout=5000) {
+    public async connect(timeout=15000) {
         return new Promise((resolve, reject) => {
 
             const validated = this.validateConnectAction(CONNECTION_STATUS.CONNECTING);
@@ -140,7 +140,7 @@ export class FrontChannel extends Channel {
                 reject(validated.error);
             }
 
-            this.messageHandlers.CONNECT({
+            this.frontMessages.CONNECT({
                 frontUid: this.frontUid,
                 frontServerIndex: this.frontServerIndex,
                 channelId: this.channelId
@@ -148,7 +148,7 @@ export class FrontChannel extends Channel {
 
             let connectionTimeout = setTimeout(() => {
                 reject(`Timed out waiting for ${(this.connectedChannelIds.size - this.totalChannels)} connections`);
-            }, 5000);
+            }, timeout);
 
             this.on('connected', (channelId) => {
                 this.connectedChannelIds.add(channelId);
@@ -168,7 +168,7 @@ export class FrontChannel extends Channel {
      * @param timeout - wait time to finish all disconnections before throwing error.
      * @returns {Promise<T>}
      */
-    public async disconnect(channelIds?: Array<string>, timeout=5000) {
+    public async disconnect(channelIds?: Array<string>, timeout=15000) {
         const awaitingChannelIds =  new Set(channelIds) || this.connectedChannelIds;
         const disconnectionsLength = awaitingChannelIds.size;
         return new Promise((resolve, reject) => {
@@ -181,7 +181,7 @@ export class FrontChannel extends Channel {
             this.on('disconnected', (channelId) => {
                 let disconnectionTimeout = setTimeout(() => {
                     reject(`Timed out waiting for ${(awaitingChannelIds.size)} disconnections`);
-                }, 5000);
+                }, timeout);
 
                 awaitingChannelIds.delete(channelId);
                 if (awaitingChannelIds.size === 0) {
@@ -247,38 +247,19 @@ export class FrontChannel extends Channel {
      */
     private initializePreConnectSubs() : void {
         //todo: create some sort of front SERVER class wrapper so we can optimaly handle backChannel -> front SERVER messages (things that not every channel need to handle)
-       // let handlerName = Protocol.SEND_FRONT_SERVER, this.frontServerIndex);
-
-        /*
-
-        if(!(this.centrum.subscriptions.has(handlerName))) {
-            this.centrum.createSubscription(handlerName, (data: BackToFrontMessage) => {
-                const { message, channelId } = data;
-                this._onMessage(message, channelId);
-            });
-        }
-        */
-
-     //   this.messageHandlers.SEND_FRONT.createSubscribe(this._onMessage);
-
-        /*
-        this.centrum.createSubscription(Protocol.SEND_FRONT(this.frontUid), (data: BackToFrontMessage) => {
-            const { message, channelId } = data;
-            this._onMessage(message, channelId);
+        this.frontMessages.SEND_FRONT.createSub(data => {
+            this._onMessage(data.message, data.channelId);
         });
-        */
 
-   //     this.messageHandlers.CONNECT_SUCCESS.createSubscribe(this.onConnected);
-
-        this.messageHandlers.CONNECT_SUCCESS.createSubscribe(Protocol.CONNECT_SUCCESS(this.frontUid), this.onConnected.bind(this));
+        this.frontMessages.CONNECT_SUCCESS.createSub(this.onConnected.bind(this));
     }
 
     /**
      * Publications we initialize before connections are made.
      */
     private initializePreConnectedPubs() : void {
-        this.messageHandlers.CONNECT.createPublish(Protocol.CONNECT());
-        this.messageHandlers.BROADCAST_ALL_BACK.createPublish(Protocol.BROADCAST_ALL_BACK());
+        this.frontMessages.CONNECT.createPub();
+        this.frontMessages.BROADCAST_ALL_BACK.createPub();
     }
 
     /**
@@ -311,13 +292,9 @@ export class FrontChannel extends Channel {
                 this._onMessage(data.message, data.channelId);
             });
             */
-
-            //register sendQueued
-           // this.sendQueuedHandler = this.centrum.createPublish(Protocol.SEND_QUEUED(this.frontUid));
-            this.messageHandlers.SEND_QUEUED.createPublish(Protocol.SEND_QUEUED(this.frontUid));
+            this.frontMessages.SEND_QUEUED.createPub();
         }
-
-        this.messageHandlers.SEND_BACK.createMultiPublish(Protocol.SEND_BACK(backChannelId), backChannelId);
+        this.frontMessages.SEND_BACK.createMultiPub(backChannelId);
 
         /*
         const disconnectHandler = this.centrum.getOrCreatePublish(Protocol.DISCONNECT(backChannelId), (fromFrontId, message) => {
@@ -352,7 +329,7 @@ export class FrontChannel extends Channel {
 
 
             //remove sendQueued
-            this.messageHandlers.SEND_QUEUED.removePublish();
+            this.frontMessages.SEND_QUEUED.removePublish();
         }
 
         // check to see if following publishers were already initialized for centrum instance.
