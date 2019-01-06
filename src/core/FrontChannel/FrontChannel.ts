@@ -269,91 +269,17 @@ export class FrontChannel extends Channel {
     private onConnected(backChannelId) {
         // channelId of connected backChannel was the same so register pub/subs meant for mirrored channels.
         if(backChannelId === this.channelId) {
-
-            /*
-            this.centrum.createOrAddSubscription(Protocol.PATCH_STATE(this.channelId), (patches: any) => {
-                this._onPatchState(patches);
-            });
-
-            this.centrum.createOrAddSubscription(Protocol.SET_STATE(this.channelId), (stateData: StateData) => {
-                this._onSetState(stateData);
-            });
-            */
-
-            // for when back broadcasts to all mirror fronts
-
-            /*
-            this.centrum.createOrAddSubscription(Protocol.BROADCAST_MIRROR_FRONTS(this.channelId), (message: any) => {
-                this._onMessage(message, this.channelId);
-            });
-
-            // for when back broadcasts to all channels
-            this.centrum.createOrAddSubscription(Protocol.BROADCAST_ALL_FRONTS(), (data: any) => {
+            this.frontMessages.BROADCAST_MIRROR_FRONTS.createSub(data => {
                 this._onMessage(data.message, data.channelId);
             });
-            */
             this.frontMessages.SEND_QUEUED.createPub();
         }
+
         this.frontMessages.SEND_BACK.createMultiPub(backChannelId);
-
-        /*
-        const disconnectHandler = this.centrum.getOrCreatePublish(Protocol.DISCONNECT(backChannelId), (fromFrontId, message) => {
-            return {
-                frontUid: fromFrontId,
-                message,
-            }
-        });
-        */
+        //this.frontMessages.DISCONNECT.createPub();
 
         this.emit('connected', backChannelId);
     }
 
-    /*
-    private onDisconnected(backChannelId) {
-        // channelId of connected backChannel was the same so register pub/subs meant for mirrored channels.
-        if(backChannelId === this.channelId) {
-
-            this.centrum.removeSubscriptions(Protocol.PATCH_STATE(this.channelId));
-            this.centrum.removeSubscriptions(Protocol.SET_STATE(this.channelId));
-
-
-            // for when back broadcasts to all mirror fronts
-            this.centrum.removeAllSubscriptions(Protocol.BROADCAST_MIRROR_FRONTS(this.channelId), (message: any) => {
-                this._onMessage(message, this.channelId);
-            });
-
-            // for when back broadcasts to all channels
-            this.centrum.removeSubscription(Protocol.BROADCAST_ALL_FRONTS(), (data: any) => {
-                this._onMessage(data.message, data.channelId);
-            });
-
-
-            //remove sendQueued
-            this.frontMessages.SEND_QUEUED.removePublish();
-        }
-
-        // check to see if following publishers were already initialized for centrum instance.
-        const sendHandler = this.centrum.getOrCreatePublish(Protocol.SEND_BACK(backChannelId), (fromFrontId, message) => {
-            return {
-                frontUid: fromFrontId,
-                message,
-            }
-        });
-
-        const disconnectHandler = this.centrum.getOrCreatePublish(Protocol.DISCONNECT(backChannelId), (fromFrontId, message) => {
-            return {
-                frontUid: fromFrontId,
-                message,
-            }
-        });
-
-        //TODO see if i can bind these uniquely with this.frontUid as first param
-        this.channelMessageHandlers.set(backChannelId, {
-            'send': sendHandler,
-            'disconnect': disconnectHandler
-        });
-
-        this.emit('connected', backChannelId);
-    }
-    */
+    private onDisconnected(backChannelId) {}
 }

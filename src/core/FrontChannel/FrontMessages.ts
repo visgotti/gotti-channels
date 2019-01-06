@@ -1,9 +1,5 @@
 import { Protocol, PublishProtocol, SubscribeProtocol, ChannelMessages } from '../Channel/Messages'
-import { BackToFrontMessage } from '../types';
 import { FrontChannel } from './FrontChannel';
-
-type onMessageCallback = (message: any, channelId: string) => void;
-type onConnectedCallback = (channelId: string) => void;
 
 export class FrontMessages extends ChannelMessages {
     public SEND_QUEUED: PublishProtocol;
@@ -43,6 +39,6 @@ export class FrontMessages extends ChannelMessages {
     private initializeSubscribeProtocols() {
         this.CONNECT_SUCCESS = this.subCreator(Protocol.CONNECT_SUCCESS(this.frontUid), this.frontUid);
         this.SEND_FRONT = this.subCreator(Protocol.SEND_FRONT(this.frontUid), this.frontUid);
+        this.BROADCAST_MIRROR_FRONTS = this.subCreator(Protocol.BROADCAST_MIRROR_FRONTS(this.channelId), this.frontUid);
     }
-
 }
