@@ -1,19 +1,14 @@
-import { StateData } from '../types';
-export declare enum ChannelType {
-    BACK = "BACK",
-    FRONT = "TYPE"
+declare const EventEmitter: any;
+import { State, StateData } from '../types';
+import { Centrum } from '../../../lib/Centrum';
+export declare class Channel extends EventEmitter {
+    readonly channelId: string;
+    protected centrum: Centrum;
+    private _state;
+    constructor(channelId: any, centrum: any);
+    readonly state: State;
+    protected _setState(newState: StateData): void;
+    protected patchState(patches: any): StateData;
+    close(): void;
 }
-export declare class Channel {
-    broadcastState: Function;
-    private state;
-    private centrum;
-    readonly publishStateFunctionName: string;
-    readonly subscribeStateName: string;
-    readonly id: string;
-    constructor(id: any, centrum: any, channelType: ChannelType);
-    private initializeCentrumMessengers;
-    protected _onStateUpdate(stateData: StateData): void;
-    setState(newState: StateData, key?: string): void;
-    removeState(key: string): void;
-    getState(): StateData;
-}
+export {};

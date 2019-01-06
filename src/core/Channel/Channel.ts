@@ -1,63 +1,40 @@
-import { ChannelState } from './ChannelState';
-import { StateData, StateDatum } from '../types';
+const EventEmitter = require('events');
+
+import { State, StateData } from '../types';
 import { Centrum } from '../../../lib/Centrum';
 
-export enum ChannelType {
-    BACK = "BACK",
-    FRONT = "TYPE"
-}
 
-export class Channel {
+export class Channel extends EventEmitter{
+    readonly channelId: string;
+    readonly serverId: string;
     protected centrum: Centrum;
 
-    protected _setState: Function;
-    protected _updateState: Function;
-    protected _removeState: Function;
+    private _state: State;
 
-    private channelState: ChannelState;
-    readonly channelType: ChannelType;
-    readonly publishStateFunctionName: string;
-    readonly subscribeStateName: string;
-    readonly id: string;
-
-    constructor(id, centrum, channelType: ChannelType) {
-        this.id = id;
+    constructor(channelId, centrum) {
+        super();
+        this.channelId = channelId;
         this.centrum = centrum;
-        this.channelType === channelType;
-
-        // depending on the type of channel it is, these will be inversed.
-        // we want to subscribe to front if back, and subscribe to back if we're front.
-        this.publishStateFunctionName = channelType === ChannelType.BACK ?
-                                        ChannelType.BACK + this.id :
-                                        ChannelType.FRONT + this.id;
-
-        this.subscribeStateName = channelType === ChannelType.BACK ?
-                                        ChannelType.FRONT + this.id :
-                                        ChannelType.BACK + this.id;
-
-        this.channelState = new ChannelState();
-
-        // inherit all methods from state and make sure they stay bound to state object.
-        this._setState = this.channelState.setState.bind(this.channelState);
-        this._updateState = this.channelState.updateState.bind(this.channelState);
-        this._removeState = this.channelState.removeState.bind(this.channelState);
+        this.serverId = centrum.serverId;
+        this._state = {
+            data: {} as StateData,
+        };
     }
 
-    protected getState() {
-        return this.channelState.state;
+    get state () : State {
+        return this._state;
     }
 
-    protected getStateData() {
-        const state = this.getState();
-        return state.data;
+    protected _setState (newState: StateData) {
+        this._state.data = newState;
     }
 
-    protected _onStateUpdate(stateData: StateData, removedStates?: Array<string>): void {
-        throw new Error(`Unimplemented onStateUpdate handler in channel`);
+    protected patchState(patches) : StateData {
+        //this.channelState.patchState(patches);
+        return this._state.data;
     }
 
     public close() {
         this.centrum.close();
     }
-
 }
