@@ -97,18 +97,16 @@ describe('BackChannel', function() {
             }, []);
 
             frontChannels.forEach(frontChannel => {
-                if(randomUids.indexOf(frontChannel.frontUid) > -1) {
-                    frontChannel.onMessage((message, channelId) => {
-                        actualReceived += message;
-                        assert.strictEqual(channelId, backChannels[0].channelId);
-                        if(actualReceived === randomUids.length) {
-                            setTimeout(() => {
-                                assert.strictEqual(actualReceived, randomUids.length);
-                                done();
-                            }, 50)
-                        }
-                    });
-                }
+                frontChannel.onMessage((message, channelId) => {
+                    actualReceived += message;
+                    assert.strictEqual(channelId, backChannels[0].channelId);
+                    if(actualReceived === randomUids.length) {
+                        setTimeout(() => {
+                            assert.strictEqual(actualReceived, randomUids.length);
+                            done();
+                        }, 50)
+                    }
+                });
             });
 
             backChannels[0].broadcast(1, randomUids);
