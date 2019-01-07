@@ -9,8 +9,7 @@ enum MSG_CODES {
     BROADCAST_ALL_BACK,
 
     // BACK -> FRONT
-    CONNECT_SUCCESS,
-    CONNECT_FAILED,
+    CONNECTION_CHANGE,
     BROADCAST_MIRROR_FRONTS,
     BROADCAST_ALL_FRONTS,
     SEND_FRONT,
@@ -33,11 +32,10 @@ export class Protocol {
 
     // FRONT -> BACKS
     static CONNECT() : string  { return Protocol.make(MSG_CODES.CONNECT) };
+    static DISCONNECT() : string  { return Protocol.make(MSG_CODES.DISCONNECT) };
     static BROADCAST_ALL_BACK() : string  { return Protocol.make(MSG_CODES.BROADCAST_ALL_BACK) };
     static SEND_QUEUED(frontUid) : string  { return Protocol.make(MSG_CODES.SEND_QUEUED, frontUid) };
 
-    // FRONT -> BACK
-    static DISCONNECT(backChannelId) : string  { return Protocol.make(MSG_CODES.DISCONNECT, backChannelId) };
     static SEND_BACK(backChannelId) : string  { return Protocol.make(MSG_CODES.SEND_BACK, backChannelId) };
 
     // BACK -> FRONTS
@@ -47,8 +45,7 @@ export class Protocol {
     static BROADCAST_ALL_FRONTS() : string  { return Protocol.make(MSG_CODES.BROADCAST_ALL_FRONTS) };
 
     // BACK -> FRONT
-    static CONNECT_SUCCESS(frontUid) : string { return Protocol.make(MSG_CODES.CONNECT_SUCCESS, frontUid) };
-    static CONNECT_FAILED(frontUid) : string { return Protocol.make(MSG_CODES.CONNECT_FAILED, frontUid) };
+    static CONNECTION_CHANGE(frontUid) : string { return Protocol.make(MSG_CODES.CONNECTION_CHANGE, frontUid) };
     static SEND_FRONT(frontUid) : string  { return Protocol.make(MSG_CODES.SEND_FRONT, frontUid) };
     /**
      * returns concatenated protocol code if id is provided
@@ -78,8 +75,7 @@ export abstract class MessageFactory {
     public abstract DISCONNECT: PushProtocol | SubscribeProtocol;
 
     // BACK -> FRONT
-    public abstract CONNECT_SUCCESS: PublishProtocol | SubscribeProtocol;
-    public abstract CONNECT_FAILED: PublishProtocol | SubscribeProtocol;
+    public abstract CONNECTION_CHANGE: PushProtocol | SubscribeProtocol;
     public abstract BROADCAST_MIRROR_FRONTS: PublishProtocol | SubscribeProtocol;
     public abstract BROADCAST_ALL_FRONTS: PublishProtocol | SubscribeProtocol;
     public abstract SEND_FRONT: PublishProtocol | SubscribeProtocol;
@@ -119,8 +115,9 @@ export abstract class MessageFactory {
     }
 
     /**
-     * push will use the same centrum publisher but since the recipients can change dynamically we want to be able to
-     * just give a 'to' parameter to create push and have the protocol factory create the message name for us.
+     * push will use the same centrum publisher so any registered subs will receive it but since the recipients
+     * can change dynamically we want to be able to just give a 'to' parameter to create push and have the protocol
+     * factory create the message name for us.
      * @param protocolFactory - Function used to create the publisher name based on the to parameter passed in.
      */
     protected pushCreator(protocolFactory: Function) {
@@ -166,19 +163,17 @@ export abstract class MessageFactory {
     }
 
     /**
-     * used for subscriptions with multiple handlers. (single channel listening for unique broadcast)
+     * used for subscriptions with only one handler. (single handler listening for unique broadcast)
      * @param protocol
      * @returns {any}
      */
-    protected pullCreator(protocol) {
+    protected pullCreator(protocolFactory: Function) {
         let pull: any = {};
 
-        pull.register = (onSubscriptionHandler: SubscriptionHandler) => {
-            if(!(this.centrum.subscriptions[protocol])) {
-                pull.subscriber = this.centrum.createSubscription(protocol, protocol, onSubscriptionHandler)
-            }
-            pull.unregister = () => {
-                this.centrum.removeAllSubscriptionsWithName(protocol);
+        pull.register = (from, onSubscriptionHandler: SubscriptionHandler) => {
+            pull.subscriber = this.centrum.createSubscription(protocolFactory(from), protocolFactory(from), onSubscriptionHandler);
+            pull.unregister = (from) => {
+                this.centrum.removeAllSubscriptionsWithName(protocolFactory(from));
             };
         };
         return pull;

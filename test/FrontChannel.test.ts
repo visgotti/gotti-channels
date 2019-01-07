@@ -1,11 +1,9 @@
 import {clearInterval} from "timers";
-const { Centrum } = require('../lib/Centrum.js');
 
-const { createChannels, makeRandomMessages, arrayAverage, getRandomChannelIds, formatBytes } = require('./testHelpers');
+import { ChannelCluster } from '../src/core/ChannelCluster';
 
-import { FrontChannel } from '../src/core/FrontChannel/FrontChannel';
-import { BackChannel } from '../src/core/BackChannel/BackChannel';
-
+const { TEST_CLUSTER_OPTIONS, makeRandomMessages, arrayAverage, getRandomChannelIds, formatBytes } = require('./testHelpers');
+const options = TEST_CLUSTER_OPTIONS;
 
 interface TestFrontMessage {
     message: any,
@@ -14,9 +12,6 @@ interface TestFrontMessage {
 
 import * as assert from 'assert';
 import * as mocha from 'mocha'
-import * as fs from 'fs';
-import * as path from 'path';
-
 
 const messageFactories = {
     xxsmall: ((minMessages, maxMessages) =>  (makeRandomMessages(minMessages, maxMessages, 1, 1, 1, 1, 1, 1))),
@@ -28,77 +23,22 @@ const messageFactories = {
 };
 
 const messageFactory = messageFactories.xsmall;
+let frontServers, frontChannels, backServers, backChannels, channelsById;
 
 describe('FrontChannel', function() {
-    const options = {
-        FRONT_SERVERS: 5,
-        BACK_SERVERS: 10,
-        TOTAL_CHANNELS: 150,
-        STARTING_BACK_PUB_PORT: 4000,
-        STARTING_FRONT_PUB_PORT: 5000,
-    };
 
-    const { frontServers, frontChannels, backServers, backChannels, channelsById } = createChannels(options);
+    let cluster: ChannelCluster;
 
-    before('Checks createChannels initialized properly channels properly', (done) => {
-        assert.strictEqual(frontServers.length, options.FRONT_SERVERS);
-        assert.strictEqual(backServers.length, options.BACK_SERVERS);
-
-        let frontServerChannelCountMap = new Map();
-        for(let i = 0; i < frontChannels.length; i++) {
-            if(!(frontServerChannelCountMap.has(frontChannels[i].serverId))) {
-                frontServerChannelCountMap.set(frontChannels[i].serverId, 0);
-            }
-            let count =frontServerChannelCountMap.get(frontChannels[i].serverId);
-            frontServerChannelCountMap.set(frontChannels[i].serverId, ++count);
-        }
-
-        const frontKeys = Array.from(frontServerChannelCountMap.keys());
-        assert.strictEqual(frontKeys.length, options.FRONT_SERVERS);
-        frontKeys.forEach(key => {
-            // each front server gets all channels.
-            assert.strictEqual(frontServerChannelCountMap.get(key), options.TOTAL_CHANNELS);
-        });
-
-        let backServerChannelCountMap = new Map();
-        for(let i = 0; i < backChannels.length; i++) {
-            if(!(backServerChannelCountMap.has(backChannels[i].serverId))) {
-                backServerChannelCountMap.set(backChannels[i].serverId, 0);
-            }
-            let count =backServerChannelCountMap.get(backChannels[i].serverId);
-            backServerChannelCountMap.set(backChannels[i].serverId, ++count);
-        }
-
-        const backKeys = Array.from(backServerChannelCountMap.keys());
-        assert.strictEqual(backKeys.length, options.BACK_SERVERS);
-        backKeys.forEach(key => {
-            // back channels should be dispersed evenly amongst servers.
-            assert.strictEqual(backServerChannelCountMap.get(key), options.TOTAL_CHANNELS / options.BACK_SERVERS);
-        });
-
-        for(let i = 0; i < frontChannels.length; i++) {
-            assert.strictEqual(frontChannels[i].channelId in channelsById, true);
-            // each front server should have one of each channel
-            assert.strictEqual(channelsById[frontChannels[i].channelId].fronts.length, options.FRONT_SERVERS);
-        }
-
-        for(let i = 0; i < backChannels.length; i++) {
-            assert.strictEqual(backChannels[i].channelId in channelsById, true);
-            assert.notDeepStrictEqual(channelsById[backChannels[i].channelId].back, null);
-        }
-
+    before('Creates Channel Cluster.', (done) => {
+        cluster = new ChannelCluster(options);
+        ({ frontServers, frontChannels, backServers, backChannels, channelsById } = cluster.createChannels());
         setTimeout(() => {
             done();
         }, 200);
     });
 
     after(done => {
-        for(let i = 0; i < frontServers.length; i++) {
-            frontServers[i].close();
-        }
-        for(let i = 0; i < backServers.length; i++) {
-            backServers[i].close();
-        }
+        cluster.closeAll();
         setTimeout(() => {
             done();
         }, 200);
@@ -109,20 +49,19 @@ describe('FrontChannel', function() {
         it('tests asynchronous connection of 1 channel', (done) => {
             frontChannels[0].connect().then(connected => {
                 connections += connected.size;
-                assert.strictEqual(connected.size, options.TOTAL_CHANNELS);
+                assert.strictEqual(connected.size, options.totalChannels);
                 done();
             });
         });
 
         it('tests asynchronous connection of the rest of the channels besides last one', (done) => {
-
             // all front channels besides the last one at the end of this test should be connected.
-            const expectedConnections = options.TOTAL_CHANNELS * (frontChannels.length - 1);
+            const expectedConnections = options.totalChannels * (frontChannels.length - 1);
 
             for(let i = 1; i < frontChannels.length - 1; i++) {
                 frontChannels[i].connect().then(connected => {
                     connections+=connected.size;
-                    assert.strictEqual(connected.size, options.TOTAL_CHANNELS);
+                    assert.strictEqual(connected.size, options.totalChannels);
                     if(connections === expectedConnections){
                         // reached total connections, wait a bit then check its still correct.
                         setTimeout(() => {
@@ -135,7 +74,7 @@ describe('FrontChannel', function() {
         }).timeout(100000)
     });
 
-    describe('frontChannel.onConnect', () => {
+    describe('frontChannel.onConnected', () => {
         it('tests handler gets called on successful connection', (done) => {
 
             // gets last unconnected front channel we didnt connect in previous tests
@@ -150,11 +89,11 @@ describe('FrontChannel', function() {
                 // should have been ran once for each back channel it connected to.'
                 // connections handled should match connected size
                 assert.strictEqual(connectionsHandled, connected.size);
-                assert.strictEqual(connectionsHandled, options.TOTAL_CHANNELS);
+                assert.strictEqual(connectionsHandled, options.totalChannels);
 
                 // just wait a bit and make sure no more handlers are triggered.
                 setTimeout(() => {
-                    assert.strictEqual(connectionsHandled, options.TOTAL_CHANNELS);
+                    assert.strictEqual(connectionsHandled, options.totalChannels);
                     done();
                 }, 50);
             });
@@ -496,7 +435,7 @@ describe('FrontChannel', function() {
     });
     describe('frontChannel.broadcast', () => {
         it('sends to all back channels if no backChannelIds were passed in as second param', (done) => {
-            let expectedReceived = options.TOTAL_CHANNELS;
+            let expectedReceived = options.totalChannels;
             let actualReceived = 0;
             const randomMessage = messageFactory(1, 1)[0];
 

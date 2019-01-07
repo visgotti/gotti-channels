@@ -1,4 +1,4 @@
-import { FrontChannel } from '../src/core/FrontChannel';
+import { FrontChannel } from './.';
 import { BackChannel } from '../src/core/BackChannel/BackChannel';
 import { Client } from '../src/core/Client';
 

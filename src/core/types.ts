@@ -18,6 +18,31 @@ export interface FrontToBackMessage {
     frontUid: string,
 }
 
+export interface ConnectedFrontData {
+    frontUid: string,
+    channelId: string,
+    serverIndex: number,
+    clientUids?: Set<string>,
+}
+
+export interface ConnectedClientData {
+    clientUid: string,
+    frontUid: string,
+    frontServerIndex: number,
+}
+
+export enum CONNECTION_STATUS {
+    DISCONNECTED = 'DISCONNECTED',
+    DISCONNECTING = 'DISCONNECTING',
+    CONNECTING = 'CONNECTING',
+    CONNECTED = 'CONNECTED',
+}
+
+export enum CONNECTION_CHANGE {
+    CONNECTED = CONNECTION_STATUS.CONNECTED,
+    DISCONNECTED = CONNECTION_CHANGE.DISCONNECTED,
+}
+
 export type FrontUid = string;
 export type FrontServerIndex = number;
 export type ChannelId = string;

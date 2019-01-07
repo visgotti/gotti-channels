@@ -2,23 +2,11 @@ import { Channel } from '../Channel/Channel';
 import { Centrum } from '../../../lib/Centrum';
 import { FrontMessages, FrontPubs, FrontSubs, FrontPushes } from './FrontMessages';
 
-import { StateData, BackToFrontMessage } from '../types';
+import { StateData, CONNECTION_STATUS, CONNECTION_CHANGE } from '../types';
 
 import {clearTimeout} from "timers";
 
-enum CONNECTION_STATUS {
-    DISCONNECTED = 'DISCONNECTED',
-    DISCONNECTING = 'DISCONNECTING',
-    CONNECTING = 'CONNECTING',
-    CONNECTED = 'CONNECTED',
-}
-
-enum CONNECTION_CHANGE {
-    CONNECTED = CONNECTION_STATUS.CONNECTED,
-    DISCONNECTED = CONNECTION_CHANGE.DISCONNECTED,
-}
-
-export class FrontChannel extends Channel {
+class FrontChannel extends Channel {
     private connectedChannelIds: Set<string>;
     private _connectionInfo: any;
 
@@ -30,14 +18,14 @@ export class FrontChannel extends Channel {
 
     private CONNECTION_STATUS: CONNECTION_STATUS;
 
-    // unique id to identify front channel based on channelId and frontServerIndex
+    // unique id to identify front channel based on channelId and serverIndex
     readonly frontUid : string;
     // index of server in cluster front channel lives on
-    readonly frontServerIndex: number;
+    readonly serverIndex: number;
     // count of total the front channel can be communicating with
     readonly totalChannels: number;
 
-    constructor(channelId, frontServerIndex, totalChannels, centrum: Centrum) {
+    constructor(channelId, serverIndex, totalChannels, centrum: Centrum) {
         super(channelId, centrum);
 
         this.CONNECTION_STATUS = CONNECTION_STATUS.DISCONNECTED;
@@ -47,8 +35,8 @@ export class FrontChannel extends Channel {
         this.queuedMessages = [];
 
         // front id is used for 1:1 back to front communication.
-        this.frontUid = `${channelId}-${frontServerIndex.toString()}`;
-        this.frontServerIndex = frontServerIndex;
+        this.frontUid = `${channelId}-${serverIndex.toString()}`;
+        this.serverIndex = serverIndex;
         this.totalChannels = totalChannels;
 
         this.initializeMessageFactories();
@@ -60,7 +48,7 @@ export class FrontChannel extends Channel {
      * sets the onConnectedHandler function
      * @param handler - function that gets executed when a channel succesfully connects to a backChannel.
      */
-    public onConnected(handler: (newState: StateData) => void) : void {
+    public onConnected(handler: (backChannelId, state?: StateData) => void) : void {
         this.onConnectedHandler = handler;
     };
 
@@ -149,7 +137,7 @@ export class FrontChannel extends Channel {
 
             this.pub.CONNECT({
                 frontUid: this.frontUid,
-                frontServerIndex: this.frontServerIndex,
+                serverIndex: this.serverIndex,
                 channelId: this.channelId
             });
 
@@ -224,11 +212,23 @@ export class FrontChannel extends Channel {
         throw new Error(`Unimplemented onMessageHandler in front channel ${this.channelId} Use frontChannel.onMessage to implement.`);
     }
 
+    private _onConnectionChange(backChannelId, change: CONNECTION_CHANGE, data?) {
+        if(change === CONNECTION_CHANGE.CONNECTED) {
+            this._onConnected(backChannelId, data);
+        } else if(change === CONNECTION_CHANGE.DISCONNECTED) {
+            this._onDisconnect(backChannelId, data);
+        } else {
+            throw new Error(`Unrecognized connection change value: ${change} from backChannel: ${backChannelId}`)
+        }
+    }
+
     /**
      * registers needed pub and subs when connected and runs handler passed into onConnected(optional)
+     * if its the same channelId
      * @param backChannelId
+     * @param state - if its the mirrored channelId, it will have the current state as well.
      */
-    private _onConnected(backChannelId) {
+    private _onConnected(backChannelId, state?: StateData) {
         // channelId of connected backChannel was the same so register pub/subs meant for mirrored channels.
         if(backChannelId === this.channelId) {
             this.sub.BROADCAST_MIRROR_FRONTS.register(data => {
@@ -236,16 +236,19 @@ export class FrontChannel extends Channel {
                 this._onMessage(data.message, data.channelId);
             });
             this.pub.SEND_QUEUED.register();
+
+            // this.setState(state)
         }
 
         this.push.SEND_BACK.register(backChannelId);
-        this.push.DISCONNECT.register(backChannelId);
+        this.pub.DISCONNECT.register(backChannelId);
 
-        this.onConnectedHandler(backChannelId);
+        this.onConnectedHandler(backChannelId, state);
 
         this.emit('connected', backChannelId);
     }
-    private onConnectedHandler(channelId) : void {};
+
+    private onConnectedHandler(backChannelId, state?: StateData) : void {};
 
     private onDisconnected(backChannelId) {
         // channelId of connected backChannel was the same so register pub/subs meant for mirrored channels.
@@ -254,7 +257,7 @@ export class FrontChannel extends Channel {
         //  this.sub.PATCH_STATE.remove();
         }
 
-        this.push.DISCONNECT.unregister();
+        this.pub.DISCONNECT.unregister();
         this.push.SEND_BACK.unregister();
     }
 
@@ -291,7 +294,14 @@ export class FrontChannel extends Channel {
             this._onMessage(data.message, data.channelId);
         });
 
-        this.sub.CONNECT_SUCCESS.register(this._onConnected.bind(this));
+        this.sub.CONNECTION_CHANGE.register(data => {
+            //todo: refactor to look cleaner for when I eventually pass in state.
+            this._onConnectionChange(data.channelId, data.connectionStatus);
+        });
+
+        this.sub.BROADCAST_ALL_FRONTS.register(data => {
+            this._onMessage(data.message, data.channelId)
+        })
     }
 
     /**
@@ -312,3 +322,5 @@ export class FrontChannel extends Channel {
         this.sub = sub;
     }
 }
+
+export default FrontChannel;
