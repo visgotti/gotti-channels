@@ -1,4 +1,4 @@
-import { FrontChannel } from './FrontChannel';
+import FrontChannel from './FrontChannel';
 export declare class Client {
     readonly uid: string;
     state: any;

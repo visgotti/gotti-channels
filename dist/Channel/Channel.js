@@ -6,6 +6,7 @@ class Channel extends EventEmitter {
         super();
         this.channelId = channelId;
         this.centrum = centrum;
+        this.serverId = centrum.serverId;
         this._state = {
             data: {},
         };

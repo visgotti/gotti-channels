@@ -2,23 +2,16 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="52f8aeae-be83-469f-bcb7-bd5cada003c1" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/core/BackChannel/index.ts" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/core/ChannelCluster.ts" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/core/FrontChannel/index.ts" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/BackChannel.test.ts" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/ChannelCluster.test.ts" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/test/Channel.old.ts" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/test/centrum.config.json" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dist/Channel/Channel.d.ts" afterPath="$PROJECT_DIR$/dist/Channel/Channel.d.ts" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dist/Channel/Channel.js" afterPath="$PROJECT_DIR$/dist/Channel/Channel.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dist/types.d.ts" afterPath="$PROJECT_DIR$/dist/types.d.ts" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dist/types.js" afterPath="$PROJECT_DIR$/dist/types.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/core/BackChannel/BackChannel.ts" afterPath="$PROJECT_DIR$/src/core/BackChannel/BackChannel.ts" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/core/BackChannel/BackMessages.ts" afterPath="$PROJECT_DIR$/src/core/BackChannel/BackMessages.ts" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/core/Channel/MessageFactory.ts" afterPath="$PROJECT_DIR$/src/core/Channel/MessageFactory.ts" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/core/Client.ts" afterPath="$PROJECT_DIR$/src/core/Client.ts" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/core/FrontChannel/FrontChannel.ts" afterPath="$PROJECT_DIR$/src/core/FrontChannel/FrontChannel.ts" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/core/FrontChannel/FrontMessages.ts" afterPath="$PROJECT_DIR$/src/core/FrontChannel/FrontMessages.ts" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/core/types.ts" afterPath="$PROJECT_DIR$/src/core/types.ts" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/Client.old.ts" afterPath="$PROJECT_DIR$/test/Client.old.ts" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/FrontChannel.test.ts" afterPath="$PROJECT_DIR$/test/FrontChannel.test.ts" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/testHelpers.ts" afterPath="$PROJECT_DIR$/test/testHelpers.ts" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/BackChannel.test.ts" afterPath="$PROJECT_DIR$/test/BackChannel.test.ts" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -32,50 +25,6 @@
   </component>
   <component name="CreatePatchCommitExecutor">
     <option name="PATCH_PATH" value="" />
-  </component>
-  <component name="DockManager">
-    <window id="1">
-      <content type="file-editors">
-        <state>
-          <leaf>
-            <file leaf-file-name="BackMessages.ts" pinned="false" current-in-tab="false">
-              <entry file="file://$PROJECT_DIR$/src/core/BackChannel/BackMessages.ts">
-                <provider selected="true" editor-type-id="text-editor">
-                  <state relative-caret-position="592">
-                    <caret line="94" column="26" lean-forward="false" selection-start-line="94" selection-start-column="26" selection-end-line="94" selection-end-column="26" />
-                    <folding>
-                      <element signature="e#0#132#0" expanded="true" />
-                    </folding>
-                  </state>
-                </provider>
-              </entry>
-            </file>
-            <file leaf-file-name="testHelpers.ts" pinned="false" current-in-tab="false">
-              <entry file="file://$PROJECT_DIR$/test/testHelpers.ts">
-                <provider selected="true" editor-type-id="text-editor">
-                  <state relative-caret-position="0">
-                    <caret line="0" column="33" lean-forward="false" selection-start-line="0" selection-start-column="13" selection-end-line="0" selection-end-column="33" />
-                    <folding />
-                  </state>
-                </provider>
-              </entry>
-            </file>
-            <file leaf-file-name="BackChannel.ts" pinned="false" current-in-tab="true">
-              <entry file="file://$PROJECT_DIR$/src/core/BackChannel/BackChannel.ts">
-                <provider selected="true" editor-type-id="text-editor">
-                  <state relative-caret-position="399">
-                    <caret line="171" column="120" lean-forward="false" selection-start-line="171" selection-start-column="120" selection-end-line="171" selection-end-column="120" />
-                    <folding>
-                      <element signature="e#0#47#0" expanded="true" />
-                    </folding>
-                  </state>
-                </provider>
-              </entry>
-            </file>
-          </leaf>
-        </state>
-      </content>
-    </window>
   </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FavoritesManager">
@@ -100,7 +49,7 @@
         <entry file="file://$PROJECT_DIR$/src/core/FrontChannel/FrontMessages.ts">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="45">
-              <caret line="3" column="28" lean-forward="true" selection-start-line="3" selection-start-column="28" selection-end-line="3" selection-end-column="28" />
+              <caret line="3" column="28" lean-forward="false" selection-start-line="3" selection-start-column="28" selection-end-line="3" selection-end-column="28" />
               <folding>
                 <element signature="e#0#132#0" expanded="true" />
               </folding>
@@ -120,23 +69,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Channel.ts" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/core/Channel/Channel.ts">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="180">
-              <caret line="12" column="37" lean-forward="true" selection-start-line="12" selection-start-column="37" selection-end-line="12" selection-end-column="37" />
-              <folding>
-                <element signature="e#41#85#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="types.ts" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/core/types.ts">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="465">
-              <caret line="31" column="1" lean-forward="true" selection-start-line="31" selection-start-column="1" selection-end-line="31" selection-end-column="1" />
+              <caret line="31" column="1" lean-forward="false" selection-start-line="31" selection-start-column="1" selection-end-line="31" selection-end-column="1" />
               <folding />
             </state>
           </provider>
@@ -146,17 +83,17 @@
         <entry file="file://$PROJECT_DIR$/src/core/Channel/MessageFactory.ts">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="375">
-              <caret line="25" column="0" lean-forward="true" selection-start-line="25" selection-start-column="0" selection-end-line="25" selection-end-column="0" />
+              <caret line="25" column="0" lean-forward="false" selection-start-line="25" selection-start-column="0" selection-end-line="25" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="BackChannel.test.ts" pinned="false" current-in-tab="true">
+      <file leaf-file-name="BackChannel.test.ts" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/test/BackChannel.test.ts">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="285">
-              <caret line="43" column="10" lean-forward="false" selection-start-line="43" selection-start-column="10" selection-end-line="43" selection-end-column="10" />
+            <state relative-caret-position="291">
+              <caret line="95" column="27" lean-forward="false" selection-start-line="95" selection-start-column="27" selection-end-line="95" selection-end-column="27" />
               <folding>
                 <element signature="e#0#37#0" expanded="true" />
                 <element signature="e#265#298#0" expanded="true" />
@@ -168,10 +105,22 @@
       <file leaf-file-name="FrontChannel.ts" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/core/FrontChannel/FrontChannel.ts">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="247">
-              <caret line="218" column="30" lean-forward="false" selection-start-line="218" selection-start-column="17" selection-end-line="218" selection-end-column="30" />
+            <state relative-caret-position="105">
+              <caret line="7" column="0" lean-forward="true" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
               <folding>
                 <element signature="e#0#45#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Client.ts" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/core/Client.ts">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="74">
+              <caret line="5" column="21" lean-forward="true" selection-start-line="5" selection-start-column="21" selection-end-line="5" selection-end-column="21" />
+              <folding>
+                <element signature="e#0#44#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -181,7 +130,7 @@
         <entry file="file://$PROJECT_DIR$/test/ChannelCluster.test.ts">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="623">
-              <caret line="85" column="11" lean-forward="true" selection-start-line="82" selection-start-column="5" selection-end-line="85" selection-end-column="11" />
+              <caret line="85" column="11" lean-forward="false" selection-start-line="82" selection-start-column="5" selection-end-line="85" selection-end-column="11" />
               <folding>
                 <element signature="e#228#261#0" expanded="true" />
               </folding>
@@ -206,12 +155,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>pull</find>
-      <find>Fac</find>
-      <find>channelId</find>
-      <find>this.centrum</find>
-      <find>CONNECT_SUCCESS</find>
-      <find>SEND_QUEUED</find>
       <find>sendPatched</find>
       <find>frontChannels</find>
       <find>backChannels</find>
@@ -222,7 +165,6 @@
       <find>serverIndex</find>
       <find>CONNECT</find>
       <find>frontServerLookup</find>
-      <find>Centrum</find>
       <find>ConnectedFront</find>
       <find>ConnectedFrontData</find>
       <find>_connectedFrontUids</find>
@@ -230,19 +172,26 @@
       <find>new Centrum</find>
       <find>frontChannel</find>
       <find>connectedFrontUids</find>
-      <find>BROADCAST_ALL_FRONTS</find>
       <find>BROADCAST_ALL_</find>
       <find>_onConnectionChange</find>
       <find>connect</find>
       <find>_onConnected</find>
       <find>_onDisconnect</find>
+      <find>broadcastAll</find>
+      <find>clearTimeout</find>
+      <find>SEND_FRONT</find>
+      <find>B</find>
+      <find>onMirror</find>
+      <find>BROADCAST_ALL_FRONTS</find>
+      <find>Centrum</find>
+      <find>console.log</find>
     </findStrings>
     <replaceStrings>
       <replace>.register()</replace>
       <replace>frontServers</replace>
+      <replace>options.totalChannels</replace>
       <replace>.register</replace>
       <replace>backChannel</replace>
-      <replace>options.totalChannels</replace>
       <replace>serverIndex</replace>
     </replaceStrings>
   </component>
@@ -252,7 +201,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/core/Client.ts" />
         <option value="$PROJECT_DIR$/src/core/ChannelState.ts" />
         <option value="$PROJECT_DIR$/src/core/Channel.ts" />
         <option value="$PROJECT_DIR$/src/core/base/Client.ts" />
@@ -273,7 +221,6 @@
         <option value="$PROJECT_DIR$/test/Client.test.ts" />
         <option value="$PROJECT_DIR$/src/core/Client/Client.ts" />
         <option value="$PROJECT_DIR$/src/core/Channel/Messages.ts" />
-        <option value="$PROJECT_DIR$/src/core/BackChannel/BackMessages.ts" />
         <option value="$PROJECT_DIR$/src/core/Channel/MessageFactory.ts" />
         <option value="$PROJECT_DIR$/test/beforeTest.ts" />
         <option value="$PROJECT_DIR$/src/core/Cluster.ts" />
@@ -290,6 +237,8 @@
         <option value="$PROJECT_DIR$/src/core/BackChannel/BackChannel.ts" />
         <option value="$PROJECT_DIR$/src/core/FrontChannel/FrontChannel.ts" />
         <option value="$PROJECT_DIR$/test/BackChannel.test.ts" />
+        <option value="$PROJECT_DIR$/src/core/BackChannel/BackMessages.ts" />
+        <option value="$PROJECT_DIR$/src/core/Client.ts" />
       </list>
     </option>
   </component>
@@ -303,10 +252,10 @@
     <handled-path value="$PROJECT_DIR$/node_modules" />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="59" />
-    <option name="y" value="21" />
-    <option name="width" value="1541" />
-    <option name="height" value="879" />
+    <option name="x" value="1667" />
+    <option name="y" value="24" />
+    <option name="width" value="1533" />
+    <option name="height" value="876" />
   </component>
   <component name="ProjectView">
     <navigator currentView="ProjectPane" proportions="" version="1">
@@ -544,19 +493,19 @@
       <workItem from="1545927920273" duration="9248000" />
       <workItem from="1545946270945" duration="18159000" />
       <workItem from="1546026722068" duration="26023000" />
-      <workItem from="1546792735587" duration="24276000" />
+      <workItem from="1546792735587" duration="27043000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="77706000" />
+    <option name="totallyTimeSpent" value="80473000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="59" y="21" width="1541" height="879" extended-state="6" />
+    <frame x="1667" y="24" width="1533" height="876" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="TypeScript" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32711443" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22647631" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22765818" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
@@ -829,16 +778,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/core/Client.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="5" column="21" lean-forward="true" selection-start-line="5" selection-start-column="21" selection-end-line="5" selection-end-column="21" />
-          <folding>
-            <element signature="e#0#44#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/core/BackChannel/index.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -873,18 +812,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/testHelpers.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="33" lean-forward="false" selection-start-line="0" selection-start-column="13" selection-end-line="0" selection-end-column="33" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/core/Channel/MessageFactory.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="375">
-          <caret line="25" column="0" lean-forward="true" selection-start-line="25" selection-start-column="0" selection-end-line="25" selection-end-column="0" />
+          <caret line="25" column="0" lean-forward="false" selection-start-line="25" selection-start-column="0" selection-end-line="25" selection-end-column="0" />
           <folding />
         </state>
       </provider>
@@ -902,7 +833,7 @@
     <entry file="file://$PROJECT_DIR$/src/core/types.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="465">
-          <caret line="31" column="1" lean-forward="true" selection-start-line="31" selection-start-column="1" selection-end-line="31" selection-end-column="1" />
+          <caret line="31" column="1" lean-forward="false" selection-start-line="31" selection-start-column="1" selection-end-line="31" selection-end-column="1" />
           <folding />
         </state>
       </provider>
@@ -910,7 +841,7 @@
     <entry file="file://$PROJECT_DIR$/test/ChannelCluster.test.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="623">
-          <caret line="85" column="11" lean-forward="true" selection-start-line="82" selection-start-column="5" selection-end-line="85" selection-end-column="11" />
+          <caret line="85" column="11" lean-forward="false" selection-start-line="82" selection-start-column="5" selection-end-line="85" selection-end-column="11" />
           <folding>
             <element signature="e#228#261#0" expanded="true" />
           </folding>
@@ -928,26 +859,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/core/BackChannel/BackMessages.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="592">
-          <caret line="94" column="26" lean-forward="false" selection-start-line="94" selection-start-column="26" selection-end-line="94" selection-end-column="26" />
-          <folding>
-            <element signature="e#0#132#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/core/FrontChannel/FrontMessages.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="45">
-          <caret line="3" column="28" lean-forward="true" selection-start-line="3" selection-start-column="28" selection-end-line="3" selection-end-column="28" />
-          <folding>
-            <element signature="e#0#132#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/test/FrontChannel.test.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="540">
@@ -959,33 +870,71 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/core/FrontChannel/FrontChannel.ts">
+    <entry file="file://$PROJECT_DIR$/test/BackChannel.test.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="247">
-          <caret line="218" column="30" lean-forward="false" selection-start-line="218" selection-start-column="17" selection-end-line="218" selection-end-column="30" />
+        <state relative-caret-position="291">
+          <caret line="95" column="27" lean-forward="false" selection-start-line="95" selection-start-column="27" selection-end-line="95" selection-end-column="27" />
           <folding>
-            <element signature="e#0#45#0" expanded="true" />
+            <element signature="e#0#37#0" expanded="true" />
+            <element signature="e#265#298#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/core/FrontChannel/FrontMessages.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="45">
+          <caret line="3" column="28" lean-forward="false" selection-start-line="3" selection-start-column="28" selection-end-line="3" selection-end-column="28" />
+          <folding>
+            <element signature="e#0#132#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/core/BackChannel/BackMessages.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="210">
+          <caret line="14" column="1" lean-forward="true" selection-start-line="14" selection-start-column="1" selection-end-line="14" selection-end-column="1" />
+          <folding>
+            <element signature="e#0#132#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/testHelpers.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="33" lean-forward="false" selection-start-line="0" selection-start-column="13" selection-end-line="0" selection-end-column="33" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/core/BackChannel/BackChannel.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="399">
-          <caret line="171" column="120" lean-forward="false" selection-start-line="171" selection-start-column="120" selection-end-line="171" selection-end-column="120" />
+        <state relative-caret-position="120">
+          <caret line="8" column="26" lean-forward="true" selection-start-line="8" selection-start-column="26" selection-end-line="8" selection-end-column="26" />
           <folding>
             <element signature="e#0#47#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/BackChannel.test.ts">
+    <entry file="file://$PROJECT_DIR$/src/core/FrontChannel/FrontChannel.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="285">
-          <caret line="43" column="10" lean-forward="false" selection-start-line="43" selection-start-column="10" selection-end-line="43" selection-end-column="10" />
+        <state relative-caret-position="105">
+          <caret line="7" column="0" lean-forward="true" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
           <folding>
-            <element signature="e#0#37#0" expanded="true" />
-            <element signature="e#265#298#0" expanded="true" />
+            <element signature="e#0#45#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/core/Client.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="74">
+          <caret line="5" column="21" lean-forward="true" selection-start-line="5" selection-start-column="21" selection-end-line="5" selection-end-column="21" />
+          <folding>
+            <element signature="e#0#44#0" expanded="true" />
           </folding>
         </state>
       </provider>

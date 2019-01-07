@@ -34,7 +34,7 @@ describe('BackChannel', function() {
         }, 50);
     });
 
-    describe('backChannel getters should be accurate after connections', () => {
+    describe('backChannel getters', () => {
         it('backChannel.mirroredFrontUids has one for each front server made.', (done) => {
             backChannels.forEach(backChannel => {
                 assert.strictEqual(backChannel.mirroredFrontUids.length, options.frontServers)
@@ -65,7 +65,7 @@ describe('BackChannel', function() {
     });
 
     describe('backChannel.broadcast', () => {
-        it('sends to all front channels if no second parameter is passed in', (done) => {
+        it('sends to all front channels if no second parameter is passed in.', (done) => {
             let actualReceived = 0;
             // each front channel should get it
             const expectedReceived = frontChannels.length;
@@ -84,6 +84,57 @@ describe('BackChannel', function() {
             });
             backChannels[0].broadcast(1);
         });
+
+        it('only sends to front channels specified by uid as the second parameter.', (done) => {
+            let actualReceived = 0;
+
+            // get random front channels to send to.
+            const randomUids = frontChannels.reduce((uids, frontChannel) => {
+                if(Math.random() > .8) {
+                    uids.push(frontChannel.frontUid)
+                }
+                return uids
+            }, []);
+
+            frontChannels.forEach(frontChannel => {
+                if(randomUids.indexOf(frontChannel.frontUid) > -1) {
+                    frontChannel.onMessage((message, channelId) => {
+                        actualReceived += message;
+                        assert.strictEqual(channelId, backChannels[0].channelId);
+                        if(actualReceived === randomUids.length) {
+                            setTimeout(() => {
+                                assert.strictEqual(actualReceived, randomUids.length);
+                                done();
+                            }, 50)
+                        }
+                    });
+                }
+            });
+
+            backChannels[0].broadcast(1, randomUids);
+        });
+    });
+
+    describe('backChannel.broadcastMirrored', () => {
+        it('sends to all front channels with same channelId as back', (done) => {
+            let actualReceived = 0;
+            let expectedReceive = options.frontServers;
+
+            frontChannels.forEach(frontChannel => {
+                frontChannel.onMessage((message, channelId) => {
+                    assert.strictEqual(frontChannel.channelId, channelId);
+                    assert.strictEqual(frontChannel.channelId, backChannels[0].channelId);
+                    actualReceived+=message;
+                    if(actualReceived === expectedReceive) {
+                        setTimeout(() => {
+                            assert.strictEqual(actualReceived, expectedReceive);
+                            done();
+                        }, 50)
+                    }
+                });
+            });
+            backChannels[0].broadcastMirrored(1);
+        });
     });
 
     describe('backChannel.broadcastPatchedState', () => {
@@ -98,14 +149,4 @@ describe('BackChannel', function() {
         });
     });
 
-    describe('backChannel.send', () => {
-        it('sends to mirrored back channel when no backChannelId is passed in as a param', (done) => {
-            done();
-        })
-    });
-    describe('backChannel.broadcast', () => {
-        it('sends to all back channels if no backChannelIds were passed in as second param', (done) => {
-            done();
-        });
-    });
 });

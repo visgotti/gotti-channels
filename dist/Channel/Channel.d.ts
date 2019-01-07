@@ -3,6 +3,7 @@ import { State, StateData } from '../types';
 import { Centrum } from '../../../lib/Centrum';
 export declare class Channel extends EventEmitter {
     readonly channelId: string;
+    readonly serverId: string;
     protected centrum: Centrum;
     private _state;
     constructor(channelId: any, centrum: any);

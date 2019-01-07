@@ -1,5 +1,5 @@
 import { Protocol, PublishProtocol, SubscribeProtocol, PushProtocol, PullProtocol, MessageFactory } from '../Channel/MessageFactory'
-import { BackChannel } from './BackChannel';
+import BackChannel from './BackChannel';
 
 
 export interface BackPubs {

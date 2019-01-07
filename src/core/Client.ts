@@ -1,7 +1,7 @@
 import * as fossilDelta from 'fossil-delta';
 import * as msgpack from 'notepack.io';
 
-import { FrontChannel } from './FrontChannel';
+import FrontChannel from './FrontChannel';
 
 export class Client {
     readonly uid: string;
