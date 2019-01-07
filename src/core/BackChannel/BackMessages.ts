@@ -61,14 +61,14 @@ export class BackMessages extends MessageFactory {
 
     private initializePubs() : BackPubs {
         this.BROADCAST_MIRROR_FRONTS = this.pubCreator(Protocol.BROADCAST_MIRROR_FRONTS(this.channelId));
-        this.SET_STATE = this.pubCreator(Protocol.SET_STATE(this.channelId));
-        this.PATCH_STATE = this.pubCreator(Protocol.PATCH_STATE(this.channelId));
+        this.SET_STATE = this.pubCreator(Protocol.SET_STATE(this.channelId), 'NONE'); // encoding for states happen in the back channel business logic
+        this.PATCH_STATE = this.pubCreator(Protocol.PATCH_STATE(this.channelId), 'NONE');
         this.BROADCAST_ALL_FRONTS = this.pubCreator(Protocol.BROADCAST_ALL_FRONTS());
 
         return {
             BROADCAST_MIRROR_FRONTS: this.BROADCAST_MIRROR_FRONTS,
-            PATCH_STATE: this.SET_STATE,
-            SET_STATE: this.PATCH_STATE,
+            PATCH_STATE: this.PATCH_STATE,
+            SET_STATE: this.SET_STATE,
             BROADCAST_ALL_FRONTS: this.BROADCAST_ALL_FRONTS,
         }
     }

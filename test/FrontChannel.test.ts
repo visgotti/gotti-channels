@@ -1,4 +1,6 @@
 import {clearInterval} from "timers";
+import * as fossilDelta from 'fossil-delta';
+import * as msgpack from 'notepack.io';
 
 import { ChannelCluster } from '../src/core/ChannelCluster';
 
@@ -11,11 +13,11 @@ interface TestFrontMessage {
 }
 
 import * as assert from 'assert';
-import * as mocha from 'mocha'
+import * as mocha from 'mocha';
 
 const messageFactories = {
     xxsmall: ((minMessages, maxMessages) =>  (makeRandomMessages(minMessages, maxMessages, 1, 1, 1, 1, 1, 1))),
-    xsmall: ((minMessages, maxMessages) =>  (makeRandomMessages(minMessages, maxMessages, 5, 10, 5, 10, 20, 50))),
+    xsmall: ((minMessages, maxMessages) =>  (makeRandomMessages(minMessages, maxMessages, 3, 5, 5, 10, 15, 25))),
     small: ((minMessages, maxMessages) =>  (makeRandomMessages(minMessages, maxMessages, 15, 50, 10, 30, 100, 300))),
     medium: ((minMessages, maxMessages) =>  makeRandomMessages(minMessages, maxMessages, 30, 70, 10, 30, 200, 500)),
     large: ((minMessages, maxMessages) =>  makeRandomMessages(minMessages, maxMessages, 40, 80, 10, 30, 300, 800)),
@@ -107,15 +109,41 @@ describe('FrontChannel', function() {
         })
     });
     describe('frontChannel.onSetState', () => {
-        it('correctly handles set state from back channel', (done) => {
-            done();
+        it('correctly receives and handles state sent from back channel', (done) => {
+            const state = { "foo": "bar" };
+
+            frontChannels[0].onSetState(newState => {
+                let decoded = msgpack.decode(newState);
+                assert.deepStrictEqual(decoded, state);
+                done();
+            });
+
+            backChannels[0].setState(state);
+            backChannels[0].broadcastState();
         });
     });
+
     describe('frontChannel.onPatchState', () => {
-        it('correctly handles patched state from back channel', (done) => {
-            done();
+        it('correctly receives and handles state patches from back channel', (done) => {
+            const state = { "foo": "bar" };
+
+            let _oldState = msgpack.encode(state);
+
+            frontChannels[0].onPatchState(patches => {
+                const binaryPatch = msgpack.decode(patches);
+                assert.strictEqual(patches.length > 0, true);
+                _oldState = Buffer.from(fossilDelta.apply(_oldState, binaryPatch));
+                const newState = msgpack.decode(_oldState);
+                assert.deepStrictEqual(newState, backChannels[0].state);
+                done();
+            });
+
+            backChannels[0].setState(state);
+            backChannels[0].state.foo = 'baz';
+            backChannels[0].broadcastPatch();
         });
     });
+
     describe('frontChannel.onMessage', () => {
         it('correctly handles message from back channel', (done) => {
             done();

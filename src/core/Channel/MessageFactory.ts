@@ -1,4 +1,4 @@
-import { Centrum } from '../../../lib/Centrum';
+import { Centrum } from '../../../lib/core/Centrum';
 
 enum MSG_CODES {
     // FRONT -> BACK
@@ -92,7 +92,7 @@ export abstract class MessageFactory {
         this.centrum = centrum;
     }
 
-    protected pubCreator(protocol) {
+    protected pubCreator(protocol, encoder?) {
         let pub: any = {};
 
         pub = (function (...args) {
@@ -104,7 +104,7 @@ export abstract class MessageFactory {
         });
 
         pub.register = () => {
-            pub.publisher = this.centrum.getOrCreatePublish(protocol);
+            pub.publisher = this.centrum.getOrCreatePublish(protocol, null, encoder);
 
             pub.unregister = (...args) => {
                 this.centrum.removePublish(protocol);
@@ -149,11 +149,11 @@ export abstract class MessageFactory {
      * @param id
      * @returns {any}
      */
-    protected subCreator(protocol, id) {
+    protected subCreator(protocol, id, decoder?) {
         let sub: any = {};
 
         sub.register = (onSubscriptionHandler: SubscriptionHandler) => {
-            sub.subscriber = this.centrum.createOrAddSubscription(protocol, id, onSubscriptionHandler);
+            sub.subscriber = this.centrum.createOrAddSubscription(protocol, id, onSubscriptionHandler, decoder);
             sub.unregister = () => {
                 this.centrum.removeSubscriptionById(protocol, id);
             };

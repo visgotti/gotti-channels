@@ -1,4 +1,7 @@
-import { Centrum } from '../../../lib/Centrum';
+import * as fossilDelta from 'fossil-delta';
+import * as msgpack from 'notepack.io';
+
+import { Centrum } from '../../../lib/core/Centrum';
 
 import { Channel } from '../Channel/Channel';
 import { BackMessages, BackPubs, BackPushes, BackSubs, BackPulls } from './BackMessages';
@@ -15,6 +18,9 @@ class BackChannel extends Channel {
     private _connectedFrontsData: Map<string, ConnectedFrontData>;
     private _mirroredFrontUids: Set<string>;
 
+    public state: any;
+    private _previousState: any;
+    private _previousStateEncoded: string;
 
     // to be used when clients start interacting with channels.
     private _connectedClientsData: Map<string, ConnectedClientData>;
@@ -23,6 +29,9 @@ class BackChannel extends Channel {
 
     constructor(channelId, centrum: Centrum) {
         super(channelId, centrum);
+
+        this.state = null;
+        this._previousState = null;
 
         this._connectedFrontsData = new Map();
         this._mirroredFrontUids = new Set();
@@ -44,12 +53,33 @@ class BackChannel extends Channel {
         this.onMessageHandler = handler;
     }
 
-    public broadcastPatchedState() {
-       // this.sendPatchedStateHandler();
+    /**
+     * sends state patches to mirrored channels
+     * @returns {boolean}
+     */
+    public broadcastPatch() : boolean {
+        if(!(this.state)) { throw new Error ('null state')}
+
+        const currentState = this.state;
+        const currentStateEncoded = msgpack.encode(currentState);
+
+        if(currentStateEncoded.equals(this._previousStateEncoded)) {
+            return false;
+        }
+        const patches = fossilDelta.create(this._previousStateEncoded, currentStateEncoded);
+
+        this._previousStateEncoded = currentStateEncoded;
+
+        this.pub.PATCH_STATE(msgpack.encode(patches));
+        return true;
     };
 
-    public broadcastSetState(){
-       // this.sendSetStateHandler();
+    /**
+     * sends state to mirrored channels
+     */
+    public broadcastState(){
+        if(!(this.state)) { throw new Error ('null state')}
+        this.pub.SET_STATE(this._previousStateEncoded)
     };
 
     /**
@@ -89,6 +119,11 @@ class BackChannel extends Channel {
 
     public getFrontUidForClient(clientUid) : string {
         return this._connectedClientsData.get(clientUid).frontUid;
+    }
+
+    public setState(newState) {
+        this._previousStateEncoded = msgpack.encode(newState);
+        this.state = newState;
     }
 
     get connectedFrontsData() : Map<string, ConnectedFrontData> {
@@ -139,6 +174,8 @@ class BackChannel extends Channel {
         // handler that broadcasts instance already exists on centrum before creating it if its not the first backChannel instantiated
         this.pub.BROADCAST_ALL_FRONTS.register();
         this.pub.BROADCAST_MIRROR_FRONTS.register();
+        this.pub.PATCH_STATE.register();
+        this.pub.SET_STATE.register();
     }
 
     /**
@@ -149,9 +186,7 @@ class BackChannel extends Channel {
         const { channelId, frontUid, serverIndex } = frontData;
         if(channelId === this.channelId) {
             this.pull.SEND_QUEUED.register(frontUid, (messages => {
-                for(let i = 0; i < messages.length; i++) {
-                    this.onMessageHandler(messages[i], frontUid);
-                }
+                this.onMessageQueue(messages, frontUid);
             }));
 
             // add to mirror set since its same channelId

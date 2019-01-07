@@ -1,8 +1,10 @@
+import { SERIALIZER_TYPES } from '../Serializers';
 export declare type Hook = (...args: any[]) => any;
 export declare type Handler<T> = (data: any) => void;
 export interface SubscriptionHandler {
     (data: any): Handler<Function>;
     id: string;
+    decode?: Function;
 }
 export declare type Sequence = number;
 export interface REQUEST_MESSAGE {
@@ -99,15 +101,17 @@ export declare class Centrum {
      * @param name - name for publish method
      * @param beforeHook - hook that sends return value as message
      * @param afterHandler - hook used for cleanup after publishing a method, gets message sent as param.
+     * @param serializer - enum value that tells the publisher how to encode your message, look at SERIALIZER_TYPES for more info
      */
-    createPublish(name: string, beforeHook?: Hook, afterHandler?: Handler<Function>): Function;
+    createPublish(name: string, beforeHook?: Hook, serializer?: SERIALIZER_TYPES): Function;
     /**
      * does same thing as createPublish but if the publish name already exists it will return the handler.
      * @param name - name for publish method
      * @param beforeHook - hook that sends return value as message
      * @param afterHandler - hook used for cleanup after publishing a method, gets message sent as param.
+     * @param serializer - enum value that tells the publisher how to encode your message, look at SERIALIZER_TYPES for more info
      */
-    getOrCreatePublish(name: string, beforeHook?: Hook, afterHandler?: Handler<Function>): Function;
+    getOrCreatePublish(name: string, beforeHook?: Hook, serializer?: SERIALIZER_TYPES): Function;
     removePublish(name: any): void;
     removeAllPublish(): void;
     /**
@@ -115,17 +119,19 @@ export declare class Centrum {
      * @param name - name of publication to subscribe to.
      * @param id - identifier for handler to run on publication
      * @param handler - method that takes in publication data as parameter when received.
+     * @param serializer - enum value that tells the subscriber how to decode incoming message, look at SERIALIZER_TYPES for more info
      * @returns boolean - returns true if it was successful.
      */
-    createSubscription(name: string, id: string, handler: Handler<Function>): boolean;
+    createSubscription(name: string, id: string, handler: Handler<Function>, serializer?: SERIALIZER_TYPES): boolean;
     /**
      * creates a new subscription if it doesnt exist but if it does, instead of throwing an error it will add a new handler to be ran on the publication
      * @param name - name of publication to subscribe to.
      * @param id - identifier for handler to run on publication
      * @param handler - method that takes in publication data as parameter when received.
+     * @param serializer - enum value that tells the subscriber how to decode incoming message, look at SERIALIZER_TYPES for more info
      * @returns CREATED_OR_ADDED - enum value to signify if you created new subscription or added new handler to existing subscription.
      */
-    createOrAddSubscription(name: string, id: string, handler: Handler<Function>): CREATED_OR_ADDED;
+    createOrAddSubscription(name: string, id: string, handler: Handler<Function>, serializer?: SERIALIZER_TYPES): CREATED_OR_ADDED;
     /**
      * removes specific subscription by id
      * @param id - id of subscription that gets returned on creation.

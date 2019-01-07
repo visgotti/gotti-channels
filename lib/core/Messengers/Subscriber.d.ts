@@ -5,14 +5,7 @@ export declare class Subscriber {
     private handlerIdToNames;
     private idsAssigned;
     constructor(subSocket: any);
-    /**
-     * Used when adding a handler for incoming requests.
-     * @param name - name linked to the handler.
-     * @param id - handler instance identifier
-     * @param handler - function used to process data
-     * @returns number - returns id of handler used for removing specific one.
-     */
-    addHandler(name: string, id: string, handler: SubscriptionHandler): {
+    addHandler(name: string, id: string, handler: SubscriptionHandler, decode?: Function): {
         success: boolean;
         error?: string;
     };

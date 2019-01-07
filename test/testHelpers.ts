@@ -1,12 +1,11 @@
 export const TEST_CLUSTER_OPTIONS = {
     frontServers: 5,
     backServers: 10,
-    totalChannels: 150,
+    totalChannels: 100,
     startingBackPort: 4000,
     startingFrontPort: 5000,
     host: 'tcp://127.0.0.1:',
 };
-
 
 export function makeRandomMessages(
     minMessages=1, maxMessages=5,

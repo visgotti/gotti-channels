@@ -1,5 +1,6 @@
 import {clearInterval} from "timers";
 import { ChannelCluster } from '../src/core/ChannelCluster';
+import * as msgpack from 'notepack.io';
 
 const { TEST_CLUSTER_OPTIONS, makeRandomMessages, arrayAverage, getRandomChannelIds, formatBytes } = require('./testHelpers');
 const options = TEST_CLUSTER_OPTIONS;
@@ -135,16 +136,72 @@ describe('BackChannel', function() {
         });
     });
 
-    describe('backChannel.broadcastPatchedState', () => {
-        it('tests only mirrored front channels get patched state', (done) => {
+    describe('backChannel.setState', () => {
+        it('sets and gets state correctly', (done) => {
+            backChannels[0].setState({ 'foo': 'bar' });
+            assert.deepStrictEqual(backChannels[0].state, {'foo':'bar'});
             done();
         })
     });
 
-    describe('backChannel.sendQueued', () => {
-        it('All front channels correctly send all queued messages to back mirror channel', (done) => {
+    describe('backChannel.broadcastState', () => {
+        it('throws if state is null', (done) => {
+            backChannels[0].setState(null);
+            assert.throws(() => { backChannels[0].broadcastState() });
+            done();
+        });
+        it('sends state to all mirrored front channels', (done) => {
+            let actualReceived = 0;
+            let expectedReceive = options.frontServers;
+
+            let frontUidsToReceive =  frontChannels.reduce((uids, frontChannel) => {
+                if(frontChannel.channelId === backChannels[0].channelId) {
+                    uids.push(frontChannel.frontUid)
+                }
+                return uids
+            }, []);
+
+            backChannels[0].setState({ frontUids: [...frontUidsToReceive] });
+
+            frontChannels.forEach(frontChannel => {
+                frontChannel.onSetState(state => {
+                    state = msgpack.decode(state);
+                    assert.strictEqual(state.frontUids.indexOf(frontChannel.frontUid) > -1, true);
+                    assert.strictEqual(frontUidsToReceive.indexOf(frontChannel.frontUid) > -1, true);
+
+                    // remove index as we receive it.
+                    frontUidsToReceive.splice(frontUidsToReceive.indexOf(frontChannel.frontUid), 1);
+                    actualReceived+=1;
+                    if(actualReceived === expectedReceive) {
+                        setTimeout(() => {
+                            assert.strictEqual(actualReceived, expectedReceive);
+                            assert.strictEqual(frontUidsToReceive.length, 0);
+                            done();
+                        }, 50)
+                    }
+                });
+            });
+
+            backChannels[0].broadcastState();
+        });
+    });
+    describe('backChannel.broadcastPatch', () => {
+        it('throws if state is null', (done) => {
+            backChannels[0].setState(null);
+            assert.throws(() => { backChannels[0].broadcastPatch() });
+            done();
+        });
+        it('returns false if theres no state differences', (done) => {
+            backChannels[0].setState({ "foo": "bar" });
+            backChannels[0].setState({ "foo": "bar" });
+            assert.strictEqual(backChannels[0].broadcastPatch(), false);
+            done();
+        });
+        it('returns true if state was changed', (done) => {
+            backChannels[0].setState({ "foo": "bar" });
+            backChannels[0].state.foo = "baz";
+            assert.strictEqual(backChannels[0].broadcastPatch(), true);
             done();
         });
     });
-
 });

@@ -6,7 +6,7 @@
 
 import FrontChannel from './FrontChannel';
 import BackChannel from './BackChannel';
-import { Centrum } from '../../lib/Centrum.js';
+import { Centrum } from '../../lib/core/Centrum.js';
 
 export interface ClusterOptions {
     frontServers: number,

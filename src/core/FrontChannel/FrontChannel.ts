@@ -1,8 +1,8 @@
 import { Channel } from '../Channel/Channel';
-import { Centrum } from '../../../lib/Centrum';
+import { Centrum } from '../../../lib/core/Centrum';
 import { FrontMessages, FrontPubs, FrontSubs, FrontPushes } from './FrontMessages';
 
-import { StateData, CONNECTION_STATUS, CONNECTION_CHANGE } from '../types';
+import { CONNECTION_STATUS, CONNECTION_CHANGE } from '../types';
 
 import {clearTimeout} from "timers";
 
@@ -15,6 +15,8 @@ class FrontChannel extends Channel {
     private pub: FrontPubs;
     private sub: FrontSubs;
     private push: FrontPushes;
+
+    private _state: any;
 
     private CONNECTION_STATUS: CONNECTION_STATUS;
 
@@ -48,23 +50,25 @@ class FrontChannel extends Channel {
      * sets the onConnectedHandler function
      * @param handler - function that gets executed when a channel succesfully connects to a backChannel.
      */
-    public onConnected(handler: (backChannelId, state?: StateData) => void) : void {
+    public onConnected(handler: (backChannelId, state?: any) => void) : void {
         this.onConnectedHandler = handler;
     };
 
     /**
-     * sets the setStateHandler function
+     * sets the setStateHandler function, the state is not decoded for same reason as the patches
+     * are not. you may want to just blindly pass it along and not waste cpu decoding it.
      * @param handler - function that gets executed when mirror back channel sends whole state
      */
-    public onSetState(handler: (newState: StateData) => void) : void {
+    public onSetState(handler: (newState: any) => void) : void {
         this.onSetStateHandler = handler;
     };
 
     /**
-     * sets the patchStateHandler function
+     * sets the onPatchStateHHandler, the patch is not decoded or applied and its left for you to do that..
+     * the reason for this is if you may not want to use cpu applying the patch and just want to forward it.
      * @param handler - function that gets executed after channel receives and applies patched state from .
      */
-    public onPatchState(handler: (patches: any, updatedState: StateData) => void) : void {
+    public onPatchState(handler: (patches) => void) : void {
         this.onPatchStateHandler = handler
     };
 
@@ -190,6 +194,10 @@ class FrontChannel extends Channel {
         this.queuedMessages.length = 0;
     }
 
+    get state(): any {
+        return this._state;
+    }
+
     get connectionInfo(): any {
         return {
             connectedChannelIds: Array.from(this.connectedChannelIds),
@@ -197,17 +205,17 @@ class FrontChannel extends Channel {
         }
     }
 
-    private _onSetState(stateData: StateData) : void  {
-        this._setState(stateData);
-        this.onSetStateHandler(stateData);
+    private _onSetState(newState: any) : void  {
+        this.onSetStateHandler(newState);
     }
-    private onSetStateHandler(stateData: StateData) : void {}
+
+    private onSetStateHandler(newState: any) : void {}
 
     private _onPatchState(patches: any) : void {
-        const stateData = this.patchState(patches);
-        this.onPatchedStateHandler(patches, stateData);
+      //  const stateData = this.patchState(patches);
+        this.onPatchStateHandler(patches);
     }
-    private onPatchedStateHandler(patches: any, stateData: StateData) : void {}
+    private onPatchStateHandler(patches: any) : void {}
 
     private _onMessage(message: any, channelId: string) : void {
         this.onMessageHandler(message, channelId);
@@ -232,13 +240,18 @@ class FrontChannel extends Channel {
      * @param backChannelId
      * @param state - if its the mirrored channelId, it will have the current state as well.
      */
-    private _onConnected(backChannelId, state?: StateData) {
+    private _onConnected(backChannelId, state?: any) {
         // channelId of connected backChannel was the same so register pub/subs meant for mirrored channels.
         if(backChannelId === this.channelId) {
             this.sub.BROADCAST_MIRROR_FRONTS.register(message => {
                 //TODO: maybe this should be handled in a seperate onMirroredMessage or something similar.. will do if it seems needed.
                 this._onMessage(message, this.channelId);
             });
+
+
+            this.sub.PATCH_STATE.register(this._onPatchState.bind(this));
+            this.sub.SET_STATE.register(this._onSetState.bind(this));
+
             this.pub.SEND_QUEUED.register();
         }
 
@@ -250,13 +263,12 @@ class FrontChannel extends Channel {
         this.emit('connected', backChannelId);
     }
 
-    private onConnectedHandler(backChannelId, state?: StateData) : void {};
+    private onConnectedHandler(backChannelId, state?: any) : void {};
 
     private onDisconnected(backChannelId) {
         // channelId of connected backChannel was the same so register pub/subs meant for mirrored channels.
         if(backChannelId === this.channelId) {
-         this.pub.SEND_QUEUED.unregister();
-        //  this.sub.PATCH_STATE.remove();
+            this.pub.SEND_QUEUED.unregister();
         }
 
         this.pub.DISCONNECT.unregister();

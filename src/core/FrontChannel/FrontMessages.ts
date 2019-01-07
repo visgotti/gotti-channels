@@ -13,6 +13,8 @@ export interface FrontSubs {
     SEND_FRONT: SubscribeProtocol,
     BROADCAST_MIRROR_FRONTS: SubscribeProtocol,
     BROADCAST_ALL_FRONTS: SubscribeProtocol,
+    PATCH_STATE: SubscribeProtocol,
+    SET_STATE: SubscribeProtocol,
 }
 
 export interface FrontPushes {
@@ -82,12 +84,15 @@ export class FrontMessages extends MessageFactory {
         this.SEND_FRONT = this.subCreator(Protocol.SEND_FRONT(this.frontUid), this.frontUid);
         this.BROADCAST_MIRROR_FRONTS = this.subCreator(Protocol.BROADCAST_MIRROR_FRONTS(this.channelId), this.frontUid);
         this.BROADCAST_ALL_FRONTS = this.subCreator(Protocol.BROADCAST_ALL_FRONTS(), this.frontUid);
-
+        this.SET_STATE = this.subCreator(Protocol.SET_STATE(this.channelId), this.frontUid, 'NONE');
+        this.PATCH_STATE = this.subCreator(Protocol.PATCH_STATE(this.channelId), this.frontUid, 'NONE');
         return {
             CONNECTION_CHANGE: this.CONNECTION_CHANGE,
             SEND_FRONT: this.SEND_FRONT,
             BROADCAST_MIRROR_FRONTS: this.BROADCAST_MIRROR_FRONTS,
             BROADCAST_ALL_FRONTS: this.BROADCAST_ALL_FRONTS,
+            SET_STATE: this.SET_STATE,
+            PATCH_STATE: this.PATCH_STATE,
         }
     }
 }
