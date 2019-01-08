@@ -70,19 +70,19 @@ export class Protocol {
  */
 export abstract class MessageFactory {
     // FRONT -> BACKS
-    public abstract CONNECT: PublishProtocol | SubscribeProtocol;
+    public abstract CONNECT: PublishProtocol | SubscribeProtocol; //TODO: req/res
     public abstract BROADCAST_ALL_BACK: PublishProtocol | SubscribeProtocol;
 
     // FONT -> BACK
     public abstract SEND_BACK: PushProtocol | SubscribeProtocol;
-    public abstract DISCONNECT: PushProtocol | SubscribeProtocol;
+    public abstract DISCONNECT: PushProtocol | SubscribeProtocol; //TODO: req/res
     public abstract SEND_QUEUED: PublishProtocol | SubscribeProtocol;
-    public abstract LINK: PublishProtocol | SubscribeProtocol;
+    public abstract LINK: PublishProtocol | SubscribeProtocol; //TODO: req/res
     public abstract UNLINK: PublishProtocol | SubscribeProtocol;
 
 
     // BACK -> FRONT
-    public abstract CONNECTION_CHANGE: PushProtocol | SubscribeProtocol;
+    public abstract CONNECTION_CHANGE: PushProtocol | SubscribeProtocol; //TODO: wouldnt need if connect had req/res format
     public abstract BROADCAST_LINKED_FRONTS: PublishProtocol | SubscribeProtocol;
     public abstract BROADCAST_ALL_FRONTS: PublishProtocol | SubscribeProtocol;
     public abstract SEND_FRONT: PublishProtocol | SubscribeProtocol;
@@ -98,6 +98,10 @@ export abstract class MessageFactory {
         this.channel = channel;
         this.centrum = centrum;
     }
+
+    //TODO: even though were using pub/sub zmq sockets it would make some of the code much more legible if I can set up a nice req/res message layer.
+    protected requestCreator(protocolFactory, encoder?) {}
+    protected responseCreator(protocolFactory, encoder?) {};
 
     protected pubCreator(protocol, encoder?) {
         let pub: any = {};

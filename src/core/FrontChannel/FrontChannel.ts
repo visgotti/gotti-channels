@@ -6,6 +6,7 @@ import { FrontMessages, FrontPubs, FrontSubs, FrontPushes } from './FrontMessage
 import { CONNECTION_STATUS, CONNECTION_CHANGE } from '../types';
 
 import {clearTimeout} from "timers";
+import Timeout = NodeJS.Timeout;
 
 class FrontChannel extends Channel {
     private connectedChannelIds: Set<string>;
@@ -23,7 +24,9 @@ class FrontChannel extends Channel {
 
     private linked: boolean;
     private connectedClients: Map<string, Client>;
-    private awaitingConnectionClients: Map<string, Function>;
+
+    private clientConnectedCallbacks: Map<string, Function>;
+    private clientConnectedTimeouts: Map<string, Timeout>;
 
     // unique id to identify front channel based on channelId and serverIndex
     readonly frontUid : string;
@@ -31,6 +34,8 @@ class FrontChannel extends Channel {
     readonly serverIndex: number;
     // count of total the front channel can be communicating with
     readonly totalChannels: number;
+    // timeout length for waiting client connections
+    readonly clientTimeout: number;
 
     constructor(channelId, serverIndex, totalChannels, centrum: Centrum) {
         super(channelId, centrum);
@@ -39,7 +44,8 @@ class FrontChannel extends Channel {
 
         this.connectedChannelIds = new Set();
 
-        this.awaitingConnectionClients = new Map();
+        this.clientConnectedCallbacks = new Map();
+        this.clientConnectedTimeouts = new Map();
         this.connectedClients = new Map();
 
         this.queuedMessages = [];
@@ -50,33 +56,34 @@ class FrontChannel extends Channel {
         this.frontUid = `${channelId}-${serverIndex.toString()}`;
         this.serverIndex = serverIndex;
         this.totalChannels = totalChannels;
+        //TODO: do a retry system if client still needs connection.
+        this.clientTimeout = 5000;
 
         this.initializeMessageFactories();
         this.registerPreConnectedSubs();
         this.registerPreConnectedPubs();
     };
 
-    public async addClient(client: Client) {
-        // add client to awaiting connections with a callback to initialize the client with the state
-        this.awaitingConnectionClients.add(client.uid, (state) => {
-            if(this.awaitingConnectionClients.has(client.uid)) {
-                //TODO: need to distinguish that its a new state and not patch
-                client.addEncodedStateUpdate(this.channelId, state);
-                this.awaitingConnectionClients.remove(client.uid);
-                this.connectedClients.add(client.uid, client);
-                return true;
-            }
-            return false;
-        });
-        this.linkForClient(client.uid);
-    }
+    /**
+     *
+     * @param client
+     * @param timeout
+     */
+    public async connectClient(client: Client, timeout?) {
+        try {
+            if(!(this.clientCanConnect(client.uid))) throw new Error ('Client is already in connection state.');
 
-    public removeClient(uid) {
-        this.awaitingConnectionClients.remove(uid);
-        this.connectedClients.remove(uid);
-        if(this.awaitingConnectionClients.size === 0 && this.connectedClients.size === 0) {
-            this.unlink();
+            const state = await this._connectClient(client.uid);
+
+            this.connectedClients.set(client.uid, client);
+
+            return state;
+
+        } catch (err) {
+            throw err;
         }
+        // add client to awaiting connections with a callback to initialize the client with the state
+
     }
 
     /**
@@ -92,7 +99,7 @@ class FrontChannel extends Channel {
      * are not. you may want to just blindly pass it along and not waste cpu decoding it.
      * @param handler - function that gets executed when mirror back channel sends whole state
      */
-    public onSetState(handler: (newState: any) => void) : void {
+    public onSetState(handler: (encodedState: any, clientUid?) => void) : void {
         this.onSetStateHandler = handler;
     };
 
@@ -116,11 +123,12 @@ class FrontChannel extends Channel {
 
     /**
      * sends a link message to mirror back channel to notify it that it needs to receive current state and then
-     * receive patches and messages.
+     * receive patches and messages. if theres a client uid to initiate the link, the back server will respond with
+     * the clientUid when it replies with state which gets used to call the callback in clientConnectedCallbacks map
      */
-    public link() {
+    public link(clientUid=false) {
         this.linked = true;
-        this.pub.LINK(0);
+        this.pub.LINK(clientUid);
     }
 
     /**
@@ -129,6 +137,11 @@ class FrontChannel extends Channel {
     public unlink() {
         this.linked = false;
         this.pub.UNLINK(0);
+
+        // make sure all clients become unlinked with it.
+        if(this.clientConnectedCallbacks.size > 0 || this.connectedClients.size > 0) {
+            this.disconnectAllClients();
+        }
     }
 
     /**
@@ -216,7 +229,7 @@ class FrontChannel extends Channel {
      * @returns {Promise<T>}
      */
     public async disconnect(channelIds?: Array<string>, timeout=15000) {
-        const awaitingChannelIds =  new Set(channelIds) || this.connectedChannelIds;
+        const awaitingChannelIds = new Set(channelIds) || this.connectedChannelIds;
         return new Promise((resolve, reject) => {
 
             const validated = this.validateConnectAction(CONNECTION_STATUS.DISCONNECTING);
@@ -256,23 +269,95 @@ class FrontChannel extends Channel {
         }
     }
 
-    private linkForClient(clientUid) {
-        this.link = true;
-        this.pub.LINK_FOR_CLIENT(clientUid);
+    // business logic for connecting client
+    private async _connectClient(uid) {
+        this.link(uid);
+
+        this.clientConnectedCallbacks.set(uid, (state) => {
+            this.clientConnectedCallbacks.delete(uid);
+            clearTimeout(this.clientConnectedTimeouts.get(uid));
+            this.clientConnectedTimeouts.delete(uid);
+
+            if(state === false) {
+                throw new Error('Client disconnected during connection');
+            }
+
+            return state;
+        });
+
+        this.clientConnectedTimeouts.set(uid, setTimeout(() => {
+            this.clientConnectedCallbacks.delete(uid);
+            this.clientConnectedTimeouts.delete(uid);
+            throw new Error(`Client ${uid} connection request to ${this.channelId} timed out`);
+        }, this.clientTimeout));
     }
 
-    private _onSetState(newState: any) : void  {
+    public disconnectClient(clientUid) {
+        if(this.clientConnectedCallbacks.has(clientUid)) {
+            // if the client was still waiting for callback to be called, call it with false state so the promise gets rejected.
+            this.clientConnectedCallbacks.get(clientUid)(false);
+        }
+        if(this.connectedClients.has(clientUid)) {
+            this.connectedClients[clientUid].onChannelDisconnect(this.channelId);
+            this.connectedClients.delete(clientUid);
+        }
+        // after client finishes disconnecting check if we still have any clients, if not then unlink from back channel.
+        if(this.clientConnectedCallbacks.size === 0 && this.connectedClients.size === 0) {
+            this.unlink();
+        }
+    }
+
+    private disconnectAllClients() {
+        Object.keys(this.clientConnectedCallbacks).forEach(clientUid => {
+           this.disconnectClient(clientUid);
+        });
+
+        Object.keys(this.connectedClients).forEach(clientUid => {
+           this.disconnectClient(clientUid)
+        });
+    }
+
+    private _onSetState(encodedState: any, clientUid?) : void  {
         if(!this.linked) return;
 
-        this.onSetStateHandler(newState);
+        if(clientUid) {
+            this.handleSetStateForClient(encodedState, clientUid);
+        }
+
+        this.onSetStateHandler(encodedState, clientUid);
     }
 
-    private onSetStateHandler(newState: any) : void {}
+    /**
+     * received full state from back channel, check if its for
+     * a client awaiting for its connected callback and then
+     * check if the client is in the connected map
+     * @param clientUid
+     * @param state
+     */
+    private handleSetStateForClient(clientUid, state) : boolean {
+        if(this.clientConnectedCallbacks.has(clientUid)) {
+            this.clientConnectedCallbacks.get(clientUid)(state);
+            return true;
+        } else if(this.connectedClients.has(clientUid)) {
+            const client = this.connectedClients.get(clientUid);
+            client.addEncodedStateSet(this.channelId, state);
+            return true;
+        } else {
+            console.warn('tried handling state for a client not in channel.')
+        }
+    }
+
+    private onSetStateHandler(newState: any, clientUid?) : void {}
 
     private _onPatchState(patches: any) : void {
         if(!this.linked) return;
+
+        for(let client of this.connectedClients.values()) {
+            client.addEncodedStatePatch(this.channelId, patches);
+        }
         this.onPatchStateHandler(patches);
     }
+
     private onPatchStateHandler(patches: any) : void {}
 
     private _onMessage(message: any, channelId: string) : void {
@@ -307,9 +392,10 @@ class FrontChannel extends Channel {
             });
 
             this.sub.PATCH_STATE.register(this._onPatchState.bind(this));
-            this.sub.SET_STATE.register(this._onSetState.bind(this));
+            this.sub.SET_STATE.register((received) => {
+                this._onSetState(Buffer.from(received.encodedState.data), received.clientUid);
+            });
             this.pub.SEND_QUEUED.register();
-            //this.pub.LINK_FOR_CLIENT.register();
             this.pub.LINK.register();
             this.pub.UNLINK.register();
         }
@@ -386,6 +472,10 @@ class FrontChannel extends Channel {
         this.pub = pub;
         this.push = push;
         this.sub = sub;
+    }
+
+    private clientCanConnect(clientUid) : boolean {
+        return (!(this.clientConnectedCallbacks.has(clientUid)) && !(this.connectedClients.has(clientUid)));
     }
 }
 

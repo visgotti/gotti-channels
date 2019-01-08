@@ -128,7 +128,6 @@ describe('FrontChannel', function() {
             const state = { "foo": "bar" };
 
             frontChannels[0].onSetState(newState => {
-                console.log('got state again');
                 let decoded = msgpack.decode(newState);
                 assert.deepStrictEqual(decoded, state);
                 done();

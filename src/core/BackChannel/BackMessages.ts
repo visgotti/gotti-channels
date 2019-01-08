@@ -75,7 +75,7 @@ export class BackMessages extends MessageFactory {
         this.CONNECTION_CHANGE = this.pushCreator(Protocol.CONNECTION_CHANGE);
         this.SEND_FRONT = this.pushCreator(Protocol.SEND_FRONT);
         this.BROADCAST_LINKED_FRONTS = this.pushCreator(Protocol.BROADCAST_LINKED_FRONTS);
-        this.SET_STATE = this.pushCreator(Protocol.SET_STATE, 'NONE'); // encoding for states happen in the back channel business logic
+        this.SET_STATE = this.pushCreator(Protocol.SET_STATE); // encoding for states happen in the back channel business logic
         this.PATCH_STATE = this.pushCreator(Protocol.PATCH_STATE, 'NONE');
 
         return {

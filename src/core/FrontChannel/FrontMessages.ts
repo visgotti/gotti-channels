@@ -82,7 +82,6 @@ export class FrontMessages extends MessageFactory {
     private initializePushes() : FrontPushes {
         this.SEND_BACK = this.pushCreator(Protocol.SEND_BACK);
 
-
         return {
             SEND_BACK: this.SEND_BACK,
         }
@@ -92,7 +91,7 @@ export class FrontMessages extends MessageFactory {
         this.CONNECTION_CHANGE = this.subCreator(Protocol.CONNECTION_CHANGE(this.frontUid), this.frontUid);
         this.SEND_FRONT = this.subCreator(Protocol.SEND_FRONT(this.frontUid), this.frontUid);
         this.BROADCAST_ALL_FRONTS = this.subCreator(Protocol.BROADCAST_ALL_FRONTS(), this.frontUid);
-        this.SET_STATE = this.subCreator(Protocol.SET_STATE(this.frontUid), this.frontUid, 'NONE');
+        this.SET_STATE = this.subCreator(Protocol.SET_STATE(this.frontUid), this.frontUid);
         this.PATCH_STATE = this.subCreator(Protocol.PATCH_STATE(this.frontUid), this.frontUid, 'NONE');
         this.BROADCAST_LINKED_FRONTS = this.subCreator(Protocol.BROADCAST_LINKED_FRONTS(this.frontUid), this.frontUid);
 

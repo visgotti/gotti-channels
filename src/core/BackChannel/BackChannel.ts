@@ -82,12 +82,18 @@ class BackChannel extends Channel {
     };
 
     /**
-     * sends state to mirrored linked channel.
+     * sends state to mirrored linked channel and if its for specific client, clientUid can be passed as a param.
      */
-    public sendState(frontUid){
+    public sendState(frontUid, clientUid?){
         if(!(this.state)) { throw new Error ('null state')}
         if(!(this.linkedFrontUids.has(frontUid))) { throw new Error ('Trying to broadcast to unlinked front!')}
-        this.push.SET_STATE[frontUid](this._previousStateEncoded);
+
+        const sendData: any = { encodedState: this._previousStateEncoded };
+
+        if(clientUid) {
+            sendData.clientUid = clientUid;
+        }
+        this.push.SET_STATE[frontUid](sendData);
     };
 
     /**
@@ -203,9 +209,9 @@ class BackChannel extends Channel {
             this.push.PATCH_STATE.register(frontUid);
             this.push.BROADCAST_LINKED_FRONTS.register(frontUid);
 
-            this.pull.LINK.register(frontUid, () => {
+            this.pull.LINK.register(frontUid, (clientUid?) => {
                 this.linkedFrontUids.add(frontUid);
-                this.sendState(frontUid);
+                this.sendState(frontUid, clientUid);
             });
 
             this.pull.UNLINK.register(frontUid, () => {
