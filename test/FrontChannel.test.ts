@@ -1,10 +1,9 @@
 import {clearInterval} from "timers";
-import * as fossilDelta from 'fossil-delta';
 import * as msgpack from 'notepack.io';
 
 import { ChannelCluster } from '../src/core/ChannelCluster';
 
-const { TEST_CLUSTER_OPTIONS, makeRandomMessages, arrayAverage, getRandomChannelIds, formatBytes } = require('./testHelpers');
+const { TEST_CLUSTER_OPTIONS, makeRandomMessages, arrayAverage, getRandomChannelIds, formatBytes, applyPatches } = require('./testHelpers');
 const options = TEST_CLUSTER_OPTIONS;
 
 interface TestFrontMessage {
@@ -142,13 +141,10 @@ describe('FrontChannel', function() {
         it('correctly receives and handles state patches from back channel', (done) => {
             const state = { "foo": "bar" };
 
-            let _oldState = msgpack.encode(state);
+            const oldState = msgpack.encode(state);
 
             frontChannels[0].onPatchState(patches => {
-                const binaryPatch = msgpack.decode(patches);
-                assert.strictEqual(patches.length > 0, true);
-                _oldState = Buffer.from(fossilDelta.apply(_oldState, binaryPatch));
-                const newState = msgpack.decode(_oldState);
+                const newState = applyPatches(oldState, patches);
                 assert.deepStrictEqual(newState, backChannels[0].state);
                 done();
             });

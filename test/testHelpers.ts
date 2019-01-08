@@ -1,3 +1,6 @@
+import * as msgpack from 'notepack.io';
+import * as fossilDelta from 'fossil-delta';
+
 export const TEST_CLUSTER_OPTIONS = {
     frontServers: 5,
     backServers: 10,
@@ -6,6 +9,12 @@ export const TEST_CLUSTER_OPTIONS = {
     startingFrontPort: 5000,
     host: 'tcp://127.0.0.1:',
 };
+
+export function applyPatches(oldState, patches) {
+    const binaryPatch = msgpack.decode(patches);
+    const newState = Buffer.from(fossilDelta.apply(oldState, binaryPatch));
+    return msgpack.decode(newState);
+}
 
 export function makeRandomMessages(
     minMessages=1, maxMessages=5,

@@ -18,10 +18,26 @@ export class Client {
     constructor(uid) {
         this.uid = uid;
         this.processorChannel = null;
-
+        this.connectedChannels = new Map();
         this.queuedEncodedUpdates = {};
-
         this.state = null;
+    }
+
+
+    /**
+     * Sets connected channel of client also links it.
+     * @param channel
+     */
+    public async connectToChannel(channel: FrontChannel) {
+        try {
+            const encodedState = await channel.connectClient(this);
+            console.log('encoded state 1 was', encodedState);
+            this.connectedChannels.set(channel.channelId, channel);
+            this.addEncodedStateSet(channel.channelId, encodedState);
+            return encodedState;
+        } catch (err) {
+            throw err;
+        }
     }
 
     /**
@@ -32,7 +48,7 @@ export class Client {
     public async setProcessorChannel(channel: FrontChannel) {
         if(!(this.connectedChannels.has(channel.channelId))) {
             try{
-                await this.connectChannel(channel);
+                await this.connectToChannel(channel);
                 this.processorChannel = channel;
                 return true;
             } catch (err) {
@@ -44,18 +60,25 @@ export class Client {
         }
     }
 
-    public addEncodedStateSet(channelId, state) {
+    public addEncodedStateSet(channelId, state) : number | boolean {
+        if(!(this.connectedChannels.has(channelId))) return false;
+
         if(!(channelId in this.queuedEncodedUpdates)) {
             this.queuedEncodedUpdates[channelId] = [];
         }
         this.queuedEncodedUpdates[channelId].push({ type: STATE_UPDATE_TYPES.SET, state });
+        return this.queuedEncodedUpdates[channelId].length;
     }
 
-    public addEncodedStatePatch(channelId, patch) {
+    public addEncodedStatePatch(channelId, patch) : number | boolean {
+        if(!(this.connectedChannels.has(channelId))) return false;
+
         if(!(channelId in this.queuedEncodedUpdates)) {
             this.queuedEncodedUpdates[channelId] = [];
         }
         this.queuedEncodedUpdates[channelId].push({ type: STATE_UPDATE_TYPES.PATCH, patch });
+
+        return this.queuedEncodedUpdates[channelId].length;
     }
 
     public clearEncodedStateUpdates() {
@@ -100,23 +123,8 @@ export class Client {
 
     public disconnect() {
         this.connectedChannels.forEach(channel => {
-            channel.disconnectClient(clientUid);
+            channel.disconnectClient(this.uid);
         });
-    }
-
-    /**
-     * Sets connected channel of client also links it.
-     * @param channel
-     */
-    public async connectChannel(channel: FrontChannel) {
-        try {
-            const state = await channel.addClient(this);
-            this.addEncodedStateSet(channel.channelId, state);
-            this.connectedChannels.set(channel.channelId, channel);
-            return true;
-        } catch (err) {
-            throw err;
-        }
     }
 
     // removes queued updates from channel.

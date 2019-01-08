@@ -77,11 +77,13 @@ class FrontChannel extends Channel {
 
             this.connectedClients.set(client.uid, client);
 
+            console.log('if this wasnt first', state);
             return state;
 
         } catch (err) {
             throw err;
         }
+        console.log('not returning async')
         // add client to awaiting connections with a callback to initialize the client with the state
 
     }
@@ -273,23 +275,24 @@ class FrontChannel extends Channel {
     private async _connectClient(uid) {
         this.link(uid);
 
-        this.clientConnectedCallbacks.set(uid, (state) => {
-            this.clientConnectedCallbacks.delete(uid);
-            clearTimeout(this.clientConnectedTimeouts.get(uid));
-            this.clientConnectedTimeouts.delete(uid);
+        return new Promise((resolve, reject) => {
+            this.clientConnectedCallbacks.set(uid, (state) => {
+                this.clientConnectedCallbacks.delete(uid);
+                clearTimeout(this.clientConnectedTimeouts.get(uid));
+                this.clientConnectedTimeouts.delete(uid);
 
-            if(state === false) {
-                throw new Error('Client disconnected during connection');
-            }
+                if(state === false) {
+                    reject(new Error('Client disconnected during connection'));
+                }
+                resolve(state);
+            });
 
-            return state;
-        });
-
-        this.clientConnectedTimeouts.set(uid, setTimeout(() => {
-            this.clientConnectedCallbacks.delete(uid);
-            this.clientConnectedTimeouts.delete(uid);
-            throw new Error(`Client ${uid} connection request to ${this.channelId} timed out`);
-        }, this.clientTimeout));
+            this.clientConnectedTimeouts.set(uid, setTimeout(() => {
+                this.clientConnectedCallbacks.delete(uid);
+                this.clientConnectedTimeouts.delete(uid);
+                reject(new Error(`Client ${uid} connection request to ${this.channelId} timed out`));
+            }, this.clientTimeout));
+        })
     }
 
     public disconnectClient(clientUid) {
@@ -334,7 +337,8 @@ class FrontChannel extends Channel {
      * @param clientUid
      * @param state
      */
-    private handleSetStateForClient(clientUid, state) : boolean {
+    private handleSetStateForClient(state, clientUid) : boolean {
+        console.log('client uid was', clientUid);
         if(this.clientConnectedCallbacks.has(clientUid)) {
             this.clientConnectedCallbacks.get(clientUid)(state);
             return true;
