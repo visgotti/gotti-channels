@@ -60,6 +60,7 @@ class FrontChannel extends Channel {
         // add client to awaiting connections with a callback to initialize the client with the state
         this.awaitingConnectionClients.add(client.uid, (state) => {
             if(this.awaitingConnectionClients.has(client.uid)) {
+                //TODO: need to distinguish that its a new state and not patch
                 client.addEncodedStateUpdate(this.channelId, state);
                 this.awaitingConnectionClients.remove(client.uid);
                 this.connectedClients.add(client.uid, client);
@@ -336,12 +337,12 @@ class FrontChannel extends Channel {
     private validateConnectAction(REQUEST_STATUS: CONNECTION_STATUS) : { success: boolean, error?: string } {
         let validated = { success: true, error: null };
         if(this.CONNECTION_STATUS === CONNECTION_STATUS.CONNECTING) {
-            validated.success = true;
+            validated.success = false;
             validated.error = 'Channel is in the process of connecting.';
         }
 
         if(this.CONNECTION_STATUS === CONNECTION_STATUS.DISCONNECTING) {
-            validated.success = true;
+            validated.success = false;
             validated.error = 'Channel is in the process of disconnecting.';
         }
 
