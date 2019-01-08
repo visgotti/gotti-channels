@@ -4,7 +4,7 @@ export declare enum ChannelType {
     FRONT = "TYPE"
 }
 export declare class Channel {
-    broadcastState: Function;
+    sendState: Function;
     private state;
     private centrum;
     readonly publishStateFunctionName: string;

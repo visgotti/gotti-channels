@@ -7,10 +7,12 @@ enum MSG_CODES {
     SEND_QUEUED,
     SEND_BACK,
     BROADCAST_ALL_BACK,
+    LINK,
+    UNLINK,
 
     // BACK -> FRONT
     CONNECTION_CHANGE,
-    BROADCAST_MIRROR_FRONTS,
+    BROADCAST_LINKED_FRONTS,
     BROADCAST_ALL_FRONTS,
     SEND_FRONT,
     SET_STATE,
@@ -37,9 +39,11 @@ export class Protocol {
     static SEND_QUEUED(frontUid) : string  { return Protocol.make(MSG_CODES.SEND_QUEUED, frontUid) };
 
     static SEND_BACK(backChannelId) : string  { return Protocol.make(MSG_CODES.SEND_BACK, backChannelId) };
+    static LINK(frontUid) : string { return Protocol.make(MSG_CODES.LINK, frontUid) };
+    static UNLINK(frontUid) : string { return Protocol.make(MSG_CODES.UNLINK, frontUid) };
 
     // BACK -> FRONTS
-    static BROADCAST_MIRROR_FRONTS(frontChannelId) : string  { return Protocol.make(MSG_CODES.BROADCAST_MIRROR_FRONTS, frontChannelId) };
+    static BROADCAST_LINKED_FRONTS(frontChannelId) : string  { return Protocol.make(MSG_CODES.BROADCAST_LINKED_FRONTS, frontChannelId) };
     static SET_STATE(frontChannelId): string  { return Protocol.make(MSG_CODES.SET_STATE, frontChannelId) };
     static PATCH_STATE(frontChannelId) : string  { return Protocol.make(MSG_CODES.PATCH_STATE, frontChannelId) };
     static BROADCAST_ALL_FRONTS() : string  { return Protocol.make(MSG_CODES.BROADCAST_ALL_FRONTS) };
@@ -67,16 +71,19 @@ export class Protocol {
 export abstract class MessageFactory {
     // FRONT -> BACKS
     public abstract CONNECT: PublishProtocol | SubscribeProtocol;
-    public abstract SEND_QUEUED: PublishProtocol | SubscribeProtocol;
     public abstract BROADCAST_ALL_BACK: PublishProtocol | SubscribeProtocol;
 
     // FONT -> BACK
     public abstract SEND_BACK: PushProtocol | SubscribeProtocol;
     public abstract DISCONNECT: PushProtocol | SubscribeProtocol;
+    public abstract SEND_QUEUED: PublishProtocol | SubscribeProtocol;
+    public abstract LINK: PublishProtocol | SubscribeProtocol;
+    public abstract UNLINK: PublishProtocol | SubscribeProtocol;
+
 
     // BACK -> FRONT
     public abstract CONNECTION_CHANGE: PushProtocol | SubscribeProtocol;
-    public abstract BROADCAST_MIRROR_FRONTS: PublishProtocol | SubscribeProtocol;
+    public abstract BROADCAST_LINKED_FRONTS: PublishProtocol | SubscribeProtocol;
     public abstract BROADCAST_ALL_FRONTS: PublishProtocol | SubscribeProtocol;
     public abstract SEND_FRONT: PublishProtocol | SubscribeProtocol;
     public abstract SET_STATE: PublishProtocol | SubscribeProtocol;
@@ -120,7 +127,7 @@ export abstract class MessageFactory {
      * factory create the message name for us.
      * @param protocolFactory - Function used to create the publisher name based on the to parameter passed in.
      */
-    protected pushCreator(protocolFactory: Function) {
+    protected pushCreator(protocolFactory: Function, encoder?) {
         let push: any = {};
 
         push = (function (to, ...args) {
@@ -131,8 +138,8 @@ export abstract class MessageFactory {
             }
         });
 
-        push.register = (to, ...args) => {
-            push[to] = this.centrum.getOrCreatePublish(protocolFactory(to), ...args);
+        push.register = (to) => {
+            push[to] = this.centrum.getOrCreatePublish(protocolFactory(to), null, encoder);
 
             push.unregister = () => {
                 this.centrum.removePublish(protocolFactory(to));

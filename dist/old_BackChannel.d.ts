@@ -2,7 +2,7 @@ import { Channel } from './Channel/Channel';
 import { Centrum } from '../../lib/Centrum';
 import { StateData } from './types';
 export declare class BackChannel extends Channel {
-    broadcastState: Function;
+    sendState: Function;
     broadcastPatch: Function;
     private _sendMessage;
     private connectedFrontChannels;
@@ -35,7 +35,7 @@ export declare class BackChannel extends Channel {
     private addFrontChannelConnection;
     private removeFrontChannelConnection;
     private broadcastPatchHandler;
-    private broadcastStateHandler;
+    private sendStateHandler;
     private initializeCentrumSubscriptions;
     private initializeCentrumPublications;
 }

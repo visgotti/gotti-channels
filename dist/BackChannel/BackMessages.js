@@ -12,12 +12,12 @@ class BackMessages extends MessageFactory_1.MessageFactory {
         this.pull = this.initializePulls();
     }
     initializePubs() {
-        this.BROADCAST_MIRROR_FRONTS = this.pubCreator(MessageFactory_1.Protocol.BROADCAST_MIRROR_FRONTS(this.channelId));
+        this.BROADCAST_LINKED_FRONTS = this.pubCreator(MessageFactory_1.Protocol.BROADCAST_LINKED_FRONTS(this.channelId));
         this.SET_STATE = this.pubCreator(MessageFactory_1.Protocol.SET_STATE(this.channelId));
         this.PATCH_STATE = this.pubCreator(MessageFactory_1.Protocol.PATCH_STATE(this.channelId));
         this.BROADCAST_ALL_FRONTS = this.pubCreator(MessageFactory_1.Protocol.BROADCAST_ALL_FRONTS());
         return {
-            BROADCAST_MIRROR_FRONTS: this.BROADCAST_MIRROR_FRONTS,
+            BROADCAST_LINKED_FRONTS: this.BROADCAST_LINKED_FRONTS,
             PATCH_STATE: this.SET_STATE,
             SET_STATE: this.PATCH_STATE,
             BROADCAST_ALL_FRONTS: this.BROADCAST_ALL_FRONTS,

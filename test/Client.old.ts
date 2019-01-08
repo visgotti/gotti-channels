@@ -62,7 +62,7 @@ describe('Client', function() {
                     }
                 });
                 // broadcast state back after processing.
-                backChannels[i].broadcastState();
+                backChannels[i].sendState();
             }));
         }
 

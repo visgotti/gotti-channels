@@ -6,12 +6,14 @@ export interface FrontPubs {
     DISCONNECT: PublishProtocol,
     SEND_QUEUED: PublishProtocol,
     BROADCAST_ALL_BACK: PublishProtocol,
+    LINK: PublishProtocol,
+    UNLINK: PublishProtocol,
 }
 
 export interface FrontSubs {
     CONNECTION_CHANGE: SubscribeProtocol,
     SEND_FRONT: SubscribeProtocol,
-    BROADCAST_MIRROR_FRONTS: SubscribeProtocol,
+    BROADCAST_LINKED_FRONTS: SubscribeProtocol,
     BROADCAST_ALL_FRONTS: SubscribeProtocol,
     PATCH_STATE: SubscribeProtocol,
     SET_STATE: SubscribeProtocol,
@@ -28,11 +30,13 @@ export class FrontMessages extends MessageFactory {
     public CONNECT: PublishProtocol;
     public BROADCAST_ALL_BACK: PublishProtocol;
     public DISCONNECT: PublishProtocol;
+    public LINK: PublishProtocol;
+    public UNLINK: PublishProtocol;
 
     public SEND_BACK: PushProtocol;
 
     public CONNECTION_CHANGE: SubscribeProtocol;
-    public BROADCAST_MIRROR_FRONTS: SubscribeProtocol;
+    public BROADCAST_LINKED_FRONTS: SubscribeProtocol;
     public BROADCAST_ALL_FRONTS: SubscribeProtocol;
     public SET_STATE:  SubscribeProtocol;
     public PATCH_STATE: SubscribeProtocol;
@@ -61,6 +65,8 @@ export class FrontMessages extends MessageFactory {
         this.DISCONNECT = this.pubCreator(Protocol.DISCONNECT());
         this.SEND_QUEUED = this.pubCreator(Protocol.SEND_QUEUED(this.frontUid));
         this.BROADCAST_ALL_BACK = this.pubCreator(Protocol.BROADCAST_ALL_BACK());
+        this.LINK = this.pubCreator(Protocol.LINK(this.frontUid));
+        this.UNLINK = this.pubCreator(Protocol.UNLINK(this.frontUid));
 
         //todo figure out cleanest way to do this inside parent class implicitly
         return {
@@ -68,11 +74,14 @@ export class FrontMessages extends MessageFactory {
             DISCONNECT: this.DISCONNECT,
             SEND_QUEUED: this.SEND_QUEUED,
             BROADCAST_ALL_BACK: this.BROADCAST_ALL_BACK,
+            LINK: this.LINK,
+            UNLINK: this.UNLINK,
         }
     }
 
     private initializePushes() : FrontPushes {
         this.SEND_BACK = this.pushCreator(Protocol.SEND_BACK);
+
 
         return {
             SEND_BACK: this.SEND_BACK,
@@ -82,14 +91,15 @@ export class FrontMessages extends MessageFactory {
     private initializeSubs() : FrontSubs {
         this.CONNECTION_CHANGE = this.subCreator(Protocol.CONNECTION_CHANGE(this.frontUid), this.frontUid);
         this.SEND_FRONT = this.subCreator(Protocol.SEND_FRONT(this.frontUid), this.frontUid);
-        this.BROADCAST_MIRROR_FRONTS = this.subCreator(Protocol.BROADCAST_MIRROR_FRONTS(this.channelId), this.frontUid);
         this.BROADCAST_ALL_FRONTS = this.subCreator(Protocol.BROADCAST_ALL_FRONTS(), this.frontUid);
-        this.SET_STATE = this.subCreator(Protocol.SET_STATE(this.channelId), this.frontUid, 'NONE');
-        this.PATCH_STATE = this.subCreator(Protocol.PATCH_STATE(this.channelId), this.frontUid, 'NONE');
+        this.SET_STATE = this.subCreator(Protocol.SET_STATE(this.frontUid), this.frontUid, 'NONE');
+        this.PATCH_STATE = this.subCreator(Protocol.PATCH_STATE(this.frontUid), this.frontUid, 'NONE');
+        this.BROADCAST_LINKED_FRONTS = this.subCreator(Protocol.BROADCAST_LINKED_FRONTS(this.frontUid), this.frontUid);
+
         return {
             CONNECTION_CHANGE: this.CONNECTION_CHANGE,
             SEND_FRONT: this.SEND_FRONT,
-            BROADCAST_MIRROR_FRONTS: this.BROADCAST_MIRROR_FRONTS,
+            BROADCAST_LINKED_FRONTS: this.BROADCAST_LINKED_FRONTS,
             BROADCAST_ALL_FRONTS: this.BROADCAST_ALL_FRONTS,
             SET_STATE: this.SET_STATE,
             PATCH_STATE: this.PATCH_STATE,

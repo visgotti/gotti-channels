@@ -22,6 +22,8 @@ class BackChannel extends Channel {
     private _previousState: any;
     private _previousStateEncoded: string;
 
+    private linkedFrontUids: Set<string>;
+
     // to be used when clients start interacting with channels.
     private _connectedClientsData: Map<string, ConnectedClientData>;
     private _writingClientUids: Set<string>;
@@ -33,6 +35,7 @@ class BackChannel extends Channel {
         this.state = null;
         this._previousState = null;
 
+        this.linkedFrontUids = new Set();
         this._connectedFrontsData = new Map();
         this._mirroredFrontUids = new Set();
 
@@ -60,26 +63,31 @@ class BackChannel extends Channel {
     public broadcastPatch() : boolean {
         if(!(this.state)) { throw new Error ('null state')}
 
-        const currentState = this.state;
-        const currentStateEncoded = msgpack.encode(currentState);
+        if(this.linkedFrontUids.size > 0) {
+            const currentState = this.state;
+            const currentStateEncoded = msgpack.encode(currentState);
 
-        if(currentStateEncoded.equals(this._previousStateEncoded)) {
-            return false;
+            if(currentStateEncoded.equals(this._previousStateEncoded)) {
+                return false;
+            }
+            const patches = fossilDelta.create(this._previousStateEncoded, currentStateEncoded);
+
+            this._previousStateEncoded = currentStateEncoded;
+
+            this.linkedFrontUids.forEach(frontUid => {
+                this.push.PATCH_STATE[frontUid](msgpack.encode(patches));
+            });
+            return true;
         }
-        const patches = fossilDelta.create(this._previousStateEncoded, currentStateEncoded);
-
-        this._previousStateEncoded = currentStateEncoded;
-
-        this.pub.PATCH_STATE(msgpack.encode(patches));
-        return true;
     };
 
     /**
-     * sends state to mirrored channels
+     * sends state to mirrored linked channel.
      */
-    public broadcastState(){
+    public sendState(frontUid){
         if(!(this.state)) { throw new Error ('null state')}
-        this.pub.SET_STATE(this._previousStateEncoded)
+        if(!(this.linkedFrontUids.has(frontUid))) { throw new Error ('Trying to broadcast to unlinked front!')}
+        this.push.SET_STATE[frontUid](this._previousStateEncoded);
     };
 
     /**
@@ -113,8 +121,10 @@ class BackChannel extends Channel {
      * sends message to all front channels that share channelId with back channel.
      * @param message
      */
-    public broadcastMirrored(message: any) {
-        this.pub.BROADCAST_MIRROR_FRONTS(message);
+    public broadcastLinked(message: any) {
+        this.linkedFrontUids.forEach(frontUid => {
+            this.push.BROADCAST_LINKED_FRONTS[frontUid](message);
+        });
     }
 
     public getFrontUidForClient(clientUid) : string {
@@ -173,9 +183,6 @@ class BackChannel extends Channel {
     private registerPreConnectedPubs() : void {
         // handler that broadcasts instance already exists on centrum before creating it if its not the first backChannel instantiated
         this.pub.BROADCAST_ALL_FRONTS.register();
-        this.pub.BROADCAST_MIRROR_FRONTS.register();
-        this.pub.PATCH_STATE.register();
-        this.pub.SET_STATE.register();
     }
 
     /**
@@ -191,6 +198,19 @@ class BackChannel extends Channel {
 
             // add to mirror set since its same channelId
             this._mirroredFrontUids.add(frontUid);
+
+            this.push.SET_STATE.register(frontUid);
+            this.push.PATCH_STATE.register(frontUid);
+            this.push.BROADCAST_LINKED_FRONTS.register(frontUid);
+
+            this.pull.LINK.register(frontUid, () => {
+                this.linkedFrontUids.add(frontUid);
+                this.sendState(frontUid);
+            });
+
+            this.pull.UNLINK.register(frontUid, () => {
+                this.linkedFrontUids.delete(frontUid);
+            });
         }
 
         // keep connected data stored for all fronts.

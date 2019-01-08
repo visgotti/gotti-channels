@@ -208,7 +208,7 @@ class FrontChannel extends Channel_1.Channel {
     _onConnected(backChannelId, state) {
         // channelId of connected backChannel was the same so register pub/subs meant for mirrored channels.
         if (backChannelId === this.channelId) {
-            this.sub.BROADCAST_MIRROR_FRONTS.register(message => {
+            this.sub.BROADCAST_LINKED_FRONTS.register(message => {
                 //TODO: maybe this should be handled in a seperate onMirroredMessage or something similar.. will do if it seems needed.
                 this._onMessage(message, this.channelId);
             });

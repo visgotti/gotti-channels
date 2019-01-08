@@ -188,7 +188,7 @@ class FrontChannel extends Channel_1.Channel {
                 this._onSetState(stateData);
             });
             // for when back broadcasts to all mirror fronts
-            this.centrum.createSubscription(Protocol_1.default.BROADCAST_MIRROR_FRONTS(this.channelId), (message) => {
+            this.centrum.createSubscription(Protocol_1.default.BROADCAST_LINKED_FRONTS(this.channelId), (message) => {
                 this._onMessage(message, this.channelId);
             });
             // for when back broadcasts to all channels

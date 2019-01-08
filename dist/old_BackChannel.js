@@ -75,7 +75,7 @@ class BackChannel extends Channel_1.Channel {
     }
     broadcastPatchHandler() {
     }
-    broadcastStateHandler() {
+    sendStateHandler() {
         return this.state.data;
     }
     // back channels subscription can receive data that includes removed front states,
@@ -108,8 +108,8 @@ class BackChannel extends Channel_1.Channel {
         // front channels subscribe to back channel for JUST state data updates not removals since
         // the backState in a front channel just blindly takes shape each update from the sibling BackChannel
         const patchStatePubName = `${protocol_1.PROTOCOL.PATCH_STATE}-${this.id}`;
-        this.centrum.createPublish(patchStatePubName, this.broadcastStateHandler.bind(this));
-        this.broadcastState = this.centrum.publish[patchStatePubName].bind(this);
+        this.centrum.createPublish(patchStatePubName, this.sendStateHandler.bind(this));
+        this.sendState = this.centrum.publish[patchStatePubName].bind(this);
         const setStatePubName = `${protocol_1.PROTOCOL.SET_STATE}-${this.id}`;
         this.centrum.createPublish(setStatePubName, this.broadcastPatchHandler.bind(this));
         this.broadcastPatch = this.centrum.publish[setStatePubName].bind(this);

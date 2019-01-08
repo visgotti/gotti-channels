@@ -35,7 +35,7 @@ declare class BackChannel extends Channel {
      * sends message to all front channels that share channelId with back channel.
      * @param message
      */
-    broadcastMirrored(message: any): void;
+    broadcastLinked(message: any): void;
     getFrontUidForClient(clientUid: any): string;
     readonly connectedFrontsData: Map<string, ConnectedFrontData>;
     readonly mirroredFrontUids: Array<string>;

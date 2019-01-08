@@ -108,22 +108,38 @@ describe('FrontChannel', function() {
             done();
         })
     });
-    describe('frontChannel.onSetState', () => {
-        it('correctly receives and handles state sent from back channel', (done) => {
+
+    describe('frontChannel.link', () => {
+        it('links channel to and receives a setState message from back channel', (done) => {
             const state = { "foo": "bar" };
+            backChannels[0].setState(state);
+
+            frontChannels[0].link();
 
             frontChannels[0].onSetState(newState => {
                 let decoded = msgpack.decode(newState);
                 assert.deepStrictEqual(decoded, state);
                 done();
             });
+        });
+    });
+    describe('frontChannel.onSetState AFTER LINKED', () => {
+        it('correctly receives back channel broadcast of state', (done) => {
+            const state = { "foo": "bar" };
+
+            frontChannels[0].onSetState(newState => {
+                console.log('got state again');
+                let decoded = msgpack.decode(newState);
+                assert.deepStrictEqual(decoded, state);
+                done();
+            });
 
             backChannels[0].setState(state);
-            backChannels[0].broadcastState();
+            backChannels[0].sendState(frontChannels[0].frontUid);
         });
     });
 
-    describe('frontChannel.onPatchState', () => {
+    describe('frontChannel.onPatchState AFTER LINKED', () => {
         it('correctly receives and handles state patches from back channel', (done) => {
             const state = { "foo": "bar" };
 
@@ -143,6 +159,45 @@ describe('FrontChannel', function() {
             backChannels[0].broadcastPatch();
         });
     });
+
+    describe('frontChannel.onSetState AFTER UNLINKED', () => {
+        it('doesnt receives back channel broadcast of state', (done) => {
+
+            frontChannels[0].unlink();
+
+            const state = { "foo": "bar" };
+
+            backChannels[0].setState(state);
+            setTimeout(() => {
+                assert.throws(() => { backChannels[0].sendState(frontChannels[0].frontUid ) });
+                done();
+            }, 10);
+
+        });
+    });
+
+    describe('frontChannel.onPatchState AFTER UNLINKED', () => {
+        it('doesnt receives state patches from back channel', (done) => {
+            const state = { "foo": "bar" };
+
+            let _oldState = msgpack.encode(state);
+
+            let received = false;
+
+            frontChannels[0].onPatchState(patches => {
+                received = true;
+            });
+            backChannels[0].setState(state);
+            backChannels[0].state.foo = 'baz';
+            backChannels[0].broadcastPatch();
+
+            setTimeout(() => {
+                assert.strictEqual(received, false);
+                done();
+            }, 100);
+        });
+    });
+
 
     describe('frontChannel.onMessage', () => {
         it('correctly handles message from back channel', (done) => {

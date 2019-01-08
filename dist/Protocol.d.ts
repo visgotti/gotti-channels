@@ -6,7 +6,7 @@ declare enum MSG_CODES {
     BROADCAST_ALL_BACK = 4,
     CONNECT_SUCCESS = 5,
     CONNECT_FAILED = 6,
-    BROADCAST_MIRROR_FRONTS = 7,
+    BROADCAST_LINKED_FRONTS = 7,
     BROADCAST_ALL_FRONTS = 8,
     SEND_FRONT = 9,
     SET_STATE = 10,
@@ -25,7 +25,7 @@ declare class Protocol {
     static CONNECT_SUCCESS(frontUid: any): string;
     static CONNECT_FAILED(frontUid: any): string;
     static SEND_FRONT(frontUid: any): string;
-    static BROADCAST_MIRROR_FRONTS(frontChannelId: any): string;
+    static BROADCAST_LINKED_FRONTS(frontChannelId: any): string;
     static SET_STATE(frontChannelId: any): string;
     static PATCH_STATE(frontChannelId: any): string;
     static BROADCAST_ALL_FRONTS(): string;

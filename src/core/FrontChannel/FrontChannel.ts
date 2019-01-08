@@ -20,6 +20,8 @@ class FrontChannel extends Channel {
 
     private CONNECTION_STATUS: CONNECTION_STATUS;
 
+    private linked: boolean;
+
     // unique id to identify front channel based on channelId and serverIndex
     readonly frontUid : string;
     // index of server in cluster front channel lives on
@@ -35,6 +37,8 @@ class FrontChannel extends Channel {
         this.connectedChannelIds = new Set();
 
         this.queuedMessages = [];
+
+        this.linked = false;
 
         // front id is used for 1:1 back to front communication.
         this.frontUid = `${channelId}-${serverIndex.toString()}`;
@@ -79,6 +83,24 @@ class FrontChannel extends Channel {
     public onMessage(handler: (message: any, channelId: string) => void) : void {
         this.onMessageHandler = handler
     };
+
+
+    /**
+     * sends a link message to mirror back channel to notify it that it needs to receive current state and then
+     * receive patches and messages.
+     */
+    public link() {
+        this.linked = true;
+        this.pub.LINK(0);
+    }
+
+    /**
+     * sends an unlink message to back channel so it stops receiving patch updates
+     */
+    public unlink() {
+        this.linked = false;
+        this.pub.UNLINK(0);
+    }
 
     /**
      * adds message to queue to be sent to mirror back channel when broadcastQueued() is called.
@@ -206,13 +228,15 @@ class FrontChannel extends Channel {
     }
 
     private _onSetState(newState: any) : void  {
+        if(!this.linked) return;
+
         this.onSetStateHandler(newState);
     }
 
     private onSetStateHandler(newState: any) : void {}
 
     private _onPatchState(patches: any) : void {
-      //  const stateData = this.patchState(patches);
+        if(!this.linked) return;
         this.onPatchStateHandler(patches);
     }
     private onPatchStateHandler(patches: any) : void {}
@@ -243,16 +267,16 @@ class FrontChannel extends Channel {
     private _onConnected(backChannelId, state?: any) {
         // channelId of connected backChannel was the same so register pub/subs meant for mirrored channels.
         if(backChannelId === this.channelId) {
-            this.sub.BROADCAST_MIRROR_FRONTS.register(message => {
+            this.sub.BROADCAST_LINKED_FRONTS.register(message => {
                 //TODO: maybe this should be handled in a seperate onMirroredMessage or something similar.. will do if it seems needed.
                 this._onMessage(message, this.channelId);
             });
 
-
             this.sub.PATCH_STATE.register(this._onPatchState.bind(this));
             this.sub.SET_STATE.register(this._onSetState.bind(this));
-
             this.pub.SEND_QUEUED.register();
+            this.pub.LINK.register();
+            this.pub.UNLINK.register();
         }
 
         this.push.SEND_BACK.register(backChannelId);

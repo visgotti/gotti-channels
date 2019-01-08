@@ -10,7 +10,7 @@ var MSG_CODES;
     MSG_CODES[MSG_CODES["BROADCAST_ALL_BACK"] = 4] = "BROADCAST_ALL_BACK";
     // BACK -> FRONT
     MSG_CODES[MSG_CODES["CONNECTION_CHANGE"] = 5] = "CONNECTION_CHANGE";
-    MSG_CODES[MSG_CODES["BROADCAST_MIRROR_FRONTS"] = 6] = "BROADCAST_MIRROR_FRONTS";
+    MSG_CODES[MSG_CODES["BROADCAST_LINKED_FRONTS"] = 6] = "BROADCAST_LINKED_FRONTS";
     MSG_CODES[MSG_CODES["BROADCAST_ALL_FRONTS"] = 7] = "BROADCAST_ALL_FRONTS";
     MSG_CODES[MSG_CODES["SEND_FRONT"] = 8] = "SEND_FRONT";
     MSG_CODES[MSG_CODES["SET_STATE"] = 9] = "SET_STATE";
@@ -34,7 +34,7 @@ class Protocol {
     static SEND_BACK(backChannelId) { return Protocol.make(MSG_CODES.SEND_BACK, backChannelId); }
     ;
     // BACK -> FRONTS
-    static BROADCAST_MIRROR_FRONTS(frontChannelId) { return Protocol.make(MSG_CODES.BROADCAST_MIRROR_FRONTS, frontChannelId); }
+    static BROADCAST_LINKED_FRONTS(frontChannelId) { return Protocol.make(MSG_CODES.BROADCAST_LINKED_FRONTS, frontChannelId); }
     ;
     static SET_STATE(frontChannelId) { return Protocol.make(MSG_CODES.SET_STATE, frontChannelId); }
     ;

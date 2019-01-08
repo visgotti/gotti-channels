@@ -53,7 +53,7 @@ class BackChannel extends Channel_1.Channel {
      * @param message
      * @param frontUids
      */
-    broadcastMirrored(message) {
+    broadcastLinked(message) {
         this.broadcastMirrorHandler(message);
     }
     onMessageQueue(messages, frontUid) {
@@ -95,7 +95,7 @@ class BackChannel extends Channel_1.Channel {
                 message,
             };
         });
-        this.broadcastMirrorHandler = this.centrum.createPublish(Protocol_1.default.BROADCAST_MIRROR_FRONTS(this.channelId));
+        this.broadcastMirrorHandler = this.centrum.createPublish(Protocol_1.default.BROADCAST_LINKED_FRONTS(this.channelId));
     }
     /**
      * initializes channel pub and sub  handlers when we receive a connect message from front channel.

@@ -6,7 +6,7 @@ declare enum MSG_CODES {
     SEND_BACK = 3,
     BROADCAST_ALL_BACK = 4,
     CONNECTION_CHANGE = 5,
-    BROADCAST_MIRROR_FRONTS = 6,
+    BROADCAST_LINKED_FRONTS = 6,
     BROADCAST_ALL_FRONTS = 7,
     SEND_FRONT = 8,
     SET_STATE = 9,
@@ -26,7 +26,7 @@ export declare class Protocol {
     static BROADCAST_ALL_BACK(): string;
     static SEND_QUEUED(frontUid: any): string;
     static SEND_BACK(backChannelId: any): string;
-    static BROADCAST_MIRROR_FRONTS(frontChannelId: any): string;
+    static BROADCAST_LINKED_FRONTS(frontChannelId: any): string;
     static SET_STATE(frontChannelId: any): string;
     static PATCH_STATE(frontChannelId: any): string;
     static BROADCAST_ALL_FRONTS(): string;
@@ -53,7 +53,7 @@ export declare abstract class MessageFactory {
     abstract SEND_BACK: PushProtocol | SubscribeProtocol;
     abstract DISCONNECT: PushProtocol | SubscribeProtocol;
     abstract CONNECTION_CHANGE: PushProtocol | SubscribeProtocol;
-    abstract BROADCAST_MIRROR_FRONTS: PublishProtocol | SubscribeProtocol;
+    abstract BROADCAST_LINKED_FRONTS: PublishProtocol | SubscribeProtocol;
     abstract BROADCAST_ALL_FRONTS: PublishProtocol | SubscribeProtocol;
     abstract SEND_FRONT: PublishProtocol | SubscribeProtocol;
     abstract SET_STATE: PublishProtocol | SubscribeProtocol;

@@ -33,12 +33,12 @@ class FrontMessages extends MessageFactory_1.MessageFactory {
     initializeSubs() {
         this.CONNECTION_CHANGE = this.subCreator(MessageFactory_1.Protocol.CONNECTION_CHANGE(this.frontUid), this.frontUid);
         this.SEND_FRONT = this.subCreator(MessageFactory_1.Protocol.SEND_FRONT(this.frontUid), this.frontUid);
-        this.BROADCAST_MIRROR_FRONTS = this.subCreator(MessageFactory_1.Protocol.BROADCAST_MIRROR_FRONTS(this.channelId), this.frontUid);
+        this.BROADCAST_LINKED_FRONTS = this.subCreator(MessageFactory_1.Protocol.BROADCAST_LINKED_FRONTS(this.channelId), this.frontUid);
         this.BROADCAST_ALL_FRONTS = this.subCreator(MessageFactory_1.Protocol.BROADCAST_ALL_FRONTS(), this.frontUid);
         return {
             CONNECTION_CHANGE: this.CONNECTION_CHANGE,
             SEND_FRONT: this.SEND_FRONT,
-            BROADCAST_MIRROR_FRONTS: this.BROADCAST_MIRROR_FRONTS,
+            BROADCAST_LINKED_FRONTS: this.BROADCAST_LINKED_FRONTS,
             BROADCAST_ALL_FRONTS: this.BROADCAST_ALL_FRONTS,
         };
     }

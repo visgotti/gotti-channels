@@ -11,7 +11,7 @@ var MSG_CODES;
     // BACK -> FRONT
     MSG_CODES[MSG_CODES["CONNECT_SUCCESS"] = 5] = "CONNECT_SUCCESS";
     MSG_CODES[MSG_CODES["CONNECT_FAILED"] = 6] = "CONNECT_FAILED";
-    MSG_CODES[MSG_CODES["BROADCAST_MIRROR_FRONTS"] = 7] = "BROADCAST_MIRROR_FRONTS";
+    MSG_CODES[MSG_CODES["BROADCAST_LINKED_FRONTS"] = 7] = "BROADCAST_LINKED_FRONTS";
     MSG_CODES[MSG_CODES["BROADCAST_ALL_FRONTS"] = 8] = "BROADCAST_ALL_FRONTS";
     MSG_CODES[MSG_CODES["SEND_FRONT"] = 9] = "SEND_FRONT";
     MSG_CODES[MSG_CODES["SET_STATE"] = 10] = "SET_STATE";
@@ -42,7 +42,7 @@ class Protocol {
     ;
     static SEND_FRONT(frontUid) { return Protocol.make(MSG_CODES.SEND_FRONT, frontUid); }
     ;
-    static BROADCAST_MIRROR_FRONTS(frontChannelId) { return Protocol.make(MSG_CODES.BROADCAST_MIRROR_FRONTS, frontChannelId); }
+    static BROADCAST_LINKED_FRONTS(frontChannelId) { return Protocol.make(MSG_CODES.BROADCAST_LINKED_FRONTS, frontChannelId); }
     ;
     static SET_STATE(frontChannelId) { return Protocol.make(MSG_CODES.SET_STATE, frontChannelId); }
     ;

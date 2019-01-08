@@ -60,8 +60,8 @@ class BackChannel extends Channel_1.Channel {
      * sends message to all front channels that share channelId with back channel.
      * @param message
      */
-    broadcastMirrored(message) {
-        this.pub.BROADCAST_MIRROR_FRONTS(message);
+    broadcastLinked(message) {
+        this.pub.BROADCAST_LINKED_FRONTS(message);
     }
     getFrontUidForClient(clientUid) {
         return this._connectedClientsData.get(clientUid).frontUid;
@@ -104,7 +104,7 @@ class BackChannel extends Channel_1.Channel {
     registerPreConnectedPubs() {
         // handler that broadcasts instance already exists on centrum before creating it if its not the first backChannel instantiated
         this.pub.BROADCAST_ALL_FRONTS.register();
-        this.pub.BROADCAST_MIRROR_FRONTS.register();
+        this.pub.BROADCAST_LINKED_FRONTS.register();
     }
     /**
      * initializes channel pub and sub  handlers when we receive a connect message from front channel.

@@ -3,15 +3,15 @@ import BackChannel from './BackChannel';
 
 
 export interface BackPubs {
-    BROADCAST_MIRROR_FRONTS: PublishProtocol,
     BROADCAST_ALL_FRONTS: PublishProtocol;
-    SET_STATE: PublishProtocol;
-    PATCH_STATE: PublishProtocol
 }
 
 export interface BackPushes {
     CONNECTION_CHANGE: PushProtocol,
     SEND_FRONT: PushProtocol,
+    BROADCAST_LINKED_FRONTS: PushProtocol,
+    SET_STATE: PushProtocol,
+    PATCH_STATE: PushProtocol
 }
 
 export interface BackSubs {
@@ -23,6 +23,8 @@ export interface BackSubs {
 
 export interface BackPulls {
     SEND_QUEUED: PullProtocol,
+    LINK: PullProtocol,
+    UNLINK: PullProtocol,
 }
 
 export class BackMessages extends MessageFactory {
@@ -32,12 +34,14 @@ export class BackMessages extends MessageFactory {
     public SEND_BACK: SubscribeProtocol;
 
     public SEND_QUEUED: PullProtocol;
+    public LINK: PullProtocol;
+    public UNLINK: PullProtocol;
 
     public SEND_FRONT: PushProtocol;
 
     public CONNECTION_CHANGE: PushProtocol;
 
-    public BROADCAST_MIRROR_FRONTS: PublishProtocol;
+    public BROADCAST_LINKED_FRONTS: PublishProtocol;
     public BROADCAST_ALL_FRONTS: PublishProtocol;
     public SET_STATE:  PublishProtocol;
     public PATCH_STATE: PublishProtocol;
@@ -60,15 +64,9 @@ export class BackMessages extends MessageFactory {
     }
 
     private initializePubs() : BackPubs {
-        this.BROADCAST_MIRROR_FRONTS = this.pubCreator(Protocol.BROADCAST_MIRROR_FRONTS(this.channelId));
-        this.SET_STATE = this.pubCreator(Protocol.SET_STATE(this.channelId), 'NONE'); // encoding for states happen in the back channel business logic
-        this.PATCH_STATE = this.pubCreator(Protocol.PATCH_STATE(this.channelId), 'NONE');
         this.BROADCAST_ALL_FRONTS = this.pubCreator(Protocol.BROADCAST_ALL_FRONTS());
 
         return {
-            BROADCAST_MIRROR_FRONTS: this.BROADCAST_MIRROR_FRONTS,
-            PATCH_STATE: this.PATCH_STATE,
-            SET_STATE: this.SET_STATE,
             BROADCAST_ALL_FRONTS: this.BROADCAST_ALL_FRONTS,
         }
     }
@@ -76,9 +74,16 @@ export class BackMessages extends MessageFactory {
     private initializePushes() : BackPushes {
         this.CONNECTION_CHANGE = this.pushCreator(Protocol.CONNECTION_CHANGE);
         this.SEND_FRONT = this.pushCreator(Protocol.SEND_FRONT);
+        this.BROADCAST_LINKED_FRONTS = this.pushCreator(Protocol.BROADCAST_LINKED_FRONTS);
+        this.SET_STATE = this.pushCreator(Protocol.SET_STATE, 'NONE'); // encoding for states happen in the back channel business logic
+        this.PATCH_STATE = this.pushCreator(Protocol.PATCH_STATE, 'NONE');
+
         return {
             SEND_FRONT: this.SEND_FRONT,
             CONNECTION_CHANGE: this.CONNECTION_CHANGE,
+            BROADCAST_LINKED_FRONTS: this.BROADCAST_LINKED_FRONTS,
+            SET_STATE: this.SET_STATE,
+            PATCH_STATE: this.PATCH_STATE,
         }
     }
 
@@ -98,9 +103,13 @@ export class BackMessages extends MessageFactory {
 
     private initializePulls(): BackPulls {
         this.SEND_QUEUED = this.pullCreator(Protocol.SEND_QUEUED);
+        this.LINK = this.pullCreator(Protocol.LINK);
+        this.UNLINK = this.pullCreator(Protocol.UNLINK);
 
         return {
             SEND_QUEUED: this.SEND_QUEUED,
+            LINK: this.LINK,
+            UNLINK: this.UNLINK,
         }
     }
 }

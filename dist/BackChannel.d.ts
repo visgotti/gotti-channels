@@ -32,7 +32,7 @@ export declare class BackChannel extends Channel {
      * @param message
      * @param frontUids
      */
-    broadcastMirrored(message: any): void;
+    broadcastLinked(message: any): void;
     private onMessageQueue;
     private _onMessage;
     private onMessageHandler;

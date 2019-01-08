@@ -27,7 +27,7 @@ class Channel {
             this._onStateUpdate(state);
         });
         this.centrum.createPublish(this.publishStateFunctionName, this.getState.bind(this));
-        this.broadcastState = this.centrum.publish[this.publishStateFunctionName];
+        this.sendState = this.centrum.publish[this.publishStateFunctionName];
     }
     _onStateUpdate(stateData) {
         throw new Error(`Unimplemented onStateUpdate handler in channel`);
