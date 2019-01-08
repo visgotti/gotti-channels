@@ -3,18 +3,42 @@ import * as msgpack from 'notepack.io';
 
 import FrontChannel from './FrontChannel';
 
+enum STATE_UPDATE_TYPES {
+    SET,
+    PATCH
+}
+
+interface StateUpdates {
+    type: STATE_UPDATE_TYPES,
+    encoded: string,
+}
+
 export class Client {
     readonly uid: string;
     public state: any;
     private connectedChannel: FrontChannel;
-    private _previousState: any;
-    private _previousStateEncoded: any;
+    private queuedEncodedUpdates: any;
 
     constructor(uid) {
         this.uid = uid;
         this.connectedChannel = null;
+
+        this.queuedEncodedUpdates = {};
+
         this.state = null;
-        this._previousStateEncoded = {};
+    }
+
+    public addEncodedStateUpdate(channelId, stateUpdate: StateUpdates) {
+        if(!(channelId in this.queuedEncodedUpdates)) {
+            this.queuedEncodedUpdates[channelId] = [];
+        }
+        this.queuedEncodedUpdates[channelId].push(stateUpdate);
+    }
+
+    public clearEncodedStateUpdates() {
+        Object.keys(this.queuedEncodedUpdates).forEach(key => {
+            delete this.queuedEncodedUpdates[key];
+        });
     }
 
     public addMessage(message) {
@@ -44,7 +68,7 @@ export class Client {
      * @param channel
      */
     public linkChannel(channel: FrontChannel) {
-        this.state[channel.id] = channel.state;
+
     }
 
     /**

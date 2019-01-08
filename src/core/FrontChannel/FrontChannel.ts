@@ -1,4 +1,5 @@
 import { Channel } from '../Channel/Channel';
+import { Client } from '../Client';
 import { Centrum } from '../../../lib/core/Centrum';
 import { FrontMessages, FrontPubs, FrontSubs, FrontPushes } from './FrontMessages';
 
@@ -21,6 +22,8 @@ class FrontChannel extends Channel {
     private CONNECTION_STATUS: CONNECTION_STATUS;
 
     private linked: boolean;
+    private connectedClients: Map<string, Client>;
+    private awaitingConnectionClients: Map<string, Function>;
 
     // unique id to identify front channel based on channelId and serverIndex
     readonly frontUid : string;
@@ -36,6 +39,9 @@ class FrontChannel extends Channel {
 
         this.connectedChannelIds = new Set();
 
+        this.awaitingConnectionClients = new Map();
+        this.connectedClients = new Map();
+
         this.queuedMessages = [];
 
         this.linked = false;
@@ -49,6 +55,28 @@ class FrontChannel extends Channel {
         this.registerPreConnectedSubs();
         this.registerPreConnectedPubs();
     };
+
+    public async addClient(client: Client) {
+        // add client to awaiting connections with a callback to initialize the client with the state
+        this.awaitingConnectionClients.add(client.uid, (state) => {
+            if(this.awaitingConnectionClients.has(client.uid)) {
+                client.addEncodedStateUpdate(this.channelId, state);
+                this.awaitingConnectionClients.remove(client.uid);
+                this.connectedClients.add(client.uid, client);
+                return true;
+            }
+            return false;
+        });
+        this.linkForClient(client.uid);
+    }
+
+    public removeClient(uid) {
+        this.awaitingConnectionClients.remove(uid);
+        this.connectedClients.remove(uid);
+        if(this.awaitingConnectionClients.size === 0 && this.connectedClients.size === 0) {
+            this.unlink();
+        }
+    }
 
     /**
      * sets the onConnectedHandler function
@@ -227,6 +255,11 @@ class FrontChannel extends Channel {
         }
     }
 
+    private linkForClient(clientUid) {
+        this.link = true;
+        this.pub.LINK_FOR_CLIENT(clientUid);
+    }
+
     private _onSetState(newState: any) : void  {
         if(!this.linked) return;
 
@@ -275,6 +308,7 @@ class FrontChannel extends Channel {
             this.sub.PATCH_STATE.register(this._onPatchState.bind(this));
             this.sub.SET_STATE.register(this._onSetState.bind(this));
             this.pub.SEND_QUEUED.register();
+            //this.pub.LINK_FOR_CLIENT.register();
             this.pub.LINK.register();
             this.pub.UNLINK.register();
         }
