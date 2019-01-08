@@ -121,10 +121,14 @@ export class Client {
         this.processorChannel.addMessage(data);
     }
 
-    public disconnect() {
-        this.connectedChannels.forEach(channel => {
-            channel.disconnectClient(this.uid);
-        });
+    public disconnect(channelId?) {
+        if(channelId) {
+            this.connectedChannels.get(channelId).disconnectClient(this.uid)
+        } else {
+            this.connectedChannels.forEach(channel => {
+                channel.disconnectClient(this.uid);
+            });
+        }
     }
 
     // removes queued updates from channel.

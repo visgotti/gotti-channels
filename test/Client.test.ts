@@ -43,6 +43,8 @@ describe('Client', function() {
     describe('client.connectToChannel', () => {
         it('should get encoded state from async response', (done) => {
             backChannels[0].setState({ "foo": "bar" });
+            channelsById[frontChannels[frontChannels.length - 1].channelId].back.setState({ "foo": "bar" });
+            backChannels[0].setState({ "foo": "bar" });
             client.connectToChannel(frontChannels[0]).then(encodedState => {
                 const state = msgpack.decode(encodedState);
                 assert.deepStrictEqual(state, { "foo": "bar" });
@@ -56,11 +58,18 @@ describe('Client', function() {
             assert.throws(() => { client.sendLocal("test") }, 'Client must have a channel set as its processor channel to send messages. See Client.setProcessor');
             done();
         });
-        it('doesnt throw after processer channel is set', (done) => {
+        it('sets and connects asynchronously if it wasnt connected first', () => {
+            client.setProcessorChannel(frontChannels[frontChannels.length - 1]).then(set => {
+                assert.strictEqual(set, true);
+            })
+        });
+        it('doesnt throw after processer channel is set back', (done) => {
             backChannels[0].onMessage(() => {});
-            client.setProcessorChannel(frontChannels[0]);
-            assert.doesNotThrow(() => { client.sendLocal("test") });
-            done();
+            client.setProcessorChannel(frontChannels[0]).then(set => {
+                assert.strictEqual(set, true);
+                assert.doesNotThrow(() => { client.sendLocal("test") });
+                done();
+            });
         });
     });
     describe('client.addEncodedStateSet', () => {
@@ -70,21 +79,11 @@ describe('Client', function() {
             assert.strictEqual(count, 2);
             done();
         });
-        it('returns false if the client wasnt connected to channel', (done) =>{
-            const count = client.addEncodedStateSet(frontChannels[frontChannels.length - 1].channelId,'bur');
-            assert.strictEqual(count, false);
-            done();
-        });
     });
     describe('client.addEncodedStatePatch', () => {
         it('adds an element to the queued updates', (done) => {
             const count = client.addEncodedStatePatch(frontChannels[0].channelId,'bur');
             assert.strictEqual(count, 3);
-            done();
-        });
-        it('returns false if the client wasnt connected to channel', (done) =>{
-            const count = client.addEncodedStatePatch(frontChannels[frontChannels.length - 1].channelId,'bur');
-            assert.strictEqual(count, false);
             done();
         });
     });
@@ -149,7 +148,5 @@ describe('Client', function() {
             });
             client.sendGlobal(1);
         });
-    });
-    describe('client.onChannelDisconnect', () => {
     });
 });
