@@ -53,9 +53,9 @@ export class BackMessages extends MessageFactory {
 
     readonly channelId: string;
 
-    constructor(centrum, channel: BackChannel) {
-        super(centrum, channel);
-        this.centrum = centrum;
+    constructor(messenger, channel: BackChannel) {
+        super(messenger, channel);
+        this.messenger = messenger;
         this.channelId = channel.channelId;
         this.pub = this.initializePubs();
         this.sub = this.initializeSubs();

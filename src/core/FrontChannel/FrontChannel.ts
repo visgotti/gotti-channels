@@ -1,6 +1,6 @@
 import { Channel } from '../Channel/Channel';
 import { Client } from '../Client';
-import { Centrum } from '../../../lib/core/Centrum';
+import { Messenger } from '../../../lib/core/Messenger';
 import { FrontMessages, FrontPubs, FrontSubs, FrontPushes } from './FrontMessages';
 
 import { CONNECTION_STATUS, CONNECTION_CHANGE } from '../types';
@@ -37,8 +37,8 @@ class FrontChannel extends Channel {
     // timeout length for waiting client connections
     readonly clientTimeout: number;
 
-    constructor(channelId, serverIndex, totalChannels, centrum: Centrum) {
-        super(channelId, centrum);
+    constructor(channelId, serverIndex, totalChannels, messenger: Messenger) {
+        super(channelId, messenger);
 
         this.CONNECTION_STATUS = CONNECTION_STATUS.DISCONNECTED;
 
@@ -472,7 +472,7 @@ class FrontChannel extends Channel {
      * initializes needed message factories for front channels.
      */
     private initializeMessageFactories() {
-        const { pub, push, sub } = new FrontMessages(this.centrum, this);
+        const { pub, push, sub } = new FrontMessages(this.messenger, this);
         this.pub = pub;
         this.push = push;
         this.sub = sub;

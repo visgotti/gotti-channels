@@ -5,12 +5,16 @@ export interface FrontPubs {
     DISCONNECT: PublishProtocol;
     SEND_QUEUED: PublishProtocol;
     BROADCAST_ALL_BACK: PublishProtocol;
+    LINK: PublishProtocol;
+    UNLINK: PublishProtocol;
 }
 export interface FrontSubs {
     CONNECTION_CHANGE: SubscribeProtocol;
     SEND_FRONT: SubscribeProtocol;
     BROADCAST_LINKED_FRONTS: SubscribeProtocol;
     BROADCAST_ALL_FRONTS: SubscribeProtocol;
+    PATCH_STATE: SubscribeProtocol;
+    SET_STATE: SubscribeProtocol;
 }
 export interface FrontPushes {
     SEND_BACK: PushProtocol;
@@ -22,6 +26,8 @@ export declare class FrontMessages extends MessageFactory {
     CONNECT: PublishProtocol;
     BROADCAST_ALL_BACK: PublishProtocol;
     DISCONNECT: PublishProtocol;
+    LINK: PublishProtocol;
+    UNLINK: PublishProtocol;
     SEND_BACK: PushProtocol;
     CONNECTION_CHANGE: SubscribeProtocol;
     BROADCAST_LINKED_FRONTS: SubscribeProtocol;
@@ -34,7 +40,7 @@ export declare class FrontMessages extends MessageFactory {
     sub: FrontSubs;
     readonly frontUid: string;
     readonly channelId: string;
-    constructor(centrum: any, channel: FrontChannel);
+    constructor(messenger: any, channel: FrontChannel);
     private initializePubs;
     private initializePushes;
     private initializeSubs;

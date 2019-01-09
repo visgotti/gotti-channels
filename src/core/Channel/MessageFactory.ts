@@ -1,4 +1,4 @@
-import { Centrum } from '../../../lib/core/Centrum';
+import { Messenger } from '../../../lib/core/Messenger';
 
 enum MSG_CODES {
     // FRONT -> BACK
@@ -89,14 +89,14 @@ export abstract class MessageFactory {
     public abstract SET_STATE: PublishProtocol | SubscribeProtocol;
     public abstract PATCH_STATE: PublishProtocol | SubscribeProtocol;
 
-    protected centrum: Centrum;
+    protected messenger: Messenger;
     protected channel: any;
     readonly channelId: string;
 
-    constructor(centrum, channel) {
+    constructor(messenger, channel) {
         this.channelId = channel.channelId;
         this.channel = channel;
-        this.centrum = centrum;
+        this.messenger = messenger;
     }
 
     //TODO: even though were using pub/sub zmq sockets it would make some of the code much more legible if I can set up a nice req/res message layer.
@@ -115,10 +115,10 @@ export abstract class MessageFactory {
         });
 
         pub.register = () => {
-            pub.publisher = this.centrum.getOrCreatePublish(protocol, null, encoder);
+            pub.publisher = this.messenger.getOrCreatePublish(protocol, null, encoder);
 
             pub.unregister = (...args) => {
-                this.centrum.removePublish(protocol);
+                this.messenger.removePublish(protocol);
             };
         };
 
@@ -126,7 +126,7 @@ export abstract class MessageFactory {
     }
 
     /**
-     * push will use the same centrum publisher so any registered subs will receive it but since the recipients
+     * push will use the same messenger publisher so any registered subs will receive it but since the recipients
      * can change dynamically we want to be able to just give a 'to' parameter to create push and have the protocol
      * factory create the message name for us.
      * @param protocolFactory - Function used to create the publisher name based on the to parameter passed in.
@@ -143,10 +143,10 @@ export abstract class MessageFactory {
         });
 
         push.register = (to) => {
-            push[to] = this.centrum.getOrCreatePublish(protocolFactory(to), null, encoder);
+            push[to] = this.messenger.getOrCreatePublish(protocolFactory(to), null, encoder);
 
             push.unregister = () => {
-                this.centrum.removePublish(protocolFactory(to));
+                this.messenger.removePublish(protocolFactory(to));
                 delete push[to];
             };
         };
@@ -164,9 +164,9 @@ export abstract class MessageFactory {
         let sub: any = {};
 
         sub.register = (onSubscriptionHandler: SubscriptionHandler) => {
-            sub.subscriber = this.centrum.createOrAddSubscription(protocol, id, onSubscriptionHandler, decoder);
+            sub.subscriber = this.messenger.createOrAddSubscription(protocol, id, onSubscriptionHandler, decoder);
             sub.unregister = () => {
-                this.centrum.removeSubscriptionById(protocol, id);
+                this.messenger.removeSubscriptionById(protocol, id);
             };
         };
 
@@ -182,9 +182,9 @@ export abstract class MessageFactory {
         let pull: any = {};
 
         pull.register = (from, onSubscriptionHandler: SubscriptionHandler) => {
-            pull.subscriber = this.centrum.createSubscription(protocolFactory(from), protocolFactory(from), onSubscriptionHandler);
+            pull.subscriber = this.messenger.createSubscription(protocolFactory(from), protocolFactory(from), onSubscriptionHandler);
             pull.unregister = (from) => {
-                this.centrum.removeAllSubscriptionsWithName(protocolFactory(from));
+                this.messenger.removeAllSubscriptionsWithName(protocolFactory(from));
             };
         };
         return pull;

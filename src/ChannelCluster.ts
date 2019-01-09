@@ -4,9 +4,9 @@
  * become the beef of the project when it comes to loading channels onto new processes/machines
  */
 
-import FrontChannel from './FrontChannel';
-import BackChannel from './BackChannel';
-import { Centrum } from '../../lib/core/Centrum.js';
+import FrontChannel from './core/FrontChannel';
+import BackChannel from './core/BackChannel';
+import { Messenger } from '../lib/core/Messenger.js';
 
 export interface ClusterOptions {
     frontServers: number,
@@ -16,11 +16,12 @@ export interface ClusterOptions {
     startingFrontPort: number,
     host: string,
 }
+
 export class ChannelCluster {
     readonly options: ClusterOptions;
 
-    private frontServers: Array<Centrum>;
-    private backServers: Array<Centrum>;
+    private frontServers: Array<Messenger>;
+    private backServers: Array<Messenger>;
 
     private frontChannels: Array<FrontChannel>;
     private backChannels: Array<BackChannel>;
@@ -86,7 +87,7 @@ export class ChannelCluster {
                     pubSocketURIs: frontServerPubUris
                 }
             };
-            this.backServers.push(new Centrum(backServerOptions));
+            this.backServers.push(new Messenger(backServerOptions));
         }
 
         for(let i = 0; i < frontServers; i++) {
@@ -99,7 +100,7 @@ export class ChannelCluster {
                     pubSocketURIs: backServerPubUris
                 }
             };
-            this.frontServers.push(new Centrum(frontServerOptions));
+            this.frontServers.push(new Messenger(frontServerOptions));
         }
         const backChannelsPerServer = totalChannels / backServers;
         const frontChannelsPerServer = totalChannels;

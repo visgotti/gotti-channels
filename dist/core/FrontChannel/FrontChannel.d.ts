@@ -1,6 +1,6 @@
 import { Channel } from '../Channel/Channel';
-import { Centrum } from '../../../lib/Centrum';
-import { StateData } from '../types';
+import { Client } from '../Client';
+import { Messenger } from '../../../lib/core/Messenger';
 declare class FrontChannel extends Channel {
     private connectedChannelIds;
     private _connectionInfo;
@@ -8,31 +8,55 @@ declare class FrontChannel extends Channel {
     private pub;
     private sub;
     private push;
+    private _state;
     private CONNECTION_STATUS;
+    private linked;
+    private connectedClients;
+    private clientConnectedCallbacks;
+    private clientConnectedTimeouts;
     readonly frontUid: string;
     readonly serverIndex: number;
     readonly totalChannels: number;
-    constructor(channelId: any, serverIndex: any, totalChannels: any, centrum: Centrum);
+    readonly clientTimeout: number;
+    constructor(channelId: any, serverIndex: any, totalChannels: any, messenger: Messenger);
+    /**
+     *
+     * @param client
+     * @param timeout
+     */
+    connectClient(client: Client, timeout?: any): Promise<{}>;
     /**
      * sets the onConnectedHandler function
      * @param handler - function that gets executed when a channel succesfully connects to a backChannel.
      */
-    onConnected(handler: (backChannelId: any, state?: StateData) => void): void;
+    onConnected(handler: (backChannelId: any, state?: any) => void): void;
     /**
-     * sets the setStateHandler function
+     * sets the setStateHandler function, the state is not decoded for same reason as the patches
+     * are not. you may want to just blindly pass it along and not waste cpu decoding it.
      * @param handler - function that gets executed when mirror back channel sends whole state
      */
-    onSetState(handler: (newState: StateData) => void): void;
+    onSetState(handler: (encodedState: any, clientUid?: any) => void): void;
     /**
-     * sets the patchStateHandler function
+     * sets the onPatchStateHHandler, the patch is not decoded or applied and its left for you to do that..
+     * the reason for this is if you may not want to use cpu applying the patch and just want to forward it.
      * @param handler - function that gets executed after channel receives and applies patched state from .
      */
-    onPatchState(handler: (patches: any, updatedState: StateData) => void): void;
+    onPatchState(handler: (patches: any) => void): void;
     /**
      * sets the onMessageHandler function
      * @param handler - function that gets executed, gets parameters message and channelId
      */
     onMessage(handler: (message: any, channelId: string) => void): void;
+    /**
+     * sends a link message to mirror back channel to notify it that it needs to receive current state and then
+     * receive patches and messages. if theres a client uid to initiate the link, the back server will respond with
+     * the clientUid when it replies with state which gets used to call the callback in clientConnectedCallbacks map
+     */
+    link(clientUid?: boolean): void;
+    /**
+     * sends an unlink message to back channel so it stops receiving patch updates
+     */
+    unlink(): void;
     /**
      * adds message to queue to be sent to mirror back channel when broadcastQueued() is called.
      * @param message
@@ -69,11 +93,23 @@ declare class FrontChannel extends Channel {
      */
     disconnect(channelIds?: Array<string>, timeout?: number): Promise<{}>;
     clearQueued(): void;
+    readonly state: any;
     readonly connectionInfo: any;
+    private _connectClient;
+    disconnectClient(clientUid: any): void;
+    private disconnectAllClients;
     private _onSetState;
+    /**
+     * received full state from back channel, check if its for
+     * a client awaiting for its connected callback and then
+     * check if the client is in the connected map
+     * @param clientUid
+     * @param state
+     */
+    private handleSetStateForClient;
     private onSetStateHandler;
     private _onPatchState;
-    private onPatchedStateHandler;
+    private onPatchStateHandler;
     private _onMessage;
     private onMessageHandler;
     private _onConnectionChange;
@@ -99,5 +135,6 @@ declare class FrontChannel extends Channel {
      * initializes needed message factories for front channels.
      */
     private initializeMessageFactories;
+    private clientCanConnect;
 }
 export default FrontChannel;

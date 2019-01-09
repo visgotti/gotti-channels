@@ -1,4 +1,4 @@
-import { RequestOptions, Hook } from '../Centrum';
+import { RequestOptions, Hook } from '../Messenger';
 export declare class Requester {
     private dealerSocket;
     private onResponseHandlers;

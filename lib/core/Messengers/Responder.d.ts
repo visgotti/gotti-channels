@@ -1,4 +1,4 @@
-import { Hook } from '../Centrum';
+import { Hook } from '../Messenger';
 export declare class Responder {
     private dealerSocket;
     private onRequestHooks;

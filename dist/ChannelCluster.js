@@ -13,9 +13,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const FrontChannel_1 = require("./FrontChannel");
-const BackChannel_1 = require("./BackChannel");
-const Centrum_js_1 = require("../../lib/Centrum.js");
+const FrontChannel_1 = require("./core/FrontChannel");
+const BackChannel_1 = require("./core/BackChannel");
+const Messenger_js_1 = require("../lib/core/Messenger.js");
 class ChannelCluster {
     constructor(options) {
         this.options = options;
@@ -76,7 +76,7 @@ class ChannelCluster {
                     pubSocketURIs: frontServerPubUris
                 }
             };
-            this.backServers.push(new Centrum_js_1.Centrum(backServerOptions));
+            this.backServers.push(new Messenger_js_1.Messenger(backServerOptions));
         }
         for (let i = 0; i < frontServers; i++) {
             const frontServerOptions = {
@@ -88,7 +88,7 @@ class ChannelCluster {
                     pubSocketURIs: backServerPubUris
                 }
             };
-            this.frontServers.push(new Centrum_js_1.Centrum(frontServerOptions));
+            this.frontServers.push(new Messenger_js_1.Messenger(frontServerOptions));
         }
         const backChannelsPerServer = totalChannels / backServers;
         const frontChannelsPerServer = totalChannels;

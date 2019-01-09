@@ -1,5 +1,5 @@
 import {clearInterval} from "timers";
-import { ChannelCluster } from '../src/core/ChannelCluster';
+import { ChannelCluster } from '../src/ChannelCluster';
 import { Client } from '../src/core/Client';
 
 import * as msgpack from 'notepack.io';

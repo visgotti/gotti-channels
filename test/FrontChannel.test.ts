@@ -1,7 +1,7 @@
 import {clearInterval} from "timers";
 import * as msgpack from 'notepack.io';
 
-import { ChannelCluster } from '../src/core/ChannelCluster';
+import { ChannelCluster } from '../src/ChannelCluster';
 
 const { TEST_CLUSTER_OPTIONS, makeRandomMessages, arrayAverage, getRandomChannelIds, formatBytes, applyPatches } = require('./testHelpers');
 const options = TEST_CLUSTER_OPTIONS;

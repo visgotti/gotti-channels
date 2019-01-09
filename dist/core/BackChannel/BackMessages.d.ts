@@ -1,14 +1,14 @@
 import { PublishProtocol, SubscribeProtocol, PushProtocol, PullProtocol, MessageFactory } from '../Channel/MessageFactory';
 import BackChannel from './BackChannel';
 export interface BackPubs {
-    BROADCAST_LINKED_FRONTS: PublishProtocol;
     BROADCAST_ALL_FRONTS: PublishProtocol;
-    SET_STATE: PublishProtocol;
-    PATCH_STATE: PublishProtocol;
 }
 export interface BackPushes {
     CONNECTION_CHANGE: PushProtocol;
     SEND_FRONT: PushProtocol;
+    BROADCAST_LINKED_FRONTS: PushProtocol;
+    SET_STATE: PushProtocol;
+    PATCH_STATE: PushProtocol;
 }
 export interface BackSubs {
     SEND_BACK: SubscribeProtocol;
@@ -18,6 +18,8 @@ export interface BackSubs {
 }
 export interface BackPulls {
     SEND_QUEUED: PullProtocol;
+    LINK: PullProtocol;
+    UNLINK: PullProtocol;
 }
 export declare class BackMessages extends MessageFactory {
     CONNECT: SubscribeProtocol;
@@ -25,6 +27,8 @@ export declare class BackMessages extends MessageFactory {
     DISCONNECT: SubscribeProtocol;
     SEND_BACK: SubscribeProtocol;
     SEND_QUEUED: PullProtocol;
+    LINK: PullProtocol;
+    UNLINK: PullProtocol;
     SEND_FRONT: PushProtocol;
     CONNECTION_CHANGE: PushProtocol;
     BROADCAST_LINKED_FRONTS: PublishProtocol;
@@ -36,7 +40,7 @@ export declare class BackMessages extends MessageFactory {
     sub: BackSubs;
     pull: BackPulls;
     readonly channelId: string;
-    constructor(centrum: any, channel: BackChannel);
+    constructor(messenger: any, channel: BackChannel);
     private initializePubs;
     private initializePushes;
     private initializeSubs;

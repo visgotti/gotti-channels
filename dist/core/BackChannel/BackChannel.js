@@ -1,11 +1,16 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const fossilDelta = require("fossil-delta");
+const msgpack = require("notepack.io");
 const Channel_1 = require("../Channel/Channel");
 const BackMessages_1 = require("./BackMessages");
 const types_1 = require("../types");
 class BackChannel extends Channel_1.Channel {
-    constructor(channelId, centrum) {
-        super(channelId, centrum);
+    constructor(channelId, messenger) {
+        super(channelId, messenger);
+        this.state = null;
+        this._previousState = null;
+        this.linkedFrontUids = new Set();
         this._connectedFrontsData = new Map();
         this._mirroredFrontUids = new Set();
         this._connectedClientsData = new Map();
@@ -22,12 +27,44 @@ class BackChannel extends Channel_1.Channel {
     onMessage(handler) {
         this.onMessageHandler = handler;
     }
-    broadcastPatchedState() {
-        // this.sendPatchedStateHandler();
+    /**
+     * sends state patches to mirrored channels
+     * @returns {boolean}
+     */
+    broadcastPatch() {
+        if (!(this.state)) {
+            throw new Error('null state');
+        }
+        if (this.linkedFrontUids.size > 0) {
+            const currentState = this.state;
+            const currentStateEncoded = msgpack.encode(currentState);
+            if (currentStateEncoded.equals(this._previousStateEncoded)) {
+                return false;
+            }
+            const patches = fossilDelta.create(this._previousStateEncoded, currentStateEncoded);
+            this._previousStateEncoded = currentStateEncoded;
+            this.linkedFrontUids.forEach(frontUid => {
+                this.push.PATCH_STATE[frontUid](msgpack.encode(patches));
+            });
+            return true;
+        }
     }
     ;
-    broadcastSetState() {
-        // this.sendSetStateHandler();
+    /**
+     * sends state to mirrored linked channel and if its for specific client, clientUid can be passed as a param.
+     */
+    sendState(frontUid, clientUid) {
+        if (!(this.state)) {
+            throw new Error('null state');
+        }
+        if (!(this.linkedFrontUids.has(frontUid))) {
+            throw new Error('Trying to broadcast to unlinked front!');
+        }
+        const sendData = { encodedState: this._previousStateEncoded };
+        if (clientUid) {
+            sendData.clientUid = clientUid;
+        }
+        this.push.SET_STATE[frontUid](sendData);
     }
     ;
     /**
@@ -61,10 +98,16 @@ class BackChannel extends Channel_1.Channel {
      * @param message
      */
     broadcastLinked(message) {
-        this.pub.BROADCAST_LINKED_FRONTS(message);
+        this.linkedFrontUids.forEach(frontUid => {
+            this.push.BROADCAST_LINKED_FRONTS[frontUid](message);
+        });
     }
     getFrontUidForClient(clientUid) {
         return this._connectedClientsData.get(clientUid).frontUid;
+    }
+    setState(newState) {
+        this._previousStateEncoded = msgpack.encode(newState);
+        this.state = newState;
     }
     get connectedFrontsData() {
         return this._connectedFrontsData;
@@ -102,9 +145,8 @@ class BackChannel extends Channel_1.Channel {
      * publications that we want to be able to send out before channels start connecting.
      */
     registerPreConnectedPubs() {
-        // handler that broadcasts instance already exists on centrum before creating it if its not the first backChannel instantiated
+        // handler that broadcasts instance already exists on messenger before creating it if its not the first backChannel instantiated
         this.pub.BROADCAST_ALL_FRONTS.register();
-        this.pub.BROADCAST_LINKED_FRONTS.register();
     }
     /**
      * initializes channel pub and sub  handlers when we receive a connect message from front channel.
@@ -114,12 +156,20 @@ class BackChannel extends Channel_1.Channel {
         const { channelId, frontUid, serverIndex } = frontData;
         if (channelId === this.channelId) {
             this.pull.SEND_QUEUED.register(frontUid, (messages => {
-                for (let i = 0; i < messages.length; i++) {
-                    this.onMessageHandler(messages[i], frontUid);
-                }
+                this.onMessageQueue(messages, frontUid);
             }));
             // add to mirror set since its same channelId
             this._mirroredFrontUids.add(frontUid);
+            this.push.SET_STATE.register(frontUid);
+            this.push.PATCH_STATE.register(frontUid);
+            this.push.BROADCAST_LINKED_FRONTS.register(frontUid);
+            this.pull.LINK.register(frontUid, (clientUid) => {
+                this.linkedFrontUids.add(frontUid);
+                this.sendState(frontUid, clientUid);
+            });
+            this.pull.UNLINK.register(frontUid, () => {
+                this.linkedFrontUids.delete(frontUid);
+            });
         }
         // keep connected data stored for all fronts.
         this._connectedFrontsData.set(frontUid, frontData);
@@ -135,7 +185,7 @@ class BackChannel extends Channel_1.Channel {
      * initializes needed message factories for front channels.
      */
     initializeMessageFactories() {
-        const { pub, push, sub, pull } = new BackMessages_1.BackMessages(this.centrum, this);
+        const { pub, push, sub, pull } = new BackMessages_1.BackMessages(this.messenger, this);
         this.pub = pub;
         this.push = push;
         this.sub = sub;

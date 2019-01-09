@@ -17,13 +17,13 @@ export interface RESPONSE_MESSAGE {
     readonly sequence: number;
     data: any;
 }
-export interface CentrumConfig {
+export interface MessengerConfig {
     'broker': {
         ['URI']: string;
     };
     ['servers']: Array<{
         ['name']: string;
-        ['centrumOptions']: any;
+        ['messengerOptions']: any;
     }>;
 }
 export interface RequestOptions {
@@ -35,7 +35,7 @@ export interface PublishOptions {
 export interface SubscribeOptions {
     pubSocketURIs: Array<string>;
 }
-export interface CentrumOptions {
+export interface MessengerOptions {
     id: string;
     brokerURI?: string;
     request?: RequestOptions;
@@ -48,7 +48,7 @@ declare enum CREATED_OR_ADDED {
     ADDED = "ADDED"
 }
 import { Requester } from './Messengers/Requester';
-export declare class Centrum {
+export declare class Messenger {
     serverId: string;
     requests?: {
         [name: string]: Function;
@@ -67,16 +67,16 @@ export declare class Centrum {
     private pubSocket;
     private subSocket;
     private options;
-    constructor(options: CentrumOptions);
+    constructor(options: MessengerOptions);
     /**
-     * sets and initializes available public functions based on centrum options passed in.
+     * sets and initializes available public functions based on messenger options passed in.
      * @param options
      */
     private initializeMessengers;
     close(): void;
     /**
      * If options.request was passed into constructor, you can use this function to create
-     * and send requests. After running this you can make your request by Centrum.requests.name() in which
+     * and send requests. After running this you can make your request by Messenger.requests.name() in which
      * the name() function is the beforeRequestHook passed in.
      * @param name - unique name of request which will be used
      * @param to - id of server you are sending request to.

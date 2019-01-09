@@ -49,9 +49,9 @@ export class FrontMessages extends MessageFactory {
     readonly frontUid: string;
     readonly channelId: string;
 
-    constructor(centrum, channel: FrontChannel) {
-        super(centrum, channel);
-        this.centrum = centrum;
+    constructor(messenger, channel: FrontChannel) {
+        super(messenger, channel);
+        this.messenger = messenger;
         this.frontUid = channel.frontUid;
         this.channelId = channel.channelId;
 

@@ -1,4 +1,4 @@
-import { ChannelCluster } from '../src/core/ChannelCluster';
+import { ChannelCluster } from '../src/ChannelCluster';
 
 const { TEST_CLUSTER_OPTIONS, makeRandomMessages, arrayAverage, getRandomChannelIds, formatBytes } = require('./testHelpers');
 const options = TEST_CLUSTER_OPTIONS;

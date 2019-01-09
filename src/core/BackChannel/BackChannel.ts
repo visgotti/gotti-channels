@@ -1,7 +1,7 @@
 import * as fossilDelta from 'fossil-delta';
 import * as msgpack from 'notepack.io';
 
-import { Centrum } from '../../../lib/core/Centrum';
+import { Messenger } from '../../../lib/core/Messenger';
 
 import { Channel } from '../Channel/Channel';
 import { BackMessages, BackPubs, BackPushes, BackSubs, BackPulls } from './BackMessages';
@@ -29,8 +29,8 @@ class BackChannel extends Channel {
     private _writingClientUids: Set<string>;
     private _listeningClientUids: Set<string>;
 
-    constructor(channelId, centrum: Centrum) {
-        super(channelId, centrum);
+    constructor(channelId, messenger: Messenger) {
+        super(channelId, messenger);
 
         this.state = null;
         this._previousState = null;
@@ -187,7 +187,7 @@ class BackChannel extends Channel {
      * publications that we want to be able to send out before channels start connecting.
      */
     private registerPreConnectedPubs() : void {
-        // handler that broadcasts instance already exists on centrum before creating it if its not the first backChannel instantiated
+        // handler that broadcasts instance already exists on messenger before creating it if its not the first backChannel instantiated
         this.pub.BROADCAST_ALL_FRONTS.register();
     }
 
@@ -236,7 +236,7 @@ class BackChannel extends Channel {
      * initializes needed message factories for front channels.
      */
     private initializeMessageFactories() {
-        const { pub, push, sub, pull } = new BackMessages(this.centrum, this);
+        const { pub, push, sub, pull } = new BackMessages(this.messenger, this);
         this.pub = pub;
         this.push = push;
         this.sub = sub;

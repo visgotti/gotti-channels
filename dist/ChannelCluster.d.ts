@@ -3,9 +3,9 @@
  * right now it's just my createChannels test helper refactored a bit but this will eventually
  * become the beef of the project when it comes to loading channels onto new processes/machines
  */
-import FrontChannel from './FrontChannel';
-import BackChannel from './BackChannel';
-import { Centrum } from '../../lib/Centrum.js';
+import FrontChannel from './core/FrontChannel';
+import BackChannel from './core/BackChannel';
+import { Messenger } from '../lib/core/Messenger.js';
 export interface ClusterOptions {
     frontServers: number;
     backServers: number;
@@ -24,8 +24,8 @@ export declare class ChannelCluster {
     closeAll(): void;
     connectAll(): Promise<boolean>;
     createChannels(): {
-        frontServers: Centrum[];
-        backServers: Centrum[];
+        frontServers: Messenger[];
+        backServers: Messenger[];
         frontChannels: FrontChannel[];
         backChannels: BackChannel[];
         channelsById: {};
