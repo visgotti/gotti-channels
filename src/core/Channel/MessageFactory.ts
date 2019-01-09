@@ -1,4 +1,4 @@
-import { Messenger } from '../../../lib/core/Messenger';
+import { Messenger } from 'centrum-messengers/dist/core/Messenger';
 
 enum MSG_CODES {
     // FRONT -> BACK

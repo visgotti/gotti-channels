@@ -6,7 +6,7 @@
 
 import FrontChannel from './core/FrontChannel';
 import BackChannel from './core/BackChannel';
-import { Messenger } from '../lib/core/Messenger.js';
+import { Messenger } from 'centrum-messengers/dist/core/Messenger';
 
 export interface ClusterOptions {
     frontServers: number,

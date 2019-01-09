@@ -1,6 +1,6 @@
 const EventEmitter = require('events');
 
-import { Messenger } from '../../../lib/core/Messenger';
+import { Messenger } from 'centrum-messengers/dist/core/Messenger';
 
 export class Channel extends EventEmitter{
     readonly channelId: string;

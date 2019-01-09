@@ -1,6 +1,6 @@
 import { Channel } from '../Channel/Channel';
 import { Client } from '../Client';
-import { Messenger } from '../../../lib/core/Messenger';
+import { Messenger } from 'centrum-messengers/dist/core/Messenger';
 import { FrontMessages, FrontPubs, FrontSubs, FrontPushes } from './FrontMessages';
 
 import { CONNECTION_STATUS, CONNECTION_CHANGE } from '../types';

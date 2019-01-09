@@ -1,7 +1,7 @@
 import * as fossilDelta from 'fossil-delta';
 import * as msgpack from 'notepack.io';
 
-import { Messenger } from '../../../lib/core/Messenger';
+import { Messenger } from 'centrum-messengers/dist/core/Messenger';
 
 import { Channel } from '../Channel/Channel';
 import { BackMessages, BackPubs, BackPushes, BackSubs, BackPulls } from './BackMessages';

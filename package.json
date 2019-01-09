@@ -1,5 +1,5 @@
 {
-  "name": "CentrumChannels",
+  "name": "centrum-channels",
   "version": "0.0.1",
   "description": "Isolated channel communication for centrum servers.",
   "scripts": {
@@ -22,6 +22,7 @@
   "author": "visgotti",
   "license": "MIT",
   "dependencies": {
+    "centrum-messengers": "^0.1.0",
     "fossil-delta": "^1.0.2",
     "notepack.io": "^2.2.0",
     "zeromq": "^5.1.0"
