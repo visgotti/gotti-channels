@@ -4,8 +4,8 @@
  * become the beef of the project when it comes to loading channels onto new processes/machines
  */
 
-import FrontChannel from './core/FrontChannel';
-import BackChannel from './core/BackChannel';
+import FrontChannel from './core/Front/FrontChannel';
+import BackChannel from './core/Back/BackChannel';
 import { Messenger } from 'centrum-messengers/dist/core/Messenger';
 
 export interface ClusterOptions {

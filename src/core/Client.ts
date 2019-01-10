@@ -1,12 +1,7 @@
 import * as fossilDelta from 'fossil-delta';
 import * as msgpack from 'notepack.io';
 
-import FrontChannel from './FrontChannel';
-
-enum STATE_UPDATE_TYPES {
-    SET,
-    PATCH
-}
+import FrontChannel from './Front/FrontChannel';
 
 export class Client {
     readonly uid: string;

@@ -1,5 +1,5 @@
 {
-  "name": "centrum-channels",
+  "name": "centrum",
   "version": "0.0.1",
   "description": "Isolated channel communication for centrum servers.",
   "scripts": {

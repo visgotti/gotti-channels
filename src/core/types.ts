@@ -1,3 +1,9 @@
+export enum STATE_UPDATE_TYPES {
+    SET = 0,
+    PATCH = 1
+}
+
+
 export interface FrontConnectMessage {
     channelId: string,
     frontUid: string,

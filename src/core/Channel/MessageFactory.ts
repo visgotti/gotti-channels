@@ -1,6 +1,12 @@
 import { Messenger } from 'centrum-messengers/dist/core/Messenger';
 
 enum MSG_CODES {
+    // FRONT MASTER -> BACK MASTER
+    SEND_QUEUED,
+
+    //BACK MASTER -> FRONT MASTER
+    PATCH_STATE,
+
     // FRONT -> BACK
     CONNECT,
     DISCONNECT,
@@ -15,8 +21,7 @@ enum MSG_CODES {
     BROADCAST_LINKED_FRONTS,
     BROADCAST_ALL_FRONTS,
     SEND_FRONT,
-    SET_STATE,
-    PATCH_STATE,
+    SEND_STATE,
 }
 
 export type PublishProtocol = any;
@@ -32,11 +37,16 @@ type SubscriptionHandler = (...any) => void;
 export class Protocol {
     constructor(){};
 
+    //FRONT MASTER -> BACK MASTER
+    static SEND_QUEUED(frontServerIndex) : string  { return Protocol.make(MSG_CODES.SEND_QUEUED, frontServerIndex) };
+
+    //BACK MASTER -> FRONT MASTERS
+    static PATCH_STATE(backServerIndex) : string  { return Protocol.make(MSG_CODES.PATCH_STATE, backServerIndex) };
+
     // FRONT -> BACKS
     static CONNECT() : string  { return Protocol.make(MSG_CODES.CONNECT) };
     static DISCONNECT() : string  { return Protocol.make(MSG_CODES.DISCONNECT) };
     static BROADCAST_ALL_BACK() : string  { return Protocol.make(MSG_CODES.BROADCAST_ALL_BACK) };
-    static SEND_QUEUED(frontUid) : string  { return Protocol.make(MSG_CODES.SEND_QUEUED, frontUid) };
 
     static SEND_BACK(backChannelId) : string  { return Protocol.make(MSG_CODES.SEND_BACK, backChannelId) };
     static LINK(frontUid) : string { return Protocol.make(MSG_CODES.LINK, frontUid) };
@@ -44,13 +54,13 @@ export class Protocol {
 
     // BACK -> FRONTS
     static BROADCAST_LINKED_FRONTS(frontChannelId) : string  { return Protocol.make(MSG_CODES.BROADCAST_LINKED_FRONTS, frontChannelId) };
-    static SET_STATE(frontChannelId): string  { return Protocol.make(MSG_CODES.SET_STATE, frontChannelId) };
-    static PATCH_STATE(frontChannelId) : string  { return Protocol.make(MSG_CODES.PATCH_STATE, frontChannelId) };
     static BROADCAST_ALL_FRONTS() : string  { return Protocol.make(MSG_CODES.BROADCAST_ALL_FRONTS) };
 
     // BACK -> FRONT
     static CONNECTION_CHANGE(frontUid) : string { return Protocol.make(MSG_CODES.CONNECTION_CHANGE, frontUid) };
     static SEND_FRONT(frontUid) : string  { return Protocol.make(MSG_CODES.SEND_FRONT, frontUid) };
+    static SEND_STATE(frontUid): string  { return Protocol.make(MSG_CODES.SEND_STATE, frontUid) };
+
     /**
      * returns concatenated protocol code if id is provided
      * @param code - unique code for different pub/sub types
@@ -68,34 +78,11 @@ export class Protocol {
  * to keep track of passing in parameters when wanting to register/unregister/call
  * a message since the factory keeps all of that in its scope when instantiated.
  */
-export abstract class MessageFactory {
-    // FRONT -> BACKS
-    public abstract CONNECT: PublishProtocol | SubscribeProtocol; //TODO: req/res
-    public abstract BROADCAST_ALL_BACK: PublishProtocol | SubscribeProtocol;
-
-    // FONT -> BACK
-    public abstract SEND_BACK: PushProtocol | SubscribeProtocol;
-    public abstract DISCONNECT: PushProtocol | SubscribeProtocol; //TODO: req/res
-    public abstract SEND_QUEUED: PublishProtocol | SubscribeProtocol;
-    public abstract LINK: PublishProtocol | SubscribeProtocol; //TODO: req/res
-    public abstract UNLINK: PublishProtocol | SubscribeProtocol;
-
-
-    // BACK -> FRONT
-    public abstract CONNECTION_CHANGE: PushProtocol | SubscribeProtocol; //TODO: wouldnt need if connect had req/res format
-    public abstract BROADCAST_LINKED_FRONTS: PublishProtocol | SubscribeProtocol;
-    public abstract BROADCAST_ALL_FRONTS: PublishProtocol | SubscribeProtocol;
-    public abstract SEND_FRONT: PublishProtocol | SubscribeProtocol;
-    public abstract SET_STATE: PublishProtocol | SubscribeProtocol;
-    public abstract PATCH_STATE: PublishProtocol | SubscribeProtocol;
-
+abstract class MessageFactory {
     protected messenger: Messenger;
     protected channel: any;
-    readonly channelId: string;
 
-    constructor(messenger, channel) {
-        this.channelId = channel.channelId;
-        this.channel = channel;
+    constructor(messenger) {
         this.messenger = messenger;
     }
 
@@ -188,5 +175,36 @@ export abstract class MessageFactory {
             };
         };
         return pull;
+    }
+}
+
+export class ChannelMessageFactory extends MessageFactory {
+    // FRONT -> BACKS
+    public abstract CONNECT: PublishProtocol | SubscribeProtocol; //TODO: req/res
+    public abstract BROADCAST_ALL_BACK: PublishProtocol | SubscribeProtocol;
+
+    // FONT -> BACK
+    public abstract SEND_BACK: PushProtocol | SubscribeProtocol;
+    public abstract DISCONNECT: PushProtocol | SubscribeProtocol; //TODO: req/res
+    public abstract LINK: PublishProtocol | SubscribeProtocol; //TODO: req/res
+    public abstract UNLINK: PublishProtocol | SubscribeProtocol;
+
+    // BACK -> FRONT
+    public abstract CONNECTION_CHANGE: PushProtocol | SubscribeProtocol; //TODO: wouldnt need if connect had req/res format
+    public abstract BROADCAST_LINKED_FRONTS: PublishProtocol | SubscribeProtocol;
+    public abstract BROADCAST_ALL_FRONTS: PublishProtocol | SubscribeProtocol;
+    public abstract SEND_FRONT: PublishProtocol | SubscribeProtocol;
+    public abstract SEND_STATE: PublishProtocol | SubscribeProtocol;
+    constructor(messenger) {
+        super(messenger)
+    }
+}
+
+export class MasterMessageFactory extends MessageFactory {
+    public abstract SEND_QUEUED: PushProtocol | PullProtocol;
+    public abstract PATCH_STATE: PushProtocol | PullProtocol;
+
+    constructor(messenger) {
+        super(messenger)
     }
 }

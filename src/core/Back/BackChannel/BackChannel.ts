@@ -5,16 +5,19 @@ import { Messenger } from 'centrum-messengers/dist/core/Messenger';
 
 import { Channel } from '../Channel/Channel';
 import { BackMessages, BackPubs, BackPushes, BackSubs, BackPulls } from './BackMessages';
+import { Master } from '../BackMaster/MasterChannel';
 
-import {ConnectedFrontData, ConnectedClientData, FrontToBackMessage, FrontConnectMessage, CONNECTION_STATUS} from '../types';
+import {ConnectedFrontData, ConnectedClientData, FrontToBackMessage, FrontConnectMessage, CONNECTION_STATUS, STATE_UPDATE_TYPES } from '../types';
 
 class BackChannel extends Channel {
+    private master: Master;
+
     private pub: BackPubs;
     private sub: BackSubs;
     private push: BackPushes;
     private pull: BackPulls;
 
-    // lookup of frontUid to frontServerIndex
+    // lookup of frontUid to frontMasterIndex
     private _connectedFrontsData: Map<string, ConnectedFrontData>;
     private _mirroredFrontUids: Set<string>;
 
@@ -23,25 +26,19 @@ class BackChannel extends Channel {
     private _previousStateEncoded: string;
 
     private linkedFrontUids: Set<string>;
+    private linkedFrontMasterIndexes: Array<number>;
+    private masterIndexToFrontUidLookup: Map<number, string>;
 
-    // to be used when clients start interacting with channels.
-    private _connectedClientsData: Map<string, ConnectedClientData>;
-    private _writingClientUids: Set<string>;
-    private _listeningClientUids: Set<string>;
+    constructor(channelId, master, messenger: Messenger) {
+        super(channelId, master, messenger);
 
-    constructor(channelId, messenger: Messenger) {
-        super(channelId, messenger);
-
+        this.master = master;
         this.state = null;
         this._previousState = null;
 
-        this.linkedFrontUids = new Set();
+        this.linkedFrontMasterIndexes = [];
         this._connectedFrontsData = new Map();
         this._mirroredFrontUids = new Set();
-
-        this._connectedClientsData = new Map();
-        this._writingClientUids = new Set();
-        this._listeningClientUids = new Set();
 
         this.initializeMessageFactories();
         this.registerPreConnectedSubs();
@@ -60,7 +57,7 @@ class BackChannel extends Channel {
      * sends state patches to mirrored channels
      * @returns {boolean}
      */
-    public broadcastPatch() : boolean {
+    public patchState() : boolean {
         if(!(this.state)) { throw new Error ('null state')}
 
         if(this.linkedFrontUids.size > 0) {
@@ -74,17 +71,18 @@ class BackChannel extends Channel {
 
             this._previousStateEncoded = currentStateEncoded;
 
-            this.linkedFrontUids.forEach(frontUid => {
-                this.push.PATCH_STATE[frontUid](msgpack.encode(patches));
-            });
+            // supply master server with patches and the array of linked master indexes that need the patches.
+            this.master.addStatePatch(this.linkedFrontMasterIndexes, [this.channelId, patches]);
+
             return true;
         }
+        return false;
     };
 
     /**
      * sends state to mirrored linked channel and if its for specific client, clientUid can be passed as a param.
      */
-    public sendState(frontUid, clientUid?){
+    public sendState(frontUid, clientUid?) {
         if(!(this.state)) { throw new Error ('null state')}
         if(!(this.linkedFrontUids.has(frontUid))) { throw new Error ('Trying to broadcast to unlinked front!')}
 
@@ -93,7 +91,7 @@ class BackChannel extends Channel {
         if(clientUid) {
             sendData.clientUid = clientUid;
         }
-        this.push.SET_STATE[frontUid](sendData);
+        this.push.SEND_STATE[frontUid](sendData);
     };
 
     /**
@@ -133,13 +131,16 @@ class BackChannel extends Channel {
         });
     }
 
-    public getFrontUidForClient(clientUid) : string {
-        return this._connectedClientsData.get(clientUid).frontUid;
-    }
-
     public setState(newState) {
         this._previousStateEncoded = msgpack.encode(newState);
         this.state = newState;
+    }
+
+    public processMessageQueue(message, frontMasterIndex: number) {
+        const frontUid = this.masterIndexToFrontUidLookup[frontMasterIndex];
+        for(let i = 0; i < messages.length; i++) {
+            this._onMessage(messages[i], frontUid);
+        }
     }
 
     get connectedFrontsData() : Map<string, ConnectedFrontData> {
@@ -148,12 +149,6 @@ class BackChannel extends Channel {
 
     get mirroredFrontUids() : Array<string> {
         return Array.from(this._mirroredFrontUids)
-    }
-
-    private onMessageQueue(messages: Array<any>, frontUid: string) {
-        for(let i = 0; i < messages.length; i++) {
-            this._onMessage(messages[i], frontUid);
-        }
     }
 
     private _onMessage(message: any, frontUid: string) : void {
@@ -193,29 +188,37 @@ class BackChannel extends Channel {
 
     /**
      * initializes channel pub and sub  handlers when we receive a connect message from front channel.
-     * @param frontData - { channelId, frontUid, frontServerIndex }
+     * @param frontData - { channelId, frontUid, frontMasterIndex }
      */
     private onFrontConnected(frontData: ConnectedFrontData) {
-        const { channelId, frontUid, serverIndex } = frontData;
-        if(channelId === this.channelId) {
-            this.pull.SEND_QUEUED.register(frontUid, (messages => {
-                this.onMessageQueue(messages, frontUid);
-            }));
+        const { channelId, frontUid, frontMasterIndex } = frontData;
 
+        //notify back master a new front channel connected so it can keep track of front master connections
+        this.master.onChannelConnection(frontMasterIndex);
+
+        if(channelId === this.channelId) {
             // add to mirror set since its same channelId
             this._mirroredFrontUids.add(frontUid);
 
-            this.push.SET_STATE.register(frontUid);
-            this.push.PATCH_STATE.register(frontUid);
+            // add the frontUid to masterIndexLookup for when processing future requests and need to know frontUid.
+            this.masterIndexToFrontUidLookup.set(frontMasterIndex, frontUid);
+
+            this.push.SEND_STATE.register(frontUid);
             this.push.BROADCAST_LINKED_FRONTS.register(frontUid);
 
             this.pull.LINK.register(frontUid, (clientUid?) => {
+                this.linkedFrontMasterIndexes.push(frontMasterIndex);
                 this.linkedFrontUids.add(frontUid);
                 this.sendState(frontUid, clientUid);
+
+                // notify the master a new front channel just linked to it.
+                this.master.onNewChannelLink(frontMasterIndex);
             });
 
             this.pull.UNLINK.register(frontUid, () => {
+                this.linkedFrontMasterIndexes.splice(this.linkedFrontMasterIndexes.indexOf(frontMasterIndex), 1);
                 this.linkedFrontUids.delete(frontUid);
+                this.master.onChannelUnlink(frontMasterIndex);
             });
         }
 
@@ -223,7 +226,7 @@ class BackChannel extends Channel {
         this._connectedFrontsData.set(frontUid, frontData);
 
         // register send pusher for unique frontuid.
-        //TODO: optimize so instead of keeping a 1:1 push for each front uid, keep a 1:1 push to serverIndex of frontuid and then the correct handler will be callled
+        //TODO: optimize so instead of keeping a 1:1 push for each front uid, keep a 1:1 push to frontMasterIndex of frontuid and then the correct handler will be callled
         this.push.SEND_FRONT.register(frontUid);
 
         // create push then remove since this wont be done again unless theres a disconnection.
