@@ -1,4 +1,4 @@
-import { Protocol, PublishProtocol, SubscribeProtocol, PushProtocol, PullProtocol, ChannelMessageFactory } from '../Channel/MessageFactory'
+import { Protocol, PublishProtocol, SubscribeProtocol, PushProtocol, PullProtocol, ChannelMessageFactory } from '../../Channel/MessageFactory';
 import FrontChannel from './FrontChannel';
 
 export interface FrontPubs {
@@ -15,13 +15,14 @@ export interface FrontSubs {
     BROADCAST_LINKED_FRONTS: SubscribeProtocol,
     BROADCAST_ALL_FRONTS: SubscribeProtocol,
     SEND_STATE: SubscribeProtocol,
+    ACCEPT_LINK: SubscribeProtocol,
 }
 
 export interface FrontPushes {
     SEND_BACK: PushProtocol,
 }
 
-export class FrontMessages extends MessageFactory {
+export class FrontMessages extends ChannelMessageFactory {
     public CONNECT: PublishProtocol;
     public BROADCAST_ALL_BACK: PublishProtocol;
     public DISCONNECT: PublishProtocol;
@@ -35,6 +36,7 @@ export class FrontMessages extends MessageFactory {
     public BROADCAST_ALL_FRONTS: SubscribeProtocol;
     public SEND_FRONT: SubscribeProtocol;
     public SEND_STATE:  SubscribeProtocol;
+    public ACCEPT_LINK:  SubscribeProtocol;
 
     public push: FrontPushes;
     public pub: FrontPubs;
@@ -45,7 +47,6 @@ export class FrontMessages extends MessageFactory {
 
     constructor(messenger, channel: FrontChannel) {
         super(messenger);
-        this.messenger = messenger;
         this.frontUid = channel.frontUid;
         this.channelId = channel.channelId;
 
@@ -80,18 +81,20 @@ export class FrontMessages extends MessageFactory {
     }
 
     private initializeSubs() : FrontSubs {
-        this.CONNECTION_CHANGE = this.subCreator(Protocol.CONNECTION_CHANGE(this.frontUid), this.frontUid);
         this.SEND_FRONT = this.subCreator(Protocol.SEND_FRONT(this.frontUid), this.frontUid);
-        this.BROADCAST_ALL_FRONTS = this.subCreator(Protocol.BROADCAST_ALL_FRONTS(), this.frontUid);
         this.SEND_STATE = this.subCreator(Protocol.SEND_STATE(this.frontUid), this.frontUid);
+        this.ACCEPT_LINK = this.subCreator(Protocol.ACCEPT_LINK(this.frontUid), this.frontUid);
+        this.CONNECTION_CHANGE = this.subCreator(Protocol.CONNECTION_CHANGE(this.frontUid), this.frontUid);
+        this.BROADCAST_ALL_FRONTS = this.subCreator(Protocol.BROADCAST_ALL_FRONTS(), this.frontUid);
         this.BROADCAST_LINKED_FRONTS = this.subCreator(Protocol.BROADCAST_LINKED_FRONTS(this.frontUid), this.frontUid);
 
         return {
-            CONNECTION_CHANGE: this.CONNECTION_CHANGE,
             SEND_FRONT: this.SEND_FRONT,
-            BROADCAST_LINKED_FRONTS: this.BROADCAST_LINKED_FRONTS,
-            BROADCAST_ALL_FRONTS: this.BROADCAST_ALL_FRONTS,
             SEND_STATE: this.SEND_STATE,
+            ACCEPT_LINK: this.ACCEPT_LINK,
+            CONNECTION_CHANGE: this.CONNECTION_CHANGE,
+            BROADCAST_ALL_FRONTS: this.BROADCAST_ALL_FRONTS,
+            BROADCAST_LINKED_FRONTS: this.BROADCAST_LINKED_FRONTS,
         }
     }
 }

@@ -1,5 +1,4 @@
-import { Protocol, PushProtocol, PullProtocol, MasterMessageFactory } from '../Channel/MessageFactory'
-import { MasterChannel } from './MasterChannel';
+import { Protocol, PushProtocol, PullProtocol, MasterMessageFactory } from '../../Channel/MessageFactory'
 
 export interface FrontMasterPulls {
     PATCH_STATE: PullProtocol,
@@ -9,25 +8,22 @@ export interface FrontMasterPushes {
     SEND_QUEUED: PushProtocol
 }
 
-export class FrontMessages extends MasterMessageFactory {
+export class MasterMessages extends MasterMessageFactory {
     public PATCH_STATE:  PullProtocol;
-
     public SEND_QUEUED: PushProtocol;
 
     public push: FrontMasterPushes;
     public pull: FrontMasterPulls;
 
-    readonly channelId: string;
-
-    constructor(messenger, channel: MasterChannel) {
-        super(messenger, channel);
+    constructor(messenger) {
+        super(messenger);
         this.messenger = messenger;
 
-        this.channelId = channel.channelId;
         this.push = this.initializePushes();
         this.pull = this.initializePulls();
     }
-    private initializePulls() : FrontMasterPushes {
+
+    private initializePulls() : FrontMasterPulls {
         this.PATCH_STATE = this.pullCreator(Protocol.PATCH_STATE, 'NONE');
 
         return {
@@ -35,7 +31,7 @@ export class FrontMessages extends MasterMessageFactory {
         }
     }
 
-    private initializePushes(): FrontMasterPulls {
+    private initializePushes(): FrontMasterPushes {
         this.SEND_QUEUED = this.pushCreator(Protocol.SEND_QUEUED);
 
         return {

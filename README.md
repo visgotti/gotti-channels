@@ -1,14 +1,31 @@
-TBA.
+project status
 
-API is still a WIP and my vision has changed multiple times but I'm almost at a point where I'd be
-comfortable using it in production. Will have official documentation ready for when that time comes.
-Till then you can get a good idea of how the library will work by looking over the tests. if you're
-curious. The goal is still to center everything and that's exactly what the ChannelCluster class
-will specialize in. That will be the main focus as soon as I finish the public API for Back/Front Channels
-and the Client.
+I've gone to implement a Master Front and Back channel, this can kind of be thought of
+as a hub that lives in front of all the front and back channels, and those front and back
+channels have links together that basically streams messages back and forth to eachother
+at a defined interval.
 
-It seems I've moved a bit away from trying to keep this low level and modular. I will still keep all of that
-in mind when writing, but it came to my attention that by implementing a Client class I've coupled the systems
-more than I originally had planned. It's okay though, although the Client, FrontChannel, and BackChannel will
-be strongly coupled, the finished product will have a robust and flexible API that should be trivial to make changes
-and new functionality where needed.
+Back channels only have 1 instance of themselves and store state of an application and run application processes.
+Front channels are hubs that live on a separate machine or process. That are meant to be load balanced and those
+front servers will be the ones communicating and forwarding client data to the mirrored back server of said front server.
+The back channel collects and queues these data forwards from all linked front channels and processes them at a defined interval.
+Rinse and repeat, as long as it has linked channels, it will do this processes. It's trivial to add a new link, all it is.
+
+    frontChannel.link();
+
+    should call it asynchronously to retrieve state data
+
+    await encodedState = frontChannel.link();
+
+
+This state is sent back encoded by default because although you may want to process it and do something with it, the idea
+of the Front Channel is really not supposed to do stuff like that if it doesn't have to. If it's doing its job right if it's
+efficiently sending messages back and forth fast from client to the back channel. So any state data may it be patches or
+the state itself, will be encoded upon retrieval.
+
+
+Obviously it's not that simple and there needs to be some setup and config. But I'm trying my best to make that process simple and pain
+free as possible. Channel links are rock solid but connection states are still a little iffy since I'm still not quite sure how I want to handle
+channel/server disconnects. I envision a system where you can add/remove channels to a cluster dynamically if needed, but for now we're going
+to have to settle for statically defined clusters. Which may sound bad, but if you know what you're building for it's very trivial to set it up
+efficiently.

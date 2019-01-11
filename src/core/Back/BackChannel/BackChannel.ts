@@ -3,14 +3,14 @@ import * as msgpack from 'notepack.io';
 
 import { Messenger } from 'centrum-messengers/dist/core/Messenger';
 
-import { Channel } from '../Channel/Channel';
+import { Channel } from '../../Channel/Channel';
 import { BackMessages, BackPubs, BackPushes, BackSubs, BackPulls } from './BackMessages';
-import { Master } from '../BackMaster/MasterChannel';
+import { BackMasterChannel } from '../BackMaster/MasterChannel';
 
-import {ConnectedFrontData, ConnectedClientData, FrontToBackMessage, FrontConnectMessage, CONNECTION_STATUS, STATE_UPDATE_TYPES } from '../types';
+import {ConnectedFrontData, FrontToBackMessage, CONNECTION_STATUS } from '../../types';
 
 class BackChannel extends Channel {
-    private master: Master;
+    private master: BackMasterChannel;
 
     private pub: BackPubs;
     private sub: BackSubs;
@@ -29,14 +29,24 @@ class BackChannel extends Channel {
     private linkedFrontMasterIndexes: Array<number>;
     private masterIndexToFrontUidLookup: Map<number, string>;
 
-    constructor(channelId, master, messenger: Messenger) {
-        super(channelId, master, messenger);
+    readonly backMasterIndex: number;
 
+    constructor(channelId, messenger: Messenger, master: BackMasterChannel) {
+        super(channelId, messenger);
         this.master = master;
+        this.backMasterIndex = this.master.backMasterIndex;
+
+        // frontUid defines a unique channel that lives on a frontMaster which is identified
+        // by frontMasterIndex (index of the server in the cluster) but it's literally
+        // just the id of the server all the channels live on.
+        this.linkedFrontUids = new Set();
+        this.linkedFrontMasterIndexes = [];
+        // keep track of all frontUids by their master's id/index.
+        this.masterIndexToFrontUidLookup = new Map();
+
         this.state = null;
         this._previousState = null;
 
-        this.linkedFrontMasterIndexes = [];
         this._connectedFrontsData = new Map();
         this._mirroredFrontUids = new Set();
 
@@ -80,18 +90,17 @@ class BackChannel extends Channel {
     };
 
     /**
-     * sends state to mirrored linked channel and if its for specific client, clientUid can be passed as a param.
+     *  accepts link from front channel and sends back state for it to be retrieved asynchronously.
      */
-    public sendState(frontUid, clientUid?) {
-        if(!(this.state)) { throw new Error ('null state')}
-        if(!(this.linkedFrontUids.has(frontUid))) { throw new Error ('Trying to broadcast to unlinked front!')}
+    public acceptLink(frontUid, clientUid?) {
+        if(!(this.state)) { throw new Error ('null state on bakc channel, failed to link.')}
 
         const sendData: any = { encodedState: this._previousStateEncoded };
 
         if(clientUid) {
             sendData.clientUid = clientUid;
         }
-        this.push.SEND_STATE[frontUid](sendData);
+        this.push.ACCEPT_LINK[frontUid](sendData);
     };
 
     /**
@@ -136,7 +145,7 @@ class BackChannel extends Channel {
         this.state = newState;
     }
 
-    public processMessageQueue(message, frontMasterIndex: number) {
+    public processMessageQueue(messages, frontMasterIndex: number) {
         const frontUid = this.masterIndexToFrontUidLookup[frontMasterIndex];
         for(let i = 0; i < messages.length; i++) {
             this._onMessage(messages[i], frontUid);
@@ -165,7 +174,7 @@ class BackChannel extends Channel {
     private registerPreConnectedSubs() : void {
 
         // registers sub that handles requests the same regardless of the frontUid.
-        this.sub.CONNECT.register(this.onFrontConnected.bind(this));
+        this.sub.CONNECT.register(this.onMirrorConnected.bind(this));
 
         this.sub.BROADCAST_ALL_BACK.register((data: FrontToBackMessage) => {
             const { message, frontUid } = data;
@@ -190,7 +199,7 @@ class BackChannel extends Channel {
      * initializes channel pub and sub  handlers when we receive a connect message from front channel.
      * @param frontData - { channelId, frontUid, frontMasterIndex }
      */
-    private onFrontConnected(frontData: ConnectedFrontData) {
+    private onMirrorConnected(frontData: ConnectedFrontData) {
         const { channelId, frontUid, frontMasterIndex } = frontData;
 
         //notify back master a new front channel connected so it can keep track of front master connections
@@ -204,21 +213,23 @@ class BackChannel extends Channel {
             this.masterIndexToFrontUidLookup.set(frontMasterIndex, frontUid);
 
             this.push.SEND_STATE.register(frontUid);
+            this.push.ACCEPT_LINK.register(frontUid);
             this.push.BROADCAST_LINKED_FRONTS.register(frontUid);
 
             this.pull.LINK.register(frontUid, (clientUid?) => {
                 this.linkedFrontMasterIndexes.push(frontMasterIndex);
                 this.linkedFrontUids.add(frontUid);
-                this.sendState(frontUid, clientUid);
 
-                // notify the master a new front channel just linked to it.
-                this.master.onNewChannelLink(frontMasterIndex);
+                this.acceptLink(frontUid, clientUid);
+
+                // notify the master with the front master index of connected channel.
+                this.master.linkedChannelFrom(frontMasterIndex);
             });
 
             this.pull.UNLINK.register(frontUid, () => {
                 this.linkedFrontMasterIndexes.splice(this.linkedFrontMasterIndexes.indexOf(frontMasterIndex), 1);
                 this.linkedFrontUids.delete(frontUid);
-                this.master.onChannelUnlink(frontMasterIndex);
+                this.master.unlinkedChannelFrom(frontMasterIndex);
             });
         }
 
@@ -231,7 +242,7 @@ class BackChannel extends Channel {
 
         // create push then remove since this wont be done again unless theres a disconnection.
         this.push.CONNECTION_CHANGE.register(frontUid);
-        this.push.CONNECTION_CHANGE[frontUid]({ channelId: this.channelId, connectionStatus: CONNECTION_STATUS.CONNECTED });
+        this.push.CONNECTION_CHANGE[frontUid]({ channelId: this.channelId, backMasterIndex: this.backMasterIndex, connectionStatus: CONNECTION_STATUS.CONNECTED });
         this.push.CONNECTION_CHANGE.unregister();
     }
 

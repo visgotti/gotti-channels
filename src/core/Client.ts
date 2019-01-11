@@ -1,6 +1,8 @@
 import * as fossilDelta from 'fossil-delta';
 import * as msgpack from 'notepack.io';
 
+import { STATE_UPDATE_TYPES } from './types';
+
 import FrontChannel from './Front/FrontChannel';
 
 export class Client {

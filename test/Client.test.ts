@@ -1,3 +1,4 @@
+/*
 import {clearInterval} from "timers";
 import { ChannelCluster } from '../src/ChannelCluster';
 import { Client } from '../src/core/Client';
@@ -150,3 +151,4 @@ describe('Client', function() {
         });
     });
 });
+*/

@@ -10,13 +10,13 @@ enum MSG_CODES {
     // FRONT -> BACK
     CONNECT,
     DISCONNECT,
-    SEND_QUEUED,
     SEND_BACK,
     BROADCAST_ALL_BACK,
     LINK,
     UNLINK,
 
     // BACK -> FRONT
+    ACCEPT_LINK,
     CONNECTION_CHANGE,
     BROADCAST_LINKED_FRONTS,
     BROADCAST_ALL_FRONTS,
@@ -60,6 +60,7 @@ export class Protocol {
     static CONNECTION_CHANGE(frontUid) : string { return Protocol.make(MSG_CODES.CONNECTION_CHANGE, frontUid) };
     static SEND_FRONT(frontUid) : string  { return Protocol.make(MSG_CODES.SEND_FRONT, frontUid) };
     static SEND_STATE(frontUid): string  { return Protocol.make(MSG_CODES.SEND_STATE, frontUid) };
+    static ACCEPT_LINK(frontUid): string  { return Protocol.make(MSG_CODES.ACCEPT_LINK, frontUid) };
 
     /**
      * returns concatenated protocol code if id is provided
@@ -80,7 +81,6 @@ export class Protocol {
  */
 abstract class MessageFactory {
     protected messenger: Messenger;
-    protected channel: any;
 
     constructor(messenger) {
         this.messenger = messenger;
@@ -165,11 +165,11 @@ abstract class MessageFactory {
      * @param protocol
      * @returns {any}
      */
-    protected pullCreator(protocolFactory: Function) {
+    protected pullCreator(protocolFactory: Function, decoder?) {
         let pull: any = {};
 
         pull.register = (from, onSubscriptionHandler: SubscriptionHandler) => {
-            pull.subscriber = this.messenger.createSubscription(protocolFactory(from), protocolFactory(from), onSubscriptionHandler);
+            pull.subscriber = this.messenger.createSubscription(protocolFactory(from), protocolFactory(from), onSubscriptionHandler, decoder);
             pull.unregister = (from) => {
                 this.messenger.removeAllSubscriptionsWithName(protocolFactory(from));
             };
@@ -178,7 +178,7 @@ abstract class MessageFactory {
     }
 }
 
-export class ChannelMessageFactory extends MessageFactory {
+export abstract class ChannelMessageFactory extends MessageFactory {
     // FRONT -> BACKS
     public abstract CONNECT: PublishProtocol | SubscribeProtocol; //TODO: req/res
     public abstract BROADCAST_ALL_BACK: PublishProtocol | SubscribeProtocol;
@@ -195,12 +195,13 @@ export class ChannelMessageFactory extends MessageFactory {
     public abstract BROADCAST_ALL_FRONTS: PublishProtocol | SubscribeProtocol;
     public abstract SEND_FRONT: PublishProtocol | SubscribeProtocol;
     public abstract SEND_STATE: PublishProtocol | SubscribeProtocol;
+    public abstract ACCEPT_LINK: PublishProtocol | SubscribeProtocol;
     constructor(messenger) {
         super(messenger)
     }
 }
 
-export class MasterMessageFactory extends MessageFactory {
+export abstract class MasterMessageFactory extends MessageFactory {
     public abstract SEND_QUEUED: PushProtocol | PullProtocol;
     public abstract PATCH_STATE: PushProtocol | PullProtocol;
 

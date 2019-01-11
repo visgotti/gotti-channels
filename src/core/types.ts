@@ -3,7 +3,6 @@ export enum STATE_UPDATE_TYPES {
     PATCH = 1
 }
 
-
 export interface FrontConnectMessage {
     channelId: string,
     frontUid: string,
@@ -23,7 +22,7 @@ export interface FrontToBackMessage {
 export interface ConnectedFrontData {
     frontUid: string,
     channelId: string,
-    serverIndex: number,
+    frontMasterIndex: number,
     clientUids?: Set<string>,
 }
 

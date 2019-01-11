@@ -1,4 +1,4 @@
-import { Protocol, PublishProtocol, SubscribeProtocol, PushProtocol, PullProtocol, ChannelMessageFactory } from '../Channel/MessageFactory'
+import { Protocol, PublishProtocol, SubscribeProtocol, PushProtocol, PullProtocol, ChannelMessageFactory } from '../../Channel/MessageFactory';
 import BackChannel from './BackChannel';
 
 
@@ -10,7 +10,8 @@ export interface BackPushes {
     CONNECTION_CHANGE: PushProtocol,
     SEND_FRONT: PushProtocol,
     BROADCAST_LINKED_FRONTS: PushProtocol,
-    SEND_STATE: PushProtocol
+    SEND_STATE: PushProtocol,
+    ACCEPT_LINK: PushProtocol,
 }
 
 export interface BackSubs {
@@ -41,6 +42,7 @@ export class BackMessages extends ChannelMessageFactory {
     public BROADCAST_LINKED_FRONTS: PublishProtocol;
     public BROADCAST_ALL_FRONTS: PublishProtocol;
     public SEND_STATE:  PublishProtocol;
+    public ACCEPT_LINK:  PublishProtocol;
 
     public push: BackPushes;
     public pub: BackPubs;
@@ -50,8 +52,7 @@ export class BackMessages extends ChannelMessageFactory {
     readonly channelId: string;
 
     constructor(messenger, channel: BackChannel) {
-        super(messenger, channel);
-        this.messenger = messenger;
+        super(messenger);
         this.channelId = channel.channelId;
         this.pub = this.initializePubs();
         this.sub = this.initializeSubs();
@@ -72,12 +73,14 @@ export class BackMessages extends ChannelMessageFactory {
         this.SEND_FRONT = this.pushCreator(Protocol.SEND_FRONT);
         this.BROADCAST_LINKED_FRONTS = this.pushCreator(Protocol.BROADCAST_LINKED_FRONTS);
         this.SEND_STATE = this.pushCreator(Protocol.SEND_STATE); // encoding for states happen in the back channel business logic
+        this.ACCEPT_LINK = this.pushCreator(Protocol.ACCEPT_LINK); // encoding for states happen in the back channel business logic
 
         return {
             SEND_FRONT: this.SEND_FRONT,
             CONNECTION_CHANGE: this.CONNECTION_CHANGE,
             BROADCAST_LINKED_FRONTS: this.BROADCAST_LINKED_FRONTS,
             SEND_STATE: this.SEND_STATE,
+            ACCEPT_LINK: this.ACCEPT_LINK,
         }
     }
 

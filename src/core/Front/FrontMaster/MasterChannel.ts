@@ -1,4 +1,3 @@
-import * as fossilDelta from 'fossil-delta';
 import * as msgpack from 'notepack.io';
 
 import { Messenger } from 'centrum-messengers/dist/core/Messenger';
@@ -6,35 +5,34 @@ import { Messenger } from 'centrum-messengers/dist/core/Messenger';
 import { MasterMessages, FrontMasterPushes, FrontMasterPulls } from './MasterMessages';
 
 import FrontChannel from '../FrontChannel';
+import { Channel } from '../../Channel/Channel';
 
 export class FrontMasterChannel extends Channel {
     private pull: FrontMasterPulls;
     private push: FrontMasterPushes;
 
-    private frontChannels: { channelId: string, channel: FrontChannel };
     private frontChannelIds: Array<string>;
-    private statePatchesByFrontMasterIndex: { frontMasterIndex: number, encodedPatches: Array<any> };
+    private linkedBackMasterLookup: { linkedChannelsCount: number, queuedMessages: Array<any> };
 
-
-    private linkedBackMasterLookup = {
-        1: {
-            "count": 3,
-            queuedMessages: [ { channelId, message }],
-        },
-    };
+    public frontChannels: any;
 
     readonly frontMasterIndex;
 
-    constructor(channelIds, frontMasterIndex, messenger: Messenger) {
+    constructor(channelIds, totalChannels, frontMasterIndex, messenger: Messenger) {
         super(frontMasterIndex, messenger);
-
         this.frontMasterIndex = frontMasterIndex;
 
+        this.frontChannels = {};
+        this.frontChannelIds = [];
+        this.linkedBackMasterLookup = {} as { linkedChannelsCount: number, queuedMessages: Array<any> };;
+
         channelIds.forEach(channelId => {
-            const frontChannel = new FrontChannel(channelId, this, messenger);
+            const frontChannel = new FrontChannel(channelId, totalChannels, messenger, this);
             this.frontChannels[channelId] = frontChannel;
             this.frontChannelIds.push(channelId);
         });
+
+        this.initializeMessageFactories();
     }
 
     public sendQueuedMessages() {
@@ -54,17 +52,17 @@ export class FrontMasterChannel extends Channel {
     }
 
     public unlinkChannel(backMasterIndex) {
-        if( --(this.linkedBackMasterLookup[backMasterIndex].count) === 0) {
-            this.linkedBackMasterLookup[key].queuedMessages.length = 0;
+        if( --(this.linkedBackMasterLookup[backMasterIndex].linkedChannelsCount) === 0) {
+            this.linkedBackMasterLookup[backMasterIndex].queuedMessages.length = 0;
             delete this.linkedBackMasterLookup[backMasterIndex];
         }
     }
 
     public linkChannel(backMasterIndex) {
         if(!(this.linkedBackMasterLookup[backMasterIndex])) {
-            this.linkedBackMasterLookup = { count: 1, queuedMessages: [] }
+            this.linkedBackMasterLookup[backMasterIndex] = { linkedChannelsCount: 1, queuedMessages: [] }
         } else {
-            this.linkedBackMasterLookup.count++;
+            this.linkedBackMasterLookup[backMasterIndex].linkedChannelsCount++;
         }
     }
 
@@ -84,5 +82,30 @@ export class FrontMasterChannel extends Channel {
                 this.frontChannels[channelId].patchState(patch);
             }
         })
+    }
+
+    public async connect() {
+        try {
+            let awaitingConnections = this.frontChannelIds.length;
+            for(let i = 0; i < this.frontChannelIds.length; i++) {
+                const connected  = await this.frontChannels[i].connect();
+                if(connected) {
+                    awaitingConnections--;
+                    if(awaitingConnections === 0) {
+                        return true;
+                    }
+                } else {
+                    throw new Error('Error connecting.');
+                }
+            }
+        } catch(err) {
+            throw err;
+        }
+    }
+
+    public close() {
+        for(let i = 0; i < this.frontChannelIds.length; i++) {
+            this.frontChannels[this.frontChannelIds[i]].close();
+        }
     }
 }
