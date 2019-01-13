@@ -10,7 +10,6 @@ export interface BackPushes {
     CONNECTION_CHANGE: PushProtocol,
     SEND_FRONT: PushProtocol,
     BROADCAST_LINKED_FRONTS: PushProtocol,
-    SEND_STATE: PushProtocol,
     ACCEPT_LINK: PushProtocol,
 }
 
@@ -18,7 +17,6 @@ export interface BackSubs {
     SEND_BACK: SubscribeProtocol,
     CONNECT: SubscribeProtocol,
     BROADCAST_ALL_BACK: SubscribeProtocol,
-    DISCONNECT: SubscribeProtocol,
 }
 
 export interface BackPulls {
@@ -29,7 +27,6 @@ export interface BackPulls {
 export class BackMessages extends ChannelMessageFactory {
     public CONNECT: SubscribeProtocol;
     public BROADCAST_ALL_BACK: SubscribeProtocol;
-    public DISCONNECT: SubscribeProtocol;
     public SEND_BACK: SubscribeProtocol;
 
     public LINK: PullProtocol;
@@ -41,7 +38,6 @@ export class BackMessages extends ChannelMessageFactory {
 
     public BROADCAST_LINKED_FRONTS: PublishProtocol;
     public BROADCAST_ALL_FRONTS: PublishProtocol;
-    public SEND_STATE:  PublishProtocol;
     public ACCEPT_LINK:  PublishProtocol;
 
     public push: BackPushes;
@@ -72,14 +68,12 @@ export class BackMessages extends ChannelMessageFactory {
         this.CONNECTION_CHANGE = this.pushCreator(Protocol.CONNECTION_CHANGE);
         this.SEND_FRONT = this.pushCreator(Protocol.SEND_FRONT);
         this.BROADCAST_LINKED_FRONTS = this.pushCreator(Protocol.BROADCAST_LINKED_FRONTS);
-        this.SEND_STATE = this.pushCreator(Protocol.SEND_STATE); // encoding for states happen in the back channel business logic
         this.ACCEPT_LINK = this.pushCreator(Protocol.ACCEPT_LINK); // encoding for states happen in the back channel business logic
 
         return {
             SEND_FRONT: this.SEND_FRONT,
             CONNECTION_CHANGE: this.CONNECTION_CHANGE,
             BROADCAST_LINKED_FRONTS: this.BROADCAST_LINKED_FRONTS,
-            SEND_STATE: this.SEND_STATE,
             ACCEPT_LINK: this.ACCEPT_LINK,
         }
     }
@@ -87,13 +81,11 @@ export class BackMessages extends ChannelMessageFactory {
     private initializeSubs() : BackSubs {
         this.SEND_BACK = this.subCreator(Protocol.SEND_BACK(this.channelId), this.channelId);
         this.CONNECT = this.subCreator(Protocol.CONNECT(), this.channelId);
-        this.DISCONNECT = this.subCreator(Protocol.DISCONNECT(), this.channelId);
         this.BROADCAST_ALL_BACK = this.subCreator(Protocol.BROADCAST_ALL_BACK(), this.channelId);
 
         return {
             SEND_BACK: this.SEND_BACK,
             CONNECT: this.CONNECT,
-            DISCONNECT: this.DISCONNECT,
             BROADCAST_ALL_BACK: this.BROADCAST_ALL_BACK,
         }
     };

@@ -1,10 +1,10 @@
 import { Channel } from '../../Channel/Channel';
 import { FrontMasterChannel } from '../FrontMaster/MasterChannel';
-import { Client } from '../../Client';
+import Client from '../../Client';
 import { Messenger } from 'centrum-messengers/dist/core/Messenger';
 import { FrontMessages, FrontPubs, FrontSubs, FrontPushes } from './FrontMessages';
 
-import { CONNECTION_STATUS, CONNECTION_CHANGE } from '../../types';
+import { CONNECTION_STATUS, CONNECTION_CHANGE, STATE_UPDATE_TYPES } from '../../types';
 
 import {clearTimeout} from "timers";
 import Timeout = NodeJS.Timeout;
@@ -18,8 +18,6 @@ class FrontChannel extends Channel {
     private pub: FrontPubs;
     private sub: FrontSubs;
     private push: FrontPushes;
-
-    private _state: any;
 
     private CONNECTION_STATUS: CONNECTION_STATUS;
 
@@ -93,17 +91,8 @@ class FrontChannel extends Channel {
      * sets the onConnectedHandler function
      * @param handler - function that gets executed when a channel succesfully connects to a backChannel.
      */
-    public onConnected(handler: (backChannelId, state?: any) => void) : void {
+    public onConnected(handler: (backChannelId, backMasterIndex) => void) : void {
         this.onConnectedHandler = handler;
-    };
-
-    /**
-     * sets the setStateHandler function, the state is not decoded for same reason as the patches
-     * are not. you may want to just blindly pass it along and not waste cpu decoding it.
-     * @param handler - function that gets executed when mirror back channel sends whole state
-     */
-    public onSetState(handler: (encodedState: any, clientUid?) => void) : void {
-        this.onSetStateHandler = handler;
     };
 
     /**
@@ -116,7 +105,7 @@ class FrontChannel extends Channel {
     };
 
     public patchState(patch) {
-        this.onPatchStateHandler(patch)
+        this._onPatchState(patch);
     }
 
     /**
@@ -143,16 +132,19 @@ class FrontChannel extends Channel {
 
         this.pub.LINK(clientUid);
 
-        return new Promise(resolve => {
-            this.once('linked', (encodedState) => {
-                console.log('encoded state was', encodedState);
-                resolve(encodedState);
+        return new Promise((resolve, reject) => {
+            // if the link is for a uid it registers the event with the uid in it.
+            const linkedEventId = clientUid ?  `linked_${clientUid}` : 'linked';
+            this.once(linkedEventId, (data) => {
+                if(data.error) {
+                    return reject(data.error);
+                } else {
+                    return resolve(data.state);
+                }
             });
         });
     }
 
-    private onLinkedHandler(encodedState) {
-    }
     /**
      * sends an unlink message to back channel so it stops receiving patch updates
      */
@@ -162,7 +154,7 @@ class FrontChannel extends Channel {
         this.pub.UNLINK(0);
 
         // make sure all clients become unlinked with it.
-        if(this.clientConnectedCallbacks.size > 0 || this.connectedClients.size > 0) {
+        if(this.clientConnectedTimeouts.size > 0 || this.connectedClients.size > 0) {
             this.disconnectAllClients();
         }
     }
@@ -172,6 +164,9 @@ class FrontChannel extends Channel {
      * @param message
      */
     public addMessage(message: any) {
+        if(!(this.linked)) {
+            throw new Error('Front Channel is not linked, can not add messages to master queue.');
+        }
         this.master.addQueuedMessage(message, this.backMasterIndex, this.channelId);
     };
 
@@ -210,7 +205,7 @@ class FrontChannel extends Channel {
 
             const validated = this.validateConnectAction(CONNECTION_STATUS.CONNECTING);
             if(validated.error) {
-                reject(validated.error);
+                return reject(validated.error);
             }
 
             this.pub.CONNECT({
@@ -220,12 +215,19 @@ class FrontChannel extends Channel {
             });
 
             let connectionTimeout = setTimeout(() => {
-                reject(`Timed out waiting for ${(this.connectedChannelIds.size - this.totalChannels)} connections`);
+                return reject(`Timed out waiting for ${(this.connectedChannelIds.size - this.totalChannels)} connections`);
             }, timeout);
 
-            this.on('connected', (channelId, state) => {
+            let connectedChannelIds = new Set();
+            let connectedBackMasterIndexes = new Set();
+
+            this.on('connected', (channelId, backMasterIndex) => {
+
+                connectedChannelIds.add(channelId);
+                connectedBackMasterIndexes.add(backMasterIndex);
+
                 // run user defined handler. (set with onConnectedHandler())
-                this.onConnectedHandler(channelId, state);
+                this.onConnectedHandler(channelId, backMasterIndex);
 
                 this.connectedChannelIds.add(channelId);
                 if (this.connectedChannelIds.size === this.totalChannels) {
@@ -237,144 +239,67 @@ class FrontChannel extends Channel {
                     this.removeAllListeners('connected');
 
                     this.CONNECTION_STATUS = CONNECTION_STATUS.CONNECTED;
-                    resolve(this.connectedChannelIds);
+
+                    return resolve({
+                        channelIds: Array.from(connectedChannelIds.values()),
+                        backMasterIndexes: Array.from(connectedBackMasterIndexes.values())
+                    });
                 }
             });
         })
-    }
-
-    /**
-     * Either disconnects from given channel ids or by default disconnects from all.
-     * @param channelIds - Channel Ids to disconnect from.
-     * @param timeout - wait time to finish all disconnections before throwing error.
-     * @returns {Promise<T>}
-     */
-    public async disconnect(channelIds?: Array<string>, timeout=15000) {
-        const awaitingChannelIds = new Set(channelIds) || this.connectedChannelIds;
-        return new Promise((resolve, reject) => {
-
-            const validated = this.validateConnectAction(CONNECTION_STATUS.DISCONNECTING);
-            if(validated.error) {
-                reject(validated.error);
-            }
-
-            this.on('disconnected', (channelId) => {
-                let disconnectionTimeout = setTimeout(() => {
-                    reject(`Timed out waiting for ${(awaitingChannelIds.size)} disconnections`);
-                }, timeout);
-
-                awaitingChannelIds.delete(channelId);
-                if (awaitingChannelIds.size === 0) {
-                    clearTimeout(disconnectionTimeout);
-                    this.removeAllListeners('disconnected');
-                    // if we still have some connections open keep status as connected otherwise its disconnected.
-                    this.CONNECTION_STATUS = (this.connectedChannelIds.size > 0) ? CONNECTION_STATUS.CONNECTED : CONNECTION_STATUS.DISCONNECTED;
-                    resolve(this.connectedChannelIds.size);
-                }
-            });
-        })
-    }
-
-    get state(): any {
-        return this._state;
     }
 
     get connectionInfo(): any {
         return {
             connectedChannelIds: Array.from(this.connectedChannelIds),
             connectionStatus: this.CONNECTION_STATUS,
+            isLinked: this.linked,
         }
     }
 
     // business logic for connecting client
     private async _connectClient(uid) {
-        this.link(uid);
-
-        return new Promise((resolve, reject) => {
-            this.clientConnectedCallbacks.set(uid, (state) => {
-                this.clientConnectedCallbacks.delete(uid);
-                clearTimeout(this.clientConnectedTimeouts.get(uid));
-                this.clientConnectedTimeouts.delete(uid);
-
-                if(state === false) {
-                    reject(new Error('Client disconnected during connection'));
-                }
-                resolve(state);
-            });
-
+        try{
+            // setup a timeout if client takes too long to receive successful connect
             this.clientConnectedTimeouts.set(uid, setTimeout(() => {
-                this.clientConnectedCallbacks.delete(uid);
                 this.clientConnectedTimeouts.delete(uid);
-                reject(new Error(`Client ${uid} connection request to ${this.channelId} timed out`));
+                this.emitClientLinked(uid, { error: `Client ${uid} connection request to ${this.channelId} timed out`});
             }, this.clientTimeout));
-        })
+
+            const state = await this.link(uid);
+
+            clearTimeout(this.clientConnectedTimeouts.get(uid));
+            this.clientConnectedTimeouts.delete(uid);
+
+            return state;
+        } catch (err) {
+            this.emitClientLinked(uid, err.message);
+        }
+    }
+
+    private emitClientLinked(clientUid, data) {
+        this.emit(`linked_${clientUid}`, data);
     }
 
     public disconnectClient(clientUid) {
-        if(this.clientConnectedCallbacks.has(clientUid)) {
-            // if the client was still waiting for callback to be called, call it with false state so the promise gets rejected.
-            this.clientConnectedCallbacks.get(clientUid)(false);
-        }
         if(this.connectedClients.has(clientUid)) {
-            this.connectedClients[clientUid].onChannelDisconnect(this.channelId);
+            this.connectedClients.get(clientUid).onChannelDisconnect(this.channelId);
             this.connectedClients.delete(clientUid);
         }
-        // after client finishes disconnecting check if we still have any clients, if not then unlink from back channel.
-        if(this.clientConnectedCallbacks.size === 0 && this.connectedClients.size === 0) {
+        if(this.connectedClients.size === 0) {
             this.unlink();
         }
     }
-
-    private disconnectAllClients() {
-        Object.keys(this.clientConnectedCallbacks).forEach(clientUid => {
-           this.disconnectClient(clientUid);
-        });
-
-        Object.keys(this.connectedClients).forEach(clientUid => {
-           this.disconnectClient(clientUid)
-        });
-    }
-
-    private _onSetState(encodedState: any, clientUid?) : void  {
-        if(!this.linked) return;
-
-        if(clientUid) {
-            this.handleSetStateForClient(encodedState, clientUid);
-        }
-
-        this.onSetStateHandler(encodedState, clientUid);
-    }
-
-    /**
-     * received full state from back channel, check if its for
-     * a client awaiting for its connected callback and then
-     * check if the client is in the connected map
-     * @param clientUid
-     * @param state
-     */
-    private handleSetStateForClient(state, clientUid) : boolean {
-        if(this.clientConnectedCallbacks.has(clientUid)) {
-            this.clientConnectedCallbacks.get(clientUid)(state);
-            return true;
-        } else if(this.connectedClients.has(clientUid)) {
-            const client = this.connectedClients.get(clientUid);
-            client.addEncodedStateSet(this.channelId, state);
-            return true;
-        } else {
-            console.warn('tried handling state for a client not in channel.')
-        }
-    }
-
-    private onSetStateHandler(newState: any, clientUid?) : void {}
 
     private _onPatchState(patch: any) : void {
         if(!this.linked) return;
 
         for(let client of this.connectedClients.values()) {
-            client.addEncodedStatePatch(this.channelId, patch);
+            client.addStateUpdate(this.channelId, patch, STATE_UPDATE_TYPES.PATCH);
         }
         this.onPatchStateHandler(patch);
     }
+
     private onPatchStateHandler(patch: any) : void {}
 
     private _onMessage(message: any, channelId: string) : void {
@@ -384,11 +309,11 @@ class FrontChannel extends Channel {
         throw new Error(`Unimplemented onMessageHandler in front channel ${this.channelId} Use frontChannel.onMessage to implement.`);
     }
 
-    private _onConnectionChange(backChannelId, backMasterIndex, change: CONNECTION_CHANGE, data?) {
+    private _onConnectionChange(backChannelId, backMasterIndex, change: CONNECTION_CHANGE) {
         if(change === CONNECTION_CHANGE.CONNECTED) {
-            this._onConnected(backChannelId, backMasterIndex, data);
+            this._onConnected(backChannelId, backMasterIndex);
         } else if(change === CONNECTION_CHANGE.DISCONNECTED) {
-            this._onDisconnect(backChannelId, backMasterIndex, data);
+            this._onDisconnect(backChannelId, backMasterIndex);
         } else {
             throw new Error(`Unrecognized connection change value: ${change} from backChannel: ${backChannelId}`)
         }
@@ -398,9 +323,9 @@ class FrontChannel extends Channel {
      * registers needed pub and subs when connected and runs handler passed into onConnected(optional)
      * if its the same channelId
      * @param backChannelId
-     * @param state - if its the mirrored channelId, it will have the current state as well.
+     * @param backMasterIndex - index of the Back Channel's master.
      */
-    private _onConnected(backChannelId, backMasterIndex, state?: any) {
+    private _onConnected(backChannelId, backMasterIndex) {
         // channelId of connected backChannel was the same so register pub/subs meant for mirrored channels.
         if(backChannelId === this.channelId) {
             this.backMasterIndex = backMasterIndex;
@@ -410,12 +335,23 @@ class FrontChannel extends Channel {
                 this._onMessage(message, this.channelId);
             });
 
-            this.sub.SEND_STATE.register((received) => {
-                this._onSetState(Buffer.from(received.encodedState.data), received.clientUid);
-            });
+            this.sub.ACCEPT_LINK.register((response)  => {
+                // check if the accepted link was for a client.
+                let data: any = {};
 
-            this.sub.ACCEPT_LINK.register((received)  => {
-                this.emit('linked', Buffer.from(received.encodedState.data));
+                if(response.error) {
+                    data.error = response.error;
+                } else {
+                    data.error = null;
+                    const state = Buffer.from(response.encodedState.data);
+                    data.state = state;
+         }
+
+                if(response['clientUid'] !== undefined) {
+                    this.emitClientLinked(response.clientUid, data);
+                } else {
+                    this.emit('linked', data);
+                }
             });
 
             this.pub.LINK.register();
@@ -423,29 +359,27 @@ class FrontChannel extends Channel {
         }
 
         this.push.SEND_BACK.register(backChannelId);
-        this.pub.DISCONNECT.register(backChannelId);
 
-        this.emit('connected', backChannelId);
+        this.emit('connected', backChannelId, backMasterIndex);
     }
 
-    private onConnectedHandler(backChannelId, state?: any) : void {};
-
-    private onDisconnected(backChannelId) {
-        this.pub.DISCONNECT.unregister();
-        this.push.SEND_BACK.unregister();
-    }
+    private onConnectedHandler(backChannelId, backMasterIndex) : void {};
 
     private validateConnectAction(REQUEST_STATUS: CONNECTION_STATUS) : { success: boolean, error?: string } {
         let validated = { success: true, error: null };
-        if(this.CONNECTION_STATUS === CONNECTION_STATUS.CONNECTING) {
-            validated.success = false;
-            validated.error = 'Channel is in the process of connecting.';
+        if(REQUEST_STATUS === CONNECTION_STATUS.CONNECTING) {
+            if(this.CONNECTION_STATUS === CONNECTION_STATUS.CONNECTING || this.CONNECTION_STATUS === CONNECTION_STATUS.CONNECTED) {
+                validated.success = false;
+                validated.error = 'Channel is connected or in the process of connecting.';
+            }
         }
 
+        /*
         if(this.CONNECTION_STATUS === CONNECTION_STATUS.DISCONNECTING) {
             validated.success = false;
             validated.error = 'Channel is in the process of disconnecting.';
         }
+        */
 
         this.CONNECTION_STATUS = REQUEST_STATUS;
 
@@ -490,7 +424,7 @@ class FrontChannel extends Channel {
     }
 
     private clientCanConnect(clientUid) : boolean {
-        return (!(this.clientConnectedCallbacks.has(clientUid)) && !(this.connectedClients.has(clientUid)));
+        return (!(this.clientConnectedTimeouts.has(clientUid)) && !(this.connectedClients.has(clientUid)));
     }
 }
 

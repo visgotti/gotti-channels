@@ -1,25 +1,25 @@
-import * as fossilDelta from 'fossil-delta';
-import * as msgpack from 'notepack.io';
-
 import { STATE_UPDATE_TYPES } from './types';
 
 import FrontChannel from './Front/FrontChannel';
 
-export class Client {
+class Client {
     readonly uid: string;
     public state: any;
     private connectedChannels: Map<string, FrontChannel>;
-    private queuedEncodedUpdates: any;
     private processorChannel: FrontChannel;
+    private _queuedEncodedUpdates: any;
 
     constructor(uid) {
         this.uid = uid;
         this.processorChannel = null;
         this.connectedChannels = new Map();
-        this.queuedEncodedUpdates = {};
+        this._queuedEncodedUpdates = {};
         this.state = null;
     }
 
+    get queuedEncodedUpdates() {
+        return this._queuedEncodedUpdates;
+    }
 
     /**
      * Sets connected channel of client also links it.
@@ -28,9 +28,8 @@ export class Client {
     public async connectToChannel(channel: FrontChannel) {
         try {
             const encodedState = await channel.connectClient(this);
-            console.log('encoded state 1 was', encodedState);
             this.connectedChannels.set(channel.channelId, channel);
-            this.addEncodedStateSet(channel.channelId, encodedState);
+            this.addStateUpdate(channel.channelId, encodedState, STATE_UPDATE_TYPES.SET);
             return encodedState;
         } catch (err) {
             throw err;
@@ -57,30 +56,20 @@ export class Client {
         }
     }
 
-    public addEncodedStateSet(channelId, state) : number | boolean {
+    public addStateUpdate(channelId, update, type: STATE_UPDATE_TYPES) {
         if(!(this.connectedChannels.has(channelId))) return false;
 
-        if(!(channelId in this.queuedEncodedUpdates)) {
-            this.queuedEncodedUpdates[channelId] = [];
+        if(!(channelId in this._queuedEncodedUpdates)) {
+            this._queuedEncodedUpdates[channelId] = [];
         }
-        this.queuedEncodedUpdates[channelId].push({ type: STATE_UPDATE_TYPES.SET, state });
-        return this.queuedEncodedUpdates[channelId].length;
+        this._queuedEncodedUpdates[channelId].push({ type, update });
+
+        return this._queuedEncodedUpdates[channelId].length;
     }
 
-    public addEncodedStatePatch(channelId, patch) : number | boolean {
-        if(!(this.connectedChannels.has(channelId))) return false;
-
-        if(!(channelId in this.queuedEncodedUpdates)) {
-            this.queuedEncodedUpdates[channelId] = [];
-        }
-        this.queuedEncodedUpdates[channelId].push({ type: STATE_UPDATE_TYPES.PATCH, patch });
-
-        return this.queuedEncodedUpdates[channelId].length;
-    }
-
-    public clearEncodedStateUpdates() {
-        Object.keys(this.queuedEncodedUpdates).forEach(channelId => {
-            this.queuedEncodedUpdates[channelId].length = 0;
+    public clearStateUpdates() {
+        Object.keys(this._queuedEncodedUpdates).forEach(channelId => {
+            this._queuedEncodedUpdates[channelId].length = 0;
         });
     }
 
@@ -119,7 +108,7 @@ export class Client {
     }
 
     public disconnect(channelId?) {
-        if(channelId) {
+        if(this.connectedChannels.has(channelId)) {
             this.connectedChannels.get(channelId).disconnectClient(this.uid)
         } else {
             this.connectedChannels.forEach(channel => {
@@ -130,10 +119,12 @@ export class Client {
 
     // removes queued updates from channel.
     public onChannelDisconnect(channelId) {
-        if(this.processorChannel.channelId === channelId) {
+        if(this.processorChannel && this.processorChannel.channelId === channelId) {
             this.processorChannel = null;
         }
-        delete this.queuedEncodedUpdates[channelId];
+        delete this._queuedEncodedUpdates[channelId];
         this.connectedChannels.delete(channelId);
     }
 }
+
+export default Client;

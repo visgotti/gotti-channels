@@ -21,7 +21,6 @@ enum MSG_CODES {
     BROADCAST_LINKED_FRONTS,
     BROADCAST_ALL_FRONTS,
     SEND_FRONT,
-    SEND_STATE,
 }
 
 export type PublishProtocol = any;
@@ -39,13 +38,13 @@ export class Protocol {
 
     //FRONT MASTER -> BACK MASTER
     static SEND_QUEUED(frontServerIndex) : string  { return Protocol.make(MSG_CODES.SEND_QUEUED, frontServerIndex) };
+    static DISCONNECT() : string  { return Protocol.make(MSG_CODES.DISCONNECT) }; //todo: figure out all disconnection edge cases before implementing
 
     //BACK MASTER -> FRONT MASTERS
     static PATCH_STATE(backServerIndex) : string  { return Protocol.make(MSG_CODES.PATCH_STATE, backServerIndex) };
 
     // FRONT -> BACKS
     static CONNECT() : string  { return Protocol.make(MSG_CODES.CONNECT) };
-    static DISCONNECT() : string  { return Protocol.make(MSG_CODES.DISCONNECT) };
     static BROADCAST_ALL_BACK() : string  { return Protocol.make(MSG_CODES.BROADCAST_ALL_BACK) };
 
     static SEND_BACK(backChannelId) : string  { return Protocol.make(MSG_CODES.SEND_BACK, backChannelId) };
@@ -59,7 +58,6 @@ export class Protocol {
     // BACK -> FRONT
     static CONNECTION_CHANGE(frontUid) : string { return Protocol.make(MSG_CODES.CONNECTION_CHANGE, frontUid) };
     static SEND_FRONT(frontUid) : string  { return Protocol.make(MSG_CODES.SEND_FRONT, frontUid) };
-    static SEND_STATE(frontUid): string  { return Protocol.make(MSG_CODES.SEND_STATE, frontUid) };
     static ACCEPT_LINK(frontUid): string  { return Protocol.make(MSG_CODES.ACCEPT_LINK, frontUid) };
 
     /**
@@ -85,10 +83,6 @@ abstract class MessageFactory {
     constructor(messenger) {
         this.messenger = messenger;
     }
-
-    //TODO: even though were using pub/sub zmq sockets it would make some of the code much more legible if I can set up a nice req/res message layer.
-    protected requestCreator(protocolFactory, encoder?) {}
-    protected responseCreator(protocolFactory, encoder?) {};
 
     protected pubCreator(protocol, encoder?) {
         let pub: any = {};
@@ -120,14 +114,6 @@ abstract class MessageFactory {
      */
     protected pushCreator(protocolFactory: Function, encoder?) {
         let push: any = {};
-
-        push = (function (to, ...args) {
-            if (push[to]) {
-                push[to](to, ...args);
-            } else {
-                throw new Error('Unitialized');
-            }
-        });
 
         push.register = (to) => {
             push[to] = this.messenger.getOrCreatePublish(protocolFactory(to), null, encoder);
@@ -185,7 +171,6 @@ export abstract class ChannelMessageFactory extends MessageFactory {
 
     // FONT -> BACK
     public abstract SEND_BACK: PushProtocol | SubscribeProtocol;
-    public abstract DISCONNECT: PushProtocol | SubscribeProtocol; //TODO: req/res
     public abstract LINK: PublishProtocol | SubscribeProtocol; //TODO: req/res
     public abstract UNLINK: PublishProtocol | SubscribeProtocol;
 
@@ -194,7 +179,6 @@ export abstract class ChannelMessageFactory extends MessageFactory {
     public abstract BROADCAST_LINKED_FRONTS: PublishProtocol | SubscribeProtocol;
     public abstract BROADCAST_ALL_FRONTS: PublishProtocol | SubscribeProtocol;
     public abstract SEND_FRONT: PublishProtocol | SubscribeProtocol;
-    public abstract SEND_STATE: PublishProtocol | SubscribeProtocol;
     public abstract ACCEPT_LINK: PublishProtocol | SubscribeProtocol;
     constructor(messenger) {
         super(messenger)

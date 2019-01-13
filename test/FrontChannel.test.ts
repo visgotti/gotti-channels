@@ -1,42 +1,25 @@
 import {clearInterval} from "timers";
 import * as msgpack from 'notepack.io';
 
+import { Messenger } from 'centrum-messengers/dist/core/Messenger';
+
 import FrontChannel from '../src/core/Front/FrontChannel';
 import BackChannel from '../src/core/Back/BackChannel';
-
 
 import { FrontMasterChannel } from '../src/core/Front/FrontMaster/MasterChannel';
 import { BackMasterChannel } from '../src/core/Back/BackMaster/MasterChannel';
 
-import { Messenger } from 'centrum-messengers/dist/core/Messenger';
-
-const { TEST_CLUSTER_OPTIONS, makeRandomMessages, arrayAverage, getRandomChannelIds, formatBytes, applyPatches } = require('./testHelpers');
-const options = TEST_CLUSTER_OPTIONS;
-
-interface TestFrontMessage {
-    message: any,
-    frontUid: string,
-}
+import { CONNECTION_STATUS } from '../src/core/types';
 
 import * as assert from 'assert';
 import * as mocha from 'mocha';
-
-const messageFactories = {
-    xxsmall: ((minMessages, maxMessages) =>  (makeRandomMessages(minMessages, maxMessages, 1, 1, 1, 1, 1, 1))),
-    xsmall: ((minMessages, maxMessages) =>  (makeRandomMessages(minMessages, maxMessages, 3, 5, 5, 10, 15, 25))),
-    small: ((minMessages, maxMessages) =>  (makeRandomMessages(minMessages, maxMessages, 15, 50, 10, 30, 100, 300))),
-    medium: ((minMessages, maxMessages) =>  makeRandomMessages(minMessages, maxMessages, 30, 70, 10, 30, 200, 500)),
-    large: ((minMessages, maxMessages) =>  makeRandomMessages(minMessages, maxMessages, 40, 80, 10, 30, 300, 800)),
-    xlarge: ((minMessages, maxMessages) =>  makeRandomMessages(minMessages, maxMessages, 50, 90, 10, 30, 500, 1000)),
-};
-
-const messageFactory = messageFactories.xsmall;
 
 const TEST_FRONT_URI = 'tcp://127.0.0.1:4000';
 const TEST_BACK_URI = 'tcp://127.0.0.1:5000';
 
 describe('FrontChannel', function() {
-
+    let BackMaster: BackMasterChannel;
+    let FrontMaster: FrontMasterChannel;
     let FrontChannel1: FrontChannel;
     let FrontChannel2: FrontChannel;
     let BackChannel1: BackChannel;
@@ -45,13 +28,13 @@ describe('FrontChannel', function() {
         const frontMessenger = new Messenger({ id: 'testFront', publish: { pubSocketURI: TEST_FRONT_URI } , subscribe: { pubSocketURIs: [TEST_BACK_URI] } });
         const backMessenger = new Messenger({ id: 'testBack', publish: { pubSocketURI: TEST_BACK_URI } , subscribe: { pubSocketURIs: [TEST_FRONT_URI] } });
 
-        const frontMaster = new FrontMasterChannel([0, 1], 2, 0, frontMessenger);
-        const backMaster = new BackMasterChannel([0, 1], 0, backMessenger);
+        FrontMaster = new FrontMasterChannel([0, 1], 2, 0, frontMessenger);
+        BackMaster = new BackMasterChannel([0, 1], 0, backMessenger);
 
-        FrontChannel1 = frontMaster.frontChannels[0];
-        FrontChannel2 = frontMaster.frontChannels[1];
-        BackChannel1 = backMaster.backChannels[0];
-        BackChannel2 = backMaster.backChannels[1];
+        FrontChannel1 = FrontMaster.frontChannels[0];
+        FrontChannel2 = FrontMaster.frontChannels[1];
+        BackChannel1 = BackMaster.backChannels[0];
+        BackChannel2 = BackMaster.backChannels[1];
 
         assert.strictEqual(FrontChannel1.channelId, 0);
         assert.strictEqual(FrontChannel2.channelId, 1);
@@ -67,8 +50,6 @@ describe('FrontChannel', function() {
     afterEach(() => {
         FrontChannel1.onConnected(() => {});
         FrontChannel2.onConnected(() => {});
-        FrontChannel1.onSetState(() => {});
-        FrontChannel2.onSetState(() => {});
     });
 
     after(done => {
@@ -81,21 +62,45 @@ describe('FrontChannel', function() {
         }, 200);
     });
 
-    describe('frontChannel.connect', () => {
+    describe('FrontChannel.connect', () => {
         let connections = 0;
-        it.only('tests asynchronous connection of 1 channel', (done) => {
-            FrontChannel1.connect().then(() => {
+        it('tests asynchronous connection of 1 channel', (done) => {
+            FrontChannel1.connect().then((connected: any) => {
                 connections++;
+                assert.strictEqual(connected.channelIds.length, 2);
+                assert.strictEqual(connected.backMasterIndexes.length, 1);
+                assert.strictEqual(connected.channelIds.indexOf(BackChannel1.channelId) > -1, true);
+                assert.strictEqual(connected.channelIds.indexOf(BackChannel2.channelId) > -1, true);
+                assert.strictEqual(connected.backMasterIndexes[0], BackMaster.backMasterIndex);
+                assert.strictEqual(connections, 1);
+
                 setTimeout(() => {
+
                     assert.strictEqual(connections, 1);
                     done();
                 }, 50);
             });
         });
+
+        it('updates the connectionInfo getter correctly', (done) => {
+            // 2 because theres two back channels it connects to.
+            assert.strictEqual(FrontChannel1.connectionInfo.connectedChannelIds.length, 2);
+            assert.strictEqual(FrontChannel1.connectionInfo.connectionStatus, CONNECTION_STATUS.CONNECTED);
+            assert.strictEqual(FrontChannel1.connectionInfo.isLinked, false);
+            done();
+        });
+
+        it('throws an error if you try to connect after already connected', (done) => {
+            FrontChannel1.connect().then(() => {})
+            .catch(err => {
+                assert.strictEqual(err, 'Channel is connected or in the process of connecting.');
+                done();
+            });
+        });
     });
 
-    describe('frontChannel.onConnected', () => {
-        it.only('tests handler gets called on each successful connection', (done) => {
+    describe('FrontChannel.onConnected', () => {
+        it('tests handler gets called on each successful connection', (done) => {
             let connectionsHandled = 0;
             FrontChannel2.connect().then(() => {
                 // 2 since theres 2 BackChannels were connecting to.
@@ -108,11 +113,17 @@ describe('FrontChannel', function() {
         });
     });
 
-    describe('frontChannel.link', () => {
-        it.only('link responds asynchronously with a msgpack encoded state', (done) => {
+    describe('FrontChannel.link', () => {
+        it('link fails asynchronously if the back state was null', (done) => {
+            FrontChannel1.link().then(() => {})
+                .catch(err => {
+                    assert.strictEqual(err, 'null state on back channel, failed to link.');
+                    done();
+            })
+        });
+        it('link responds asynchronously with a msgpack encoded state', (done) => {
             const state = { "foo": "bar" };
             BackChannel1.setState(state);
-
              FrontChannel1.link().then(encodedState => {
                  let decoded = msgpack.decode(encodedState);
                  assert.deepStrictEqual(decoded, state);
@@ -121,41 +132,60 @@ describe('FrontChannel', function() {
         });
     });
 
-    describe('frontChannel.unlink', () => {
-        it.only('unlinks the channel', (done) => {
+    describe('FrontChannel.unlink', () => {
+        it('unlinks the channel', (done) => {
             assert.doesNotThrow(() => { FrontChannel1.unlink()  });
             done();
         });
     });
 
-    describe('frontChannel.onPatchState & frontChannel.patchState', () => {
-        it.only('fires off the onPatchState function when patchState is executed', (done) => {
+    describe('FrontChannel.onPatchState & FrontChannel.patchState', () => {
+        it('does NOT fire off the onPatchState function when patchState is executed because its UNLINKED', (done) => {
+            FrontChannel1.unlink();
 
-            let called = null;
+            let called = false;
+
             FrontChannel1.onPatchState((patch) => {
                 called = patch;
             });
 
-            FrontChannel1.patchState('test');
-            assert.strictEqual(called, 'test');
+            FrontChannel1.patchState(true);
+            assert.strictEqual(called, false);
             done();
+        });
+
+        it('does fire off the onPatchState when its linked', (done) => {
+
+            let called = null;
+            FrontChannel1.link().then(() => {
+                FrontChannel1.onPatchState((patch) => {
+                    called = patch;
+                });
+
+                FrontChannel1.patchState(true);
+                assert.strictEqual(called, true);
+                done();
+            });
+
         });
     });
 
-    describe('frontChannel.addMessage', () => {
-        it.only('Throws error because were not linked to any back channels', (done) => {
+    describe('FrontChannel.addMessage', () => {
+        it('Throws error because were not linked to any back channels', (done) => {
+            FrontChannel1.unlink();
             assert.throws(() => { FrontChannel1.addMessage({"foo": "bar"}) });
             done();
         });
-        it.only('Doesnt throw after linking.', (done) => {
-            FrontChannel1.link();
-            assert.doesNotThrow(() => { FrontChannel1.addMessage({"foo": "bar"}) });
-            done();
+        it('Doesnt throw after linking.', (done) => {
+            FrontChannel1.link().then(() => {
+                assert.doesNotThrow(() => { FrontChannel1.addMessage({"foo": "bar"}) });
+                done();
+            });
         });
     });
 
-    describe('frontChannel.send', () => {
-        it.only('sends correct data to mirrored back channel when no backChannelId is passed in as a param', (done) => {
+    describe('FrontChannel.send', () => {
+        it('sends correct data to mirrored back channel when no backChannelId is passed in as a param', (done) => {
             const sent = 'test';
             BackChannel1.onMessage((message, frontUid) => {
                 assert.strictEqual(message, sent);
@@ -165,7 +195,7 @@ describe('FrontChannel', function() {
             });
             FrontChannel1.send(sent);
         });
-        it.only('sends correct data to remote back channel if channel id is specified', (done) => {
+        it('sends correct data to remote back channel if channel id is specified', (done) => {
             const sent = 'test2';
             BackChannel2.onMessage((message, frontUid) => {
                 assert.strictEqual(message, sent);
@@ -175,10 +205,10 @@ describe('FrontChannel', function() {
             });
             FrontChannel1.send(sent, BackChannel2.channelId);
         });
-    })
+    });
 
-    describe('frontChannel.broadcast', () => {
-        it.only('sends to all back channels if no backChannelIds were passed in as second param', (done) => {
+    describe('FrontChannel.broadcast', () => {
+        it('sends to all back channels if no backChannelIds were passed in as second param', (done) => {
             let received = 0;
             let expectedReceived = 2;
             BackChannel1.onMessage((message, frontUid) => {
@@ -203,7 +233,7 @@ describe('FrontChannel', function() {
             });
             FrontChannel1.broadcast(1);
         });
-        it.only('only sends to back channels with channelIds passed in as second param', (done) => {
+        it('only sends to back channels with channelIds passed in as second param', (done) => {
             let received = 0;
             let expectedReceived = 2;
             BackChannel1.onMessage((message, frontUid) => {
@@ -229,5 +259,4 @@ describe('FrontChannel', function() {
             FrontChannel1.broadcast(1, [BackChannel1.channelId, BackChannel2.channelId]);
         })
     });
-
 });
