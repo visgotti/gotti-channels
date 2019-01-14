@@ -23,6 +23,7 @@ class FrontChannel extends Channel {
 
     private linked: boolean;
     private connectedClients: Map<string, Client>;
+    public connectedClientUids: Array<string>;
 
     private clientConnectedCallbacks: Map<string, Function>;
     private clientConnectedTimeouts: Map<string, Timeout>;
@@ -49,7 +50,9 @@ class FrontChannel extends Channel {
 
         this.clientConnectedCallbacks = new Map();
         this.clientConnectedTimeouts = new Map();
+
         this.connectedClients = new Map();
+        this.connectedClientUids = [];
 
         this.linked = false;
 
@@ -72,11 +75,13 @@ class FrontChannel extends Channel {
      */
     public async connectClient(client: Client, timeout?) {
         try {
+            if(!(client.uid)) throw new Error('Invalid client uid.');
             if(!(this.clientCanConnect(client.uid))) throw new Error ('Client is already in connection state.');
 
             const state = await this._connectClient(client.uid);
 
             this.connectedClients.set(client.uid, client);
+            this.connectedClientUids.push(client.uid);
 
             return state;
 
@@ -283,6 +288,10 @@ class FrontChannel extends Channel {
 
     public disconnectClient(clientUid) {
         if(this.connectedClients.has(clientUid)) {
+            const index = this.connectedClientUids.indexOf(clientUid);
+            if(index > -1) {
+                this.connectedClientUids.splice(index, 1);
+            }
             this.connectedClients.get(clientUid).onChannelDisconnect(this.channelId);
             this.connectedClients.delete(clientUid);
         }

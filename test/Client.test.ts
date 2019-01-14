@@ -19,6 +19,8 @@ const TEST_BACK_URI = 'tcp://127.0.0.1:5000';
 
 describe('Client', function() {
     let client: Client;
+    let undefinedClient: Client;
+
     let FrontMaster: FrontMasterChannel;
     let BackMaster: BackMasterChannel;
     let FrontChannel1: FrontChannel;
@@ -38,6 +40,7 @@ describe('Client', function() {
         BackChannel2 = BackMaster.backChannels[1];
 
         client = new Client('TEST');
+        undefinedClient = new Client(null);
 
         assert.strictEqual(FrontChannel1.channelId, 0);
         assert.strictEqual(FrontChannel2.channelId, 1);
@@ -72,6 +75,8 @@ describe('Client', function() {
                 const state = msgpack.decode(encodedState);
                 assert.deepStrictEqual(state, { "foo": "bar" });
 
+                assert.strictEqual(FrontChannel1.connectedClientUids.length, 1);
+                assert.strictEqual(FrontChannel1.connectedClientUids[0], client.uid);
                 assert.strictEqual(client.queuedEncodedUpdates.hasOwnProperty(BackChannel1.channelId), true);
                 assert.strictEqual(client.queuedEncodedUpdates[BackChannel1.channelId].length, 1);
                 done();
@@ -80,10 +85,17 @@ describe('Client', function() {
         it('throws an error if you are already connected', (done) => {
             client.connectToChannel(FrontChannel1).then(() => {})
             .catch((err) => {
-                assert.strictEqual(err.message, 'Client is already in connection state.')
+                assert.strictEqual(err.message, 'Client is already in connection state.');
                 done();
             });
-        })
+        });
+        it('throws an error if the uid was invalid', (done) => {
+            undefinedClient.connectToChannel(FrontChannel1).then(() => {})
+                .catch((err) => {
+                    assert.strictEqual(err.message, 'Invalid client uid.');
+                    done();
+                });
+        });
     });
     describe('client.setProcessorChannel', () => {
         it('should throw error when trying to send messages without processor channel set', (done) => {
@@ -94,6 +106,9 @@ describe('Client', function() {
         it('sets and connects asynchronously if it wasnt connected first', () => {
             BackChannel2.setState({ "foo": "bar" });
             client.setProcessorChannel(FrontChannel2).then(set => {
+
+                assert.strictEqual(FrontChannel2.connectedClientUids.length, 1);
+                assert.strictEqual(FrontChannel2.connectedClientUids[0], client.uid);
                 assert.strictEqual(client.queuedEncodedUpdates.hasOwnProperty(BackChannel1.channelId), true);
                 assert.strictEqual(client.queuedEncodedUpdates.hasOwnProperty(BackChannel2.channelId), true);
                 assert.strictEqual(client.queuedEncodedUpdates[BackChannel1.channelId].length, 1);
@@ -225,6 +240,9 @@ describe('Client', function() {
             assert.strictEqual(BackMaster.linkedFrontMasterChannels[FrontMaster.frontMasterIndex].linkedChannelsCount, 2);
 
             client.disconnect(FrontChannel1.channelId);
+
+            assert.strictEqual(FrontChannel1.connectedClientUids.length, 0);
+
             sinon.assert.calledOnce(frontDisconnectClientSpy);
             sinon.assert.calledOnce(frontUnlinkSpy);
 
@@ -245,6 +263,8 @@ describe('Client', function() {
                 assert.strictEqual(BackMaster.linkedFrontMasterChannels[FrontMaster.frontMasterIndex].linkedChannelsCount, 2);
                 client.disconnect();
                 setTimeout(() => {
+                    assert.strictEqual(FrontChannel1.connectedClientUids.length, 0);
+                    assert.strictEqual(FrontChannel2.connectedClientUids.length, 0);
 
                     // should no longer have any channel ids for queued encoded updates.
                     assert.strictEqual(client.queuedEncodedUpdates.hasOwnProperty(BackChannel1.channelId), false);
@@ -258,4 +278,3 @@ describe('Client', function() {
         });
     });
 });
-
