@@ -1,15 +1,19 @@
 import { STATE_UPDATE_TYPES } from './types';
 
 import FrontChannel from './Front/FrontChannel';
+import { FrontMasterChannel } from './Front/FrontMaster/MasterChannel';
 
 class Client {
     readonly uid: string;
     public state: any;
+    private masterChannel: FrontMasterChannel;
     private connectedChannels: Map<string, FrontChannel>;
     private processorChannel: FrontChannel;
     private _queuedEncodedUpdates: any;
 
-    constructor(uid) {
+    constructor(uid, masterChannel: FrontMasterChannel) {
+        this.masterChannel = masterChannel;
+        this.masterChannel.clientConnected(this);
         this.uid = uid;
         this.processorChannel = null;
         this.connectedChannels = new Map();
@@ -20,6 +24,19 @@ class Client {
     get queuedEncodedUpdates() {
         return this._queuedEncodedUpdates;
     }
+
+    /**
+     * method to be overridden to handle direct client messages from back channels.
+     */
+    public onMessage(handler) {
+        this.onMessageHandler = handler;
+    }
+
+    public handleDirectMessage(message) {
+        this.onMessageHandler(message);
+    }
+
+    private onMessageHandler(message) { throw 'Unimplemented' };
 
     /**
      * Sets connected channel of client also links it.
@@ -62,7 +79,7 @@ class Client {
         if(!(channelId in this._queuedEncodedUpdates)) {
             this._queuedEncodedUpdates[channelId] = [];
         }
-        this._queuedEncodedUpdates[channelId].push({ type, update });
+        this._queuedEncodedUpdates[channelId].push([channelId, type, update ]);
 
         return this._queuedEncodedUpdates[channelId].length;
     }
@@ -114,6 +131,7 @@ class Client {
             this.connectedChannels.forEach(channel => {
                 channel.disconnectClient(this.uid);
             });
+            this.masterChannel.clientDisconnected(this.uid)
         }
     }
 

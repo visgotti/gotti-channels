@@ -2,6 +2,7 @@ import { Protocol, PushProtocol, PullProtocol, MasterMessageFactory } from '../.
 
 export interface BackMasterPushes {
     PATCH_STATE: PushProtocol,
+    MESSAGE_CLIENT: PushProtocol,
 }
 
 export interface BackMasterPulls {
@@ -10,6 +11,7 @@ export interface BackMasterPulls {
 
 export class MasterMessages extends MasterMessageFactory {
     public PATCH_STATE:  PushProtocol;
+    public MESSAGE_CLIENT: PushProtocol;
 
     public SEND_QUEUED: PullProtocol;
 
@@ -25,9 +27,11 @@ export class MasterMessages extends MasterMessageFactory {
     }
     private initializePushes() : BackMasterPushes {
         this.PATCH_STATE = this.pushCreator(Protocol.PATCH_STATE, 'NONE'); // encoding for states happen in the back channel patchState function
+        this.MESSAGE_CLIENT = this.pushCreator(Protocol.MESSAGE_CLIENT, 'MSGPACK');
 
         return {
             PATCH_STATE: this.PATCH_STATE,
+            MESSAGE_CLIENT: this.MESSAGE_CLIENT,
         }
     }
 

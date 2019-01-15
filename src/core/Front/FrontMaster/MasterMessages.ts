@@ -1,7 +1,8 @@
-import { Protocol, PushProtocol, PullProtocol, MasterMessageFactory } from '../../Channel/MessageFactory'
+import { Protocol, PushProtocol, SubscribeProtocol, MasterMessageFactory } from '../../Channel/MessageFactory'
 
-export interface FrontMasterPulls {
-    PATCH_STATE: PullProtocol,
+export interface FrontMasterSubs {
+    PATCH_STATE: SubscribeProtocol,
+    MESSAGE_CLIENT: SubscribeProtocol,
 }
 
 export interface FrontMasterPushes {
@@ -9,27 +10,35 @@ export interface FrontMasterPushes {
 }
 
 export class MasterMessages extends MasterMessageFactory {
-    public PATCH_STATE:  PullProtocol;
+    public PATCH_STATE:  SubscribeProtocol;
+    public MESSAGE_CLIENT: SubscribeProtocol;
+
     public SEND_QUEUED: PushProtocol;
 
     public push: FrontMasterPushes;
-    public pull: FrontMasterPulls;
+    public sub: FrontMasterSubs;
 
-    constructor(messenger) {
+    private frontMasterIndex: number;
+
+    constructor(messenger, frontMasterIndex: number) {
         super(messenger);
         this.messenger = messenger;
+        this.frontMasterIndex = frontMasterIndex;
 
         this.push = this.initializePushes();
-        this.pull = this.initializePulls();
+        this.sub = this.initializeSubs();
     }
 
-    private initializePulls() : FrontMasterPulls {
-        this.PATCH_STATE = this.pullCreator(Protocol.PATCH_STATE, 'NONE');
+    private initializeSubs(): FrontMasterSubs {
+        this.PATCH_STATE = this.subCreator(Protocol.PATCH_STATE(this.frontMasterIndex), 'NONE');
+        this.MESSAGE_CLIENT = this.subCreator(Protocol.MESSAGE_CLIENT(this.frontMasterIndex), 'MSGPACK');
 
         return {
             PATCH_STATE: this.PATCH_STATE,
+            MESSAGE_CLIENT: this.MESSAGE_CLIENT,
         }
     }
+
 
     private initializePushes(): FrontMasterPushes {
         this.SEND_QUEUED = this.pushCreator(Protocol.SEND_QUEUED);

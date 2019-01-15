@@ -6,6 +6,7 @@ enum MSG_CODES {
 
     //BACK MASTER -> FRONT MASTER
     PATCH_STATE,
+    MESSAGE_CLIENT,
 
     // FRONT -> BACK
     CONNECT,
@@ -37,11 +38,12 @@ export class Protocol {
     constructor(){};
 
     //FRONT MASTER -> BACK MASTER
-    static SEND_QUEUED(frontServerIndex) : string  { return Protocol.make(MSG_CODES.SEND_QUEUED, frontServerIndex) };
+    static SEND_QUEUED(backMasterIndex) : string  { return Protocol.make(MSG_CODES.SEND_QUEUED, backMasterIndex) };
     static DISCONNECT() : string  { return Protocol.make(MSG_CODES.DISCONNECT) }; //todo: figure out all disconnection edge cases before implementing
 
     //BACK MASTER -> FRONT MASTERS
-    static PATCH_STATE(backServerIndex) : string  { return Protocol.make(MSG_CODES.PATCH_STATE, backServerIndex) };
+    static PATCH_STATE(frontMasterIndex) : string  { return Protocol.make(MSG_CODES.PATCH_STATE, frontMasterIndex) };
+    static MESSAGE_CLIENT(frontMasterIndex) : string { return Protocol.make(MSG_CODES.MESSAGE_CLIENT, frontMasterIndex ) };
 
     // FRONT -> BACKS
     static CONNECT() : string  { return Protocol.make(MSG_CODES.CONNECT) };
@@ -171,11 +173,11 @@ export abstract class ChannelMessageFactory extends MessageFactory {
 
     // FONT -> BACK
     public abstract SEND_BACK: PushProtocol | SubscribeProtocol;
-    public abstract LINK: PublishProtocol | SubscribeProtocol; //TODO: req/res
+    public abstract LINK: PublishProtocol | SubscribeProtocol;
     public abstract UNLINK: PublishProtocol | SubscribeProtocol;
 
     // BACK -> FRONT
-    public abstract CONNECTION_CHANGE: PushProtocol | SubscribeProtocol; //TODO: wouldnt need if connect had req/res format
+    public abstract CONNECTION_CHANGE: PushProtocol | SubscribeProtocol;
     public abstract BROADCAST_LINKED_FRONTS: PublishProtocol | SubscribeProtocol;
     public abstract BROADCAST_ALL_FRONTS: PublishProtocol | SubscribeProtocol;
     public abstract SEND_FRONT: PublishProtocol | SubscribeProtocol;
@@ -187,7 +189,8 @@ export abstract class ChannelMessageFactory extends MessageFactory {
 
 export abstract class MasterMessageFactory extends MessageFactory {
     public abstract SEND_QUEUED: PushProtocol | PullProtocol;
-    public abstract PATCH_STATE: PushProtocol | PullProtocol;
+    public abstract PATCH_STATE: PushProtocol | PullProtocol; //todo switch this to subscribe not pull
+    public abstract MESSAGE_CLIENT: PushProtocol | SubscribeProtocol;
 
     constructor(messenger) {
         super(messenger)

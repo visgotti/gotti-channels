@@ -2,18 +2,20 @@ import * as msgpack from 'notepack.io';
 
 import { Messenger } from 'centrum-messengers/dist/core/Messenger';
 
-import { MasterMessages, FrontMasterPushes, FrontMasterPulls } from './MasterMessages';
+import { MasterMessages, FrontMasterPushes, FrontMasterSubs } from './MasterMessages';
 
 import FrontChannel from '../FrontChannel';
+import Client from '../../Client';
 import { Channel } from '../../Channel/Channel';
 
 export class FrontMasterChannel extends Channel {
-    private pull: FrontMasterPulls;
+    private sub: FrontMasterSubs;
     private push: FrontMasterPushes;
 
     private frontChannelIds: Array<string>;
     private _linkedBackMasterLookup: { linkedChannelsCount: number, queuedMessages: Array<any> };
     private _connectedBackMasters: Set<number>;
+    private _connectedClients: any;
 
     public frontChannels: any;
 
@@ -28,6 +30,7 @@ export class FrontMasterChannel extends Channel {
 
         this._linkedBackMasterLookup = {} as { linkedChannelsCount: number, queuedMessages: Array<any> };
         this._connectedBackMasters = new Set(); //todo make this a lookup similar to linked with count of connected channels.
+        this._connectedClients = {};
 
         channelIds.forEach(channelId => {
             const frontChannel = new FrontChannel(channelId, totalChannels, messenger, this);
@@ -67,6 +70,19 @@ export class FrontMasterChannel extends Channel {
         }
     }
 
+    public clientConnected(client) {
+        this._connectedClients[client.uid] = client;
+    }
+
+    public clientDisconnected(uid) : boolean {
+        if(this._connectedClients[uid]) {
+            delete this._connectedClients[uid];
+            return true;
+        }
+        return false;
+    }
+
+    //TODO: this should iterate through an array not an object
     public sendQueuedMessages() {
         for(let key in this._linkedBackMasterLookup) {
             this.push.SEND_QUEUED[key](this._linkedBackMasterLookup[key].queuedMessages);
@@ -109,18 +125,26 @@ export class FrontMasterChannel extends Channel {
      * initializes needed message factories for front channels.
      */
     private initializeMessageFactories() {
-        const { push, pull } = new MasterMessages(this.messenger);
+        const { push, sub } = new MasterMessages(this.messenger, this.frontMasterIndex);
         this.push = push;
-        this.pull = pull;
+        this.sub = sub;
 
-        this.pull.PATCH_STATE.register(this.frontMasterIndex, (data) => { //[ channelId, patchData ]
+        this.sub.PATCH_STATE.register((data) => { //[ channelId, patchData ]
             const decoded  = msgpack.decode(data);
             for(let i = 0; i < decoded.length; i++) {
                 const channelId = decoded[i][0];
                 const encodedPatch = decoded[i][1];
                 this.frontChannels[channelId].patchState(encodedPatch);
             }
-        })
+        });
+
+        this.sub.MESSAGE_CLIENT.register((data) => {
+            const clientUid = data[0];
+            const message = data[1];
+            if(this._connectedClients[clientUid]) {
+                this._connectedClients[clientUid].handleDirectMessage(message);
+            }
+        });
     }
 
     public close() {

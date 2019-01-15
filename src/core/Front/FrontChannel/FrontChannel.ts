@@ -153,10 +153,14 @@ class FrontChannel extends Channel {
     /**
      * sends an unlink message to back channel so it stops receiving patch updates
      */
-    public unlink() {
+    public unlink(clientUid=false) {
+        if(clientUid !== false) {
+            this.pub.UNLINK(clientUid);
+            return;
+        }
         this.linked = false;
         this.master.unlinkChannel(this.backMasterIndex);
-        this.pub.UNLINK(0);
+        this.pub.UNLINK(false);
 
         // make sure all clients become unlinked with it.
         if(this.clientConnectedTimeouts.size > 0 || this.connectedClients.size > 0) {
@@ -294,6 +298,7 @@ class FrontChannel extends Channel {
             }
             this.connectedClients.get(clientUid).onChannelDisconnect(this.channelId);
             this.connectedClients.delete(clientUid);
+            this.unlink(clientUid);
         }
         if(this.connectedClients.size === 0) {
             this.unlink();

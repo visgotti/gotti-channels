@@ -39,8 +39,8 @@ describe('Client', function() {
         BackChannel1 = BackMaster.backChannels[0];
         BackChannel2 = BackMaster.backChannels[1];
 
-        client = new Client('TEST');
-        undefinedClient = new Client(null);
+        client = new Client('TEST', FrontMaster);
+        undefinedClient = new Client(null, FrontMaster);
 
         assert.strictEqual(FrontChannel1.channelId, 0);
         assert.strictEqual(FrontChannel2.channelId, 1);

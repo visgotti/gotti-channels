@@ -17,6 +17,9 @@ export class BackMasterChannel extends Channel {
     private _connectedFrontMasters: Set<number>;
     private backChannelIds: Array<string>;
 
+    // lookup to find out which front master a client lives on for direct messages.
+    public _clientFrontDataLookup: Map<string, any>;
+
     public backChannels: any;
 
     readonly backMasterIndex;
@@ -26,6 +29,7 @@ export class BackMasterChannel extends Channel {
         this.backMasterIndex = backMasterIndex;
         this.backChannels = {};
         this.backChannelIds = [];
+        this._clientFrontDataLookup = new Map();
         this._connectedFrontMasters = new Set();
         this._linkedFrontMasterChannels = {} as { linkedChannelsCount: number, encodedPatches: Array<any> };
         this._linkedFrontMasterIndexesArray = [];
@@ -76,11 +80,24 @@ export class BackMasterChannel extends Channel {
         }
     }
 
+
+    /**
+     * sends message to the front master that the channel lives on for it to relay it to client.
+     */
+    public messageClient(clientUid, message) : boolean {
+        if(this._clientFrontDataLookup.has(clientUid)) {
+            // if the clientUid is discoverable in the lookup we forward message to the front master so it can relay it to the client.
+            this.push.MESSAGE_CLIENT[this._clientFrontDataLookup.get(clientUid).frontMasterIndex]([clientUid, message]);
+        }
+        return false;
+    }
+
     private handleNewFrontMasterConnection(frontMasterIndex) {
         this.pull.SEND_QUEUED.register(frontMasterIndex, (messageQueueData => {
             this.handleQueuedMessages(messageQueueData, frontMasterIndex);
         }));
         this.push.PATCH_STATE.register(frontMasterIndex);
+        this.push.MESSAGE_CLIENT.register(frontMasterIndex);
     }
 
 /*  ================================================================================================
@@ -110,20 +127,46 @@ export class BackMasterChannel extends Channel {
     }
 
     public unlinkedChannelFrom(frontMasterIndex) {
-        if( (--this._linkedFrontMasterChannels[frontMasterIndex].linkedChannelsCount) === 0) {
+        if ((--this._linkedFrontMasterChannels[frontMasterIndex].linkedChannelsCount) === 0) {
 
             this._linkedFrontMasterChannels[frontMasterIndex].encodedPatches.length = 0;
             delete this._linkedFrontMasterChannels[frontMasterIndex];
 
             const index = this._linkedFrontMasterIndexesArray.indexOf(frontMasterIndex);
-            if(index >= 0) {
+            if (index >= 0) {
                 this._linkedFrontMasterIndexesArray.splice(index, 1);
             }
         }
     }
+
 /* ================================================================================================
    ================================================================================================
    ================================================================================================ */
+
+    /**
+     * adds client to data lookup if its new, otherwise it adds to the listener count.
+     * @param clientUid - identifier of client who is listening to one of the channels on current master
+     * @param frontMasterIndex - front master index of where the client lives.
+     */
+    public addedClientLink(clientUid, frontMasterIndex) {
+        if(!(this._clientFrontDataLookup.has(clientUid))) {
+            this._clientFrontDataLookup.set(clientUid, {
+                linkCount: 1,
+                frontMasterIndex: frontMasterIndex,
+            });
+        } else {
+            this._clientFrontDataLookup.get(clientUid).linkCount++;
+        }
+    }
+
+    public removedClientLink(clientUid) {
+        const clientData = this._clientFrontDataLookup.get(clientUid);
+
+        if( (--clientData.linkCount) === 0) {
+            this._clientFrontDataLookup.delete(clientUid);
+        }
+    }
+
 
     /** messageQueueData is formatted incoming as
      *  [ channelId,  message  ]
