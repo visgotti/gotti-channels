@@ -70,10 +70,19 @@ export class FrontMasterChannel extends Channel {
         }
     }
 
+    /**
+     * Gets called in client when initialized
+     * @param client
+     */
     public clientConnected(client) {
         this._connectedClients[client.uid] = client;
     }
 
+    /**
+     * called in client when disconnect is called
+     * @param uid
+     * @returns {boolean}
+     */
     public clientDisconnected(uid) : boolean {
         if(this._connectedClients[uid]) {
             delete this._connectedClients[uid];
@@ -142,7 +151,7 @@ export class FrontMasterChannel extends Channel {
             const clientUid = data[0];
             const message = data[1];
             if(this._connectedClients[clientUid]) {
-                this._connectedClients[clientUid].handleDirectMessage(message);
+                this._connectedClients[clientUid].onMessageHandler(message);
             }
         });
     }

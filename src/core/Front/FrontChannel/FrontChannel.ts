@@ -25,7 +25,6 @@ class FrontChannel extends Channel {
     private connectedClients: Map<string, Client>;
     public connectedClientUids: Array<string>;
 
-    private clientConnectedCallbacks: Map<string, Function>;
     private clientConnectedTimeouts: Map<string, Timeout>;
 
     // index of back master that the mirrored channel lives on.
@@ -48,7 +47,6 @@ class FrontChannel extends Channel {
 
         this.connectedChannelIds = new Set();
 
-        this.clientConnectedCallbacks = new Map();
         this.clientConnectedTimeouts = new Map();
 
         this.connectedClients = new Map();
@@ -167,8 +165,10 @@ class FrontChannel extends Channel {
             this.pub.UNLINK(clientUid);
             return;
         }
+        // if it gets here no clientUid was provided and means that we are unlinking the channel.
         this.linked = false;
         this.master.unlinkChannel(this.backMasterIndex);
+
         this.pub.UNLINK(false);
 
         // make sure all clients become unlinked with it.
@@ -310,9 +310,14 @@ class FrontChannel extends Channel {
             }
             this.connectedClients.get(clientUid).onChannelDisconnect(this.channelId);
             this.connectedClients.delete(clientUid);
-            this.unlink(clientUid);
+        } else if (this.clientConnectedTimeouts.has(clientUid)) {
+            clearTimeout(this.clientConnectedTimeouts.get(clientUid));
+            this.clientConnectedTimeouts.delete(clientUid);
         }
-        if(this.connectedClients.size === 0) {
+
+        this.unlink(clientUid);
+
+        if(this.connectedClients.size === 0 && this.clientConnectedTimeouts.size === 0) {
             this.unlink();
         }
     }
@@ -371,7 +376,7 @@ class FrontChannel extends Channel {
                     data.error = null;
                     const state = Buffer.from(response.encodedState.data);
                     data.state = state;
-         }
+                }
 
                 if(response['clientUid'] !== undefined) {
                     this.emitClientLinked(response.clientUid, data);

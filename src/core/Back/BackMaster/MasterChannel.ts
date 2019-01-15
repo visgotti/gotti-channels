@@ -18,7 +18,7 @@ export class BackMasterChannel extends Channel {
     private backChannelIds: Array<string>;
 
     // lookup to find out which front master a client lives on for direct messages.
-    public _clientFrontDataLookup: Map<string, any>;
+    private _linkedClientFrontDataLookup: Map<string, { linkCount: number, frontMasterIndex: number }>;
 
     public backChannels: any;
 
@@ -29,7 +29,7 @@ export class BackMasterChannel extends Channel {
         this.backMasterIndex = backMasterIndex;
         this.backChannels = {};
         this.backChannelIds = [];
-        this._clientFrontDataLookup = new Map();
+        this._linkedClientFrontDataLookup = new Map();
         this._connectedFrontMasters = new Set();
         this._linkedFrontMasterChannels = {} as { linkedChannelsCount: number, encodedPatches: Array<any> };
         this._linkedFrontMasterIndexesArray = [];
@@ -41,6 +41,10 @@ export class BackMasterChannel extends Channel {
         });
 
         this.initializeMessageFactories();
+    }
+
+    get linkedClientFrontDataLookup() {
+        return this._linkedClientFrontDataLookup;
     }
 
     get linkedFrontMasterChannels() {
@@ -79,14 +83,13 @@ export class BackMasterChannel extends Channel {
             const { encodedPatches } = this._linkedFrontMasterChannels[frontMasterIndex];
 
             this.push.PATCH_STATE[frontMasterIndex](msgpack.encode(encodedPatches)); // sends array of patches [ channelId, patch ]
-
             // clears patches
             encodedPatches.length = 0;
         }
     }
 
     /**
-     * sends direct message to client from the back. Data of the client is kept in the _clientFrontDataLookup
+     * sends direct message to client from the back. Data of the client is kept in the _linkedClientFrontDataLookup
      * and is updates when we handle new unlink/link publications from the front channel when the message
      * is supplied with a clientUid notifying that the link/unlink was for a client.
      * @param clientUid - uid of client to send direct message to
@@ -94,9 +97,10 @@ export class BackMasterChannel extends Channel {
      * @returns {boolean}
      */
     public messageClient(clientUid, message) : boolean {
-        if(this._clientFrontDataLookup.has(clientUid)) {
+        if(this._linkedClientFrontDataLookup.has(clientUid)) {
             // if the clientUid is discoverable in the lookup we forward message to the front master so it can relay it to the client.
-            this.push.MESSAGE_CLIENT[this._clientFrontDataLookup.get(clientUid).frontMasterIndex]([clientUid, message]);
+            this.push.MESSAGE_CLIENT[this._linkedClientFrontDataLookup.get(clientUid).frontMasterIndex]([clientUid, message]);
+            return true;
         }
         return false;
     }
@@ -116,14 +120,14 @@ export class BackMasterChannel extends Channel {
     channels.
     ================================================================================================*/
 
-    public onChannelConnection(frontMasterIndex) {
+    public onChannelConnection(frontMasterIndex: number) {
         if(!(this._connectedFrontMasters.has(frontMasterIndex))) {
             this._connectedFrontMasters.add(frontMasterIndex);
             this.handleNewFrontMasterConnection(frontMasterIndex);
         }
     }
 
-    public linkedChannelFrom(frontMasterIndex) {
+    public linkedChannelFrom(frontMasterIndex: number) {
         if(!(this._linkedFrontMasterChannels[frontMasterIndex])) {
             this._linkedFrontMasterIndexesArray.push(frontMasterIndex);
             this._linkedFrontMasterChannels[frontMasterIndex] =  {
@@ -157,14 +161,14 @@ export class BackMasterChannel extends Channel {
      * @param clientUid - identifier of client who is listening to one of the channels on current master
      * @param frontMasterIndex - front master index of where the client lives.
      */
-    public addedClientLink(clientUid, frontMasterIndex) {
-        if(!(this._clientFrontDataLookup.has(clientUid))) {
-            this._clientFrontDataLookup.set(clientUid, {
+    public addedClientLink(clientUid: string, frontMasterIndex: number) {
+        if(!(this._linkedClientFrontDataLookup.has(clientUid))) {
+            this._linkedClientFrontDataLookup.set(clientUid, {
                 linkCount: 1,
                 frontMasterIndex: frontMasterIndex,
             });
         } else {
-            this._clientFrontDataLookup.get(clientUid).linkCount++;
+            this._linkedClientFrontDataLookup.get(clientUid).linkCount++;
         }
     }
 
@@ -173,11 +177,11 @@ export class BackMasterChannel extends Channel {
      * it is removed completely from the lookup.
      * @param clientUid
      */
-    public removedClientLink(clientUid) {
-        const clientData = this._clientFrontDataLookup.get(clientUid);
+    public removedClientLink(clientUid: string) {
+        const clientData = this._linkedClientFrontDataLookup.get(clientUid);
 
         if( (--clientData.linkCount) === 0) {
-            this._clientFrontDataLookup.delete(clientUid);
+            this._linkedClientFrontDataLookup.delete(clientUid);
         }
     }
 

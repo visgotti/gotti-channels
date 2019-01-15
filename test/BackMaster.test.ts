@@ -1,6 +1,7 @@
 import {clearInterval} from "timers";
 import * as msgpack from 'notepack.io';
 
+import Client from '../src/core/Client';
 import FrontChannel from '../src/core/Front/FrontChannel';
 import BackChannel from '../src/core/Back/BackChannel';
 
@@ -18,7 +19,7 @@ import * as sinon from 'sinon';
 const TEST_FRONT_URI = 'tcp://127.0.0.1:4000';
 const TEST_BACK_URI = 'tcp://127.0.0.1:5000';
 
-describe('FrontChannel', function() {
+describe('BackMaster', function() {
 
     let FrontMaster: FrontMasterChannel;
     let BackMaster: BackMasterChannel;
@@ -26,7 +27,7 @@ describe('FrontChannel', function() {
     let FrontChannel2: FrontChannel;
     let BackChannel1: BackChannel;
     let BackChannel2; BackChannel;
-
+    let client: Client;
     let linkedChannelFromSpy: any;
     let unlinkedChannelFromSpy: any;
     let addStatePatchSpy: any;
@@ -47,6 +48,8 @@ describe('FrontChannel', function() {
         FrontChannel2 = FrontMaster.frontChannels[1];
         BackChannel1 = BackMaster.backChannels[0];
         BackChannel2 = BackMaster.backChannels[1];
+
+        client = new Client('TEST', FrontMaster);
 
         assert.strictEqual(FrontChannel1.channelId, 0);
         assert.strictEqual(FrontChannel2.channelId, 1);
@@ -200,6 +203,7 @@ describe('FrontChannel', function() {
                 received++;
                 setTimeout(() => {
                     const newState = applyPatches(oldState, patch);
+
                     assert.deepStrictEqual(newState, { "foo": "baz" });
                     assert.strictEqual(received, expectedReceived);
                     done();
@@ -211,4 +215,29 @@ describe('FrontChannel', function() {
         });
     });
 
+    describe('BackMaster.messageClient', () => {
+        it('Should return false if the client is not linked', (done) => {
+            assert.strictEqual(BackMaster.messageClient(client.uid, { "foo": "bar" } ), false);
+            done();
+        });
+
+        it('Should return true if the client was linked', (done) => {
+            client.onMessage(() => {});
+            client.connectToChannel(FrontChannel1).then(() => {
+                assert.strictEqual(BackMaster.messageClient(client.uid, { "foo": "bar" } ), true);
+                done();
+            });
+        });
+        it('Should succesfully call the clients onMessageHandler', (done) => {
+            let called = 0;
+            client.onMessage(message => {
+                called+=message;
+                setTimeout(() => {
+                   assert.strictEqual(called, 1);
+                   done();
+                }, 30);
+            });
+            assert.strictEqual(BackMaster.messageClient(client.uid, 1), true);
+        });
+    });
 });

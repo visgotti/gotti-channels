@@ -27,6 +27,17 @@ describe('Client', function() {
     let FrontChannel2: FrontChannel;
     let BackChannel1: BackChannel;
     let BackChannel2; BackChannel;
+
+    // SPIES
+    let BackMaster_addedClientLinkSpy;
+    let BackMaster_removedClientLinkSpy;
+    let BackChannel1_acceptClientLinkSpy;
+    let BackChannel2_acceptClientLinkSpy;
+    let FrontChannel1_disconnectClientSpy;
+    let FrontChannel1_unlinkSpy;
+    let FrontMaster_clientConnected;
+    let FrontMaster_clientDisconnected;
+
     before('Initialize channels and client.', (done) => {
         const frontMessenger = new Messenger({ id: 'testFront', publish: { pubSocketURI: TEST_FRONT_URI } , subscribe: { pubSocketURIs: [TEST_BACK_URI] } });
         const backMessenger = new Messenger({ id: 'testBack', publish: { pubSocketURI: TEST_BACK_URI } , subscribe: { pubSocketURIs: [TEST_FRONT_URI] } });
@@ -39,7 +50,20 @@ describe('Client', function() {
         BackChannel1 = BackMaster.backChannels[0];
         BackChannel2 = BackMaster.backChannels[1];
 
+        BackMaster_addedClientLinkSpy = sinon.spy(BackMaster, 'addedClientLink');
+        BackMaster_removedClientLinkSpy = sinon.spy(BackMaster, 'removedClientLink');
+        BackChannel1_acceptClientLinkSpy = sinon.spy(BackChannel1, 'acceptClientLink');
+        BackChannel2_acceptClientLinkSpy = sinon.spy(BackChannel2, 'acceptClientLink');
+        FrontChannel1_disconnectClientSpy = sinon.spy(FrontChannel1, 'disconnectClient');
+        FrontChannel1_unlinkSpy = sinon.spy(FrontChannel1, 'unlink');
+        FrontMaster_clientConnected = sinon.spy(FrontMaster, 'clientConnected');
+        FrontMaster_clientDisconnected = sinon.spy(FrontMaster, 'clientDisconnected');
+
         client = new Client('TEST', FrontMaster);
+
+        // should have called the clientConnected function in FrontMaster upon initialization
+        sinon.assert.calledOnce(FrontMaster_clientConnected);
+
         undefinedClient = new Client(null, FrontMaster);
 
         assert.strictEqual(FrontChannel1.channelId, 0);
@@ -82,6 +106,26 @@ describe('Client', function() {
                 done();
             });
         });
+        it('Should have added a linkedClientUid to the back channel', (done) => {
+            assert.strictEqual(BackChannel1.linkedClientUids.length, 1);
+            assert.strictEqual(BackChannel1.linkedClientUids[0], client.uid);
+            done();
+        });
+        it('should have called the acceptClientLink method in back channel', (done) => {
+            sinon.assert.calledOnce(BackChannel1_acceptClientLinkSpy);
+            done();
+        });
+        it('Should have called the addedClientLink method in the back master', (done) => {
+            sinon.assert.calledOnce(BackMaster_addedClientLinkSpy);
+            done();
+        });
+        it('Should have correct lookup data in back master linked client data lookup', (done) => {
+            assert.strictEqual(BackMaster.linkedClientFrontDataLookup.size, 1);
+            const clientData = BackMaster.linkedClientFrontDataLookup.get(client.uid);
+            assert.strictEqual(clientData.linkCount, 1);
+            assert.strictEqual(clientData.frontMasterIndex, FrontMaster.frontMasterIndex);
+            done();
+        });
         it('throws an error if you are already connected', (done) => {
             client.connectToChannel(FrontChannel1).then(() => {})
             .catch((err) => {
@@ -116,6 +160,13 @@ describe('Client', function() {
 
                 assert.strictEqual(set, true);
             })
+        });
+        it('Back master should not have the count of two for the client link count', (done) => {
+            assert.strictEqual(BackMaster.linkedClientFrontDataLookup.size, 1);
+            const clientData = BackMaster.linkedClientFrontDataLookup.get(client.uid);
+            assert.strictEqual(clientData.linkCount, 2);
+            assert.strictEqual(clientData.frontMasterIndex, FrontMaster.frontMasterIndex);
+            done();
         });
         it('changes processor channel', (done) => {
             client.setProcessorChannel(FrontChannel1).then(set => {
@@ -233,20 +284,19 @@ describe('Client', function() {
     });
     describe('client.disconnect', () => {
         it('disconnects client from front channel and then unlinks channel since it was the only client', (done) => {
-            const frontDisconnectClientSpy = sinon.spy(FrontChannel1, 'disconnectClient');
-            const frontUnlinkSpy = sinon.spy(FrontChannel1, 'unlink');
 
             // count was 2 on back master
             assert.strictEqual(BackMaster.linkedFrontMasterChannels[FrontMaster.frontMasterIndex].linkedChannelsCount, 2);
 
             client.disconnect(FrontChannel1.channelId);
-
             assert.strictEqual(FrontChannel1.connectedClientUids.length, 0);
 
-            sinon.assert.calledOnce(frontDisconnectClientSpy);
-            sinon.assert.calledOnce(frontUnlinkSpy);
-
+            sinon.assert.calledOnce(FrontChannel1_disconnectClientSpy);
             setTimeout(() => {
+                // front unlink should have been called twice, one for the client unlink
+                // and then again for the channel unlink since theres no more clients
+                sinon.assert.callCount(FrontChannel1_unlinkSpy, 2);
+
                 // back master should only have 1 front master linked now.
                 assert.strictEqual(client.queuedEncodedUpdates.hasOwnProperty(BackChannel1.channelId), false);
                 assert.strictEqual(client.queuedEncodedUpdates.hasOwnProperty(BackChannel2.channelId), true);
@@ -256,8 +306,23 @@ describe('Client', function() {
                done();
             }, 50);
         });
-        it('disconnects client from all front channels if no param is passed in', (done) => {
+        it('Should have removed the linkedClientUid to the back channel', (done) => {
+            assert.strictEqual(BackChannel1.linkedClientUids.length, 0);
+            done();
+        });
+        it('Should have called the removedClientLink method in the back master', (done) => {
+            sinon.assert.calledOnce(BackMaster_removedClientLinkSpy);
+            done();
+        });
+        it('back master linked client data lookup should only have 1 as the linkCount now', (done) => {
+            assert.strictEqual(BackMaster.linkedClientFrontDataLookup.size, 1);
+            const clientData = BackMaster.linkedClientFrontDataLookup.get(client.uid);
+            assert.strictEqual(clientData.linkCount, 1);
+            assert.strictEqual(clientData.frontMasterIndex, FrontMaster.frontMasterIndex);
+            done();
+        });
 
+        it('disconnects client from all front channels if no param is passed in', (done) => {
             client.connectToChannel(FrontChannel1).then(() => {
                 // count became 2 on back master
                 assert.strictEqual(BackMaster.linkedFrontMasterChannels[FrontMaster.frontMasterIndex].linkedChannelsCount, 2);
@@ -275,6 +340,37 @@ describe('Client', function() {
                     done();
                 }, 50);
             });
+        });
+        it('Should have called the .clientDisconnected function in the master front', (done) => {
+            sinon.assert.calledOnce(FrontMaster_clientDisconnected);
+            done();
+        });
+        it('Should have removed the linkedClientUid to both of the back channels', (done) => {
+            assert.strictEqual(BackChannel1.linkedClientUids.length, 0);
+            assert.strictEqual(BackChannel2.linkedClientUids.length, 0);
+            done();
+        });
+        it('Should have called the removedClientLink method in total of 3 times on the back master', (done) => {
+            sinon.assert.callCount(BackMaster_removedClientLinkSpy, 3);
+            done();
+        });
+        it('back master linked client data lookup not have the client in lookup anymore', (done) => {
+            assert.strictEqual(BackMaster.linkedClientFrontDataLookup.size, 0);
+            done();
+        });
+    });
+    describe('client.onMessage and client.onMessageHandler', () => {
+        it('Sets the onMessageHandler with onMessage correctly and then calls it correctly', (done) => {
+            let called = 0;
+            let handler = ((message) => {
+                called+=message;
+            });
+
+            client.onMessage(handler);
+            client.onMessageHandler(1);
+
+            assert.strictEqual(called, 1);
+            done();
         });
     });
 });

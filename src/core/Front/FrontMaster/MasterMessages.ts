@@ -30,8 +30,8 @@ export class MasterMessages extends MasterMessageFactory {
     }
 
     private initializeSubs(): FrontMasterSubs {
-        this.PATCH_STATE = this.subCreator(Protocol.PATCH_STATE(this.frontMasterIndex), 'NONE');
-        this.MESSAGE_CLIENT = this.subCreator(Protocol.MESSAGE_CLIENT(this.frontMasterIndex), 'MSGPACK');
+        this.PATCH_STATE = this.subCreator(Protocol.PATCH_STATE(this.frontMasterIndex), this.frontMasterIndex, 'NONE');
+        this.MESSAGE_CLIENT = this.subCreator(Protocol.MESSAGE_CLIENT(this.frontMasterIndex), this.frontMasterIndex, 'MSGPACK');
 
         return {
             PATCH_STATE: this.PATCH_STATE,

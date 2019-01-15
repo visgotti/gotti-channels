@@ -11,10 +11,10 @@ class Client {
     private processorChannel: FrontChannel;
     private _queuedEncodedUpdates: any;
 
-    constructor(uid, masterChannel: FrontMasterChannel) {
+    constructor(uid: string, masterChannel: FrontMasterChannel) {
+        this.uid = uid;
         this.masterChannel = masterChannel;
         this.masterChannel.clientConnected(this);
-        this.uid = uid;
         this.processorChannel = null;
         this.connectedChannels = new Map();
         this._queuedEncodedUpdates = {};
@@ -32,11 +32,7 @@ class Client {
         this.onMessageHandler = handler;
     }
 
-    public handleDirectMessage(message) {
-        this.onMessageHandler(message);
-    }
-
-    private onMessageHandler(message) { throw 'Unimplemented' };
+    public onMessageHandler(message) { throw 'Unimplemented' };
 
     /**
      * Sets connected channel of client also links it.
