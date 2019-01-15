@@ -53,8 +53,8 @@ describe('FrontChannel', function() {
     });
 
     after(done => {
-        FrontMaster.close();
-        BackMaster.close();
+        FrontMaster.disconnect();
+        BackMaster.disconnect();
         setTimeout(() => {
             done();
         }, 200);

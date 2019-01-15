@@ -1,0 +1,100 @@
+import { Messenger } from 'centrum-messengers/dist/core/Messenger';
+import { Channel } from '../../Channel/Channel';
+import { BackMasterChannel } from '../BackMaster/MasterChannel';
+import { ConnectedFrontData } from '../../types';
+declare class BackChannel extends Channel {
+    private master;
+    private pub;
+    private sub;
+    private push;
+    private pull;
+    private _connectedFrontsData;
+    private _linkedClientUids;
+    private _mirroredFrontUids;
+    state: any;
+    private _previousState;
+    private _previousStateEncoded;
+    private linkedFrontUids;
+    private linkedFrontMasterIndexes;
+    private masterIndexToFrontUidLookup;
+    readonly backMasterIndex: number;
+    constructor(channelId: any, messenger: Messenger, master: BackMasterChannel);
+    /**
+     * sets the onMessageHandler function
+     * @param handler - function that gets executed, gets parameters message and frontUid
+     */
+    onMessage(handler: (message: any, frontUid: string) => void): void;
+    /**
+     * finds the delta of the new and last state then adds the patch update
+     * to the master for it to be queued and then sent out to the needed
+     * front Masters for it to be relayed to the front children who need it.
+     * @returns {boolean}
+     */
+    patchState(): boolean;
+    /**
+     * called when we receive a link request from the front with no client uid. This means
+     * the front is just linking for a reason that doesnt include relaying data to clients.
+     * @param frontUid
+     */
+    private acceptLink;
+    /**
+     * gets called when a link publish message is received and a new unique client
+     * has been linked to given channel.
+     * @param frontUid - unique front channel sending link request.
+     * @param frontMasterIndex - front master index the client is connected to.
+     * @param clientUid - uid of client.
+     */
+    private acceptClientLink;
+    /**
+     * sends message to specific front channel based on frontUid
+     * @param message - data sent to back channel.
+     * @param frontUid - uid of front channel to send message to
+     */
+    send(message: any, frontUid: string): void;
+    /**
+     * sends message to supplied front channels based on frontUids or if omitted broadcasts to all front channels regardless of channel Id.
+     * @param message
+     * @param frontUids
+     */
+    broadcast(message: any, frontUids?: Array<string>): void;
+    /**
+     * Sends message to all mirrored front channels that are currently linked.
+     * @param message
+     */
+    broadcastLinked(message: any): void;
+    /**
+     * sets the previous encoded state in order to find the delta for next state update.
+     * @param newState
+     */
+    setState(newState: any): void;
+    /**
+     * Function that's called from the back master when it receives queued messages
+     * from a the front master server.
+     * @param message
+     * @param frontMasterIndex
+     */
+    processMessageFromMaster(message: any, frontMasterIndex: number): void;
+    readonly connectedFrontsData: Map<string, ConnectedFrontData>;
+    readonly mirroredFrontUids: Array<string>;
+    readonly linkedClientUids: Array<string>;
+    private _onMessage;
+    private onMessageHandler;
+    /**
+     * subscriptions that we want to register before front channels start connecting.
+     */
+    private registerPreConnectedSubs;
+    /**
+     * publications that we want to be able to send out before channels start connecting.
+     */
+    private registerPreConnectedPubs;
+    /**
+     * initializes channel pub and sub  handlers when we receive a connect message from front channel.
+     * @param frontData - { channelId, frontUid, frontMasterIndex }
+     */
+    private onMirrorConnected;
+    /**
+     * initializes needed message factories for front channels.
+     */
+    private initializeMessageFactories;
+}
+export default BackChannel;

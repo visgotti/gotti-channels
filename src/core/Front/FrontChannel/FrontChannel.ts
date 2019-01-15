@@ -457,6 +457,22 @@ class FrontChannel extends Channel {
     private clientCanConnect(clientUid) : boolean {
         return (!(this.clientConnectedTimeouts.has(clientUid)) && !(this.connectedClients.has(clientUid)));
     }
+
+    /*
+    public disconnect() {
+        Object.keys(this.pub).forEach(pubKey => {
+            this.pub[pubKey].unregister();
+        });
+        Object.keys(this.push).forEach(pushKey => {
+            Object.keys(this.push[pushKey]).forEach(pushId => {
+                this.push[pushKey][pushId].unregister();
+            });
+        });
+        Object.keys(this.sub).forEach(subKey => {
+            this.sub[subKey].unregister();
+        });
+    }
+    */
 }
 
 export default FrontChannel;

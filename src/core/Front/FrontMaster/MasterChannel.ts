@@ -156,9 +156,7 @@ export class FrontMasterChannel extends Channel {
         });
     }
 
-    public close() {
-        for(let i = 0; i < this.frontChannelIds.length; i++) {
-            this.frontChannels[this.frontChannelIds[i]].close();
-        }
+    public disconnect() {
+        this.messenger.close();
     }
 }
