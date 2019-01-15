@@ -1,16 +1,28 @@
 import { Messenger } from 'centrum-messengers/dist/core/Messenger';
 import { Channel } from '../../Channel/Channel';
 export declare class FrontMasterChannel extends Channel {
-    private pull;
+    private sub;
     private push;
     private frontChannelIds;
     private _linkedBackMasterLookup;
     private _connectedBackMasters;
+    private _connectedClients;
     frontChannels: any;
     readonly frontMasterIndex: any;
     constructor(channelIds: any, totalChannels: any, frontMasterIndex: any, messenger: Messenger);
     readonly connectedBackMasters: number[];
     connect(): Promise<boolean>;
+    /**
+     * Gets called in client when initialized
+     * @param client
+     */
+    clientConnected(client: any): void;
+    /**
+     * called in client when disconnect is called
+     * @param uid
+     * @returns {boolean}
+     */
+    clientDisconnected(uid: any): boolean;
     sendQueuedMessages(): void;
     /**
      * adds a message to the queue for a specific back Master Channel

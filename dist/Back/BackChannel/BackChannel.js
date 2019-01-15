@@ -20,6 +20,7 @@ class BackChannel extends Channel_1.Channel {
         this.state = null;
         this._previousState = null;
         this._connectedFrontsData = new Map();
+        this._linkedClientUids = new Set();
         this._mirroredFrontUids = new Set();
         this.initializeMessageFactories();
         this.registerPreConnectedSubs();
@@ -33,7 +34,9 @@ class BackChannel extends Channel_1.Channel {
         this.onMessageHandler = handler;
     }
     /**
-     * sends state patches to mirrored channels
+     * finds the delta of the new and last state then adds the patch update
+     * to the master for it to be queued and then sent out to the needed
+     * front Masters for it to be relayed to the front children who need it.
      * @returns {boolean}
      */
     patchState() {
@@ -56,13 +59,12 @@ class BackChannel extends Channel_1.Channel {
     }
     ;
     /**
-     *  accepts link from front channel and sends back state for it to be retrieved asynchronously.
+     * called when we receive a link request from the front with no client uid. This means
+     * the front is just linking for a reason that doesnt include relaying data to clients.
+     * @param frontUid
      */
-    acceptLink(frontUid, clientUid) {
+    acceptLink(frontUid) {
         const sendData = {};
-        if (clientUid) {
-            sendData.clientUid = clientUid;
-        }
         if (!(this.state)) {
             sendData.error = 'null state on back channel, failed to link.';
         }
@@ -72,6 +74,30 @@ class BackChannel extends Channel_1.Channel {
         this.push.ACCEPT_LINK[frontUid](sendData);
     }
     ;
+    /**
+     * gets called when a link publish message is received and a new unique client
+     * has been linked to given channel.
+     * @param frontUid - unique front channel sending link request.
+     * @param frontMasterIndex - front master index the client is connected to.
+     * @param clientUid - uid of client.
+     */
+    acceptClientLink(frontUid, frontMasterIndex, clientUid) {
+        const sendData = {};
+        sendData.clientUid = clientUid;
+        // add to set.
+        this._linkedClientUids.add(clientUid);
+        // notify master a client linked (master keeps track of how many back channels the
+        // client is connected to and also keeps a lookup to the front master index so it can
+        // send direct messages to the client by sending it to the front master.
+        this.master.addedClientLink(clientUid, frontMasterIndex);
+        if (!(this.state)) {
+            sendData.error = 'null state on back channel, failed to link.';
+        }
+        else {
+            sendData.encodedState = this._previousStateEncoded;
+        }
+        this.push.ACCEPT_LINK[frontUid](sendData);
+    }
     /**
      * sends message to specific front channel based on frontUid
      * @param message - data sent to back channel.
@@ -99,7 +125,7 @@ class BackChannel extends Channel_1.Channel {
         }
     }
     /**
-     * sends message to all front channels that share channelId with back channel.
+     * Sends message to all mirrored front channels that are currently linked.
      * @param message
      */
     broadcastLinked(message) {
@@ -107,10 +133,20 @@ class BackChannel extends Channel_1.Channel {
             this.push.BROADCAST_LINKED_FRONTS[frontUid](message);
         });
     }
+    /**
+     * sets the previous encoded state in order to find the delta for next state update.
+     * @param newState
+     */
     setState(newState) {
         this._previousStateEncoded = msgpack.encode(newState);
         this.state = newState;
     }
+    /**
+     * Function that's called from the back master when it receives queued messages
+     * from a the front master server.
+     * @param message
+     * @param frontMasterIndex
+     */
     processMessageFromMaster(message, frontMasterIndex) {
         const frontUid = this.masterIndexToFrontUidLookup[frontMasterIndex];
         this._onMessage(message, frontUid);
@@ -120,6 +156,9 @@ class BackChannel extends Channel_1.Channel {
     }
     get mirroredFrontUids() {
         return Array.from(this._mirroredFrontUids);
+    }
+    get linkedClientUids() {
+        return Array.from(this._linkedClientUids);
     }
     _onMessage(message, frontUid) {
         this.onMessageHandler(message, frontUid);
@@ -164,17 +203,35 @@ class BackChannel extends Channel_1.Channel {
             this.masterIndexToFrontUidLookup[frontMasterIndex] = frontUid;
             this.push.ACCEPT_LINK.register(frontUid);
             this.push.BROADCAST_LINKED_FRONTS.register(frontUid);
+            //TODO: these should be seperate actions for room link and client link..
             this.pull.LINK.register(frontUid, (clientUid) => {
                 this.linkedFrontMasterIndexes.push(frontMasterIndex);
                 this.linkedFrontUids.add(frontUid);
-                this.acceptLink(frontUid, clientUid);
+                if (clientUid && !this._linkedClientUids.has(clientUid)) {
+                    this.acceptClientLink(frontUid, frontMasterIndex, clientUid);
+                }
+                else {
+                    this.acceptLink(frontUid);
+                }
                 // notify the master with the front master index of connected channel.
                 this.master.linkedChannelFrom(frontMasterIndex);
             });
-            this.pull.UNLINK.register(frontUid, () => {
-                this.linkedFrontMasterIndexes.splice(this.linkedFrontMasterIndexes.indexOf(frontMasterIndex), 1);
-                this.linkedFrontUids.delete(frontUid);
-                this.master.unlinkedChannelFrom(frontMasterIndex);
+            this.pull.UNLINK.register(frontUid, (clientUid) => {
+                // if there is no client uid supplied that means that all the channels from front channel unlinked.
+                if (clientUid === false) {
+                    this.linkedFrontMasterIndexes.splice(this.linkedFrontMasterIndexes.indexOf(frontMasterIndex), 1);
+                    this.linkedFrontUids.delete(frontUid);
+                    this.master.unlinkedChannelFrom(frontMasterIndex);
+                }
+                else {
+                    // if clientUid was provided that means were trying to unlink client
+                    // but only want to do that if the linkedClientUids has the client
+                    // makes sure the master keeps a correct state of clients linked count.
+                    if (this._linkedClientUids.has(clientUid)) {
+                        this.master.removedClientLink(clientUid);
+                        this._linkedClientUids.delete(clientUid);
+                    }
+                }
             });
         }
         // keep connected data stored for all fronts.

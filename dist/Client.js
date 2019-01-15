@@ -10,8 +10,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const types_1 = require("./types");
 class Client {
-    constructor(uid) {
+    constructor(uid, masterChannel) {
         this.uid = uid;
+        this.masterChannel = masterChannel;
+        this.masterChannel.clientConnected(this);
         this.processorChannel = null;
         this.connectedChannels = new Map();
         this._queuedEncodedUpdates = {};
@@ -21,12 +23,21 @@ class Client {
         return this._queuedEncodedUpdates;
     }
     /**
-     * Sets connected channel of client also links it.
-     * @param channel
+     * method to be overridden to handle direct client messages from back channels.
      */
-    connectToChannel(channel) {
+    onMessage(handler) {
+        this.onMessageHandler = handler;
+    }
+    onMessageHandler(message) { throw 'Unimplemented'; }
+    ;
+    /**
+     * Sets connected channel of client also links it.
+     * @param channelId
+     */
+    connectToChannel(channelId) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
+                const channel = this.masterChannel.frontChannels[channelId];
                 const encodedState = yield channel.connectClient(this);
                 this.connectedChannels.set(channel.channelId, channel);
                 this.addStateUpdate(channel.channelId, encodedState, types_1.STATE_UPDATE_TYPES.SET);
@@ -42,21 +53,24 @@ class Client {
      * if the client isnt connected, it will call the connect method first.
      * @param channel
      */
-    setProcessorChannel(channel) {
+    setProcessorChannel(channelId) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!(this.connectedChannels.has(channel.channelId))) {
-                try {
-                    yield this.connectToChannel(channel);
+            try {
+                const channel = this.masterChannel.frontChannels[channelId];
+                if (!channel)
+                    throw new Error('Invalid channelId');
+                if (!(this.connectedChannels.has(channelId))) {
+                    yield this.connectToChannel(channelId);
                     this.processorChannel = channel;
                     return true;
                 }
-                catch (err) {
-                    throw err;
+                else {
+                    this.processorChannel = channel;
+                    return true;
                 }
             }
-            else {
-                this.processorChannel = channel;
-                return true;
+            catch (err) {
+                throw err;
             }
         });
     }
@@ -66,7 +80,7 @@ class Client {
         if (!(channelId in this._queuedEncodedUpdates)) {
             this._queuedEncodedUpdates[channelId] = [];
         }
-        this._queuedEncodedUpdates[channelId].push({ type, update });
+        this._queuedEncodedUpdates[channelId].push([channelId, type, update]);
         return this._queuedEncodedUpdates[channelId].length;
     }
     clearStateUpdates() {
@@ -110,6 +124,7 @@ class Client {
             this.connectedChannels.forEach(channel => {
                 channel.disconnectClient(this.uid);
             });
+            this.masterChannel.clientDisconnected(this.uid);
         }
     }
     // removes queued updates from channel.

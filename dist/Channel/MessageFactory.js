@@ -6,19 +6,20 @@ var MSG_CODES;
     MSG_CODES[MSG_CODES["SEND_QUEUED"] = 0] = "SEND_QUEUED";
     //BACK MASTER -> FRONT MASTER
     MSG_CODES[MSG_CODES["PATCH_STATE"] = 1] = "PATCH_STATE";
+    MSG_CODES[MSG_CODES["MESSAGE_CLIENT"] = 2] = "MESSAGE_CLIENT";
     // FRONT -> BACK
-    MSG_CODES[MSG_CODES["CONNECT"] = 2] = "CONNECT";
-    MSG_CODES[MSG_CODES["DISCONNECT"] = 3] = "DISCONNECT";
-    MSG_CODES[MSG_CODES["SEND_BACK"] = 4] = "SEND_BACK";
-    MSG_CODES[MSG_CODES["BROADCAST_ALL_BACK"] = 5] = "BROADCAST_ALL_BACK";
-    MSG_CODES[MSG_CODES["LINK"] = 6] = "LINK";
-    MSG_CODES[MSG_CODES["UNLINK"] = 7] = "UNLINK";
+    MSG_CODES[MSG_CODES["CONNECT"] = 3] = "CONNECT";
+    MSG_CODES[MSG_CODES["DISCONNECT"] = 4] = "DISCONNECT";
+    MSG_CODES[MSG_CODES["SEND_BACK"] = 5] = "SEND_BACK";
+    MSG_CODES[MSG_CODES["BROADCAST_ALL_BACK"] = 6] = "BROADCAST_ALL_BACK";
+    MSG_CODES[MSG_CODES["LINK"] = 7] = "LINK";
+    MSG_CODES[MSG_CODES["UNLINK"] = 8] = "UNLINK";
     // BACK -> FRONT
-    MSG_CODES[MSG_CODES["ACCEPT_LINK"] = 8] = "ACCEPT_LINK";
-    MSG_CODES[MSG_CODES["CONNECTION_CHANGE"] = 9] = "CONNECTION_CHANGE";
-    MSG_CODES[MSG_CODES["BROADCAST_LINKED_FRONTS"] = 10] = "BROADCAST_LINKED_FRONTS";
-    MSG_CODES[MSG_CODES["BROADCAST_ALL_FRONTS"] = 11] = "BROADCAST_ALL_FRONTS";
-    MSG_CODES[MSG_CODES["SEND_FRONT"] = 12] = "SEND_FRONT";
+    MSG_CODES[MSG_CODES["ACCEPT_LINK"] = 9] = "ACCEPT_LINK";
+    MSG_CODES[MSG_CODES["CONNECTION_CHANGE"] = 10] = "CONNECTION_CHANGE";
+    MSG_CODES[MSG_CODES["BROADCAST_LINKED_FRONTS"] = 11] = "BROADCAST_LINKED_FRONTS";
+    MSG_CODES[MSG_CODES["BROADCAST_ALL_FRONTS"] = 12] = "BROADCAST_ALL_FRONTS";
+    MSG_CODES[MSG_CODES["SEND_FRONT"] = 13] = "SEND_FRONT";
 })(MSG_CODES || (MSG_CODES = {}));
 /**
  * helper class with functions to make sure protocol codes stay synchronized between front and back channels.
@@ -27,12 +28,14 @@ class Protocol {
     constructor() { }
     ;
     //FRONT MASTER -> BACK MASTER
-    static SEND_QUEUED(frontServerIndex) { return Protocol.make(MSG_CODES.SEND_QUEUED, frontServerIndex); }
+    static SEND_QUEUED(backMasterIndex) { return Protocol.make(MSG_CODES.SEND_QUEUED, backMasterIndex); }
     ;
     static DISCONNECT() { return Protocol.make(MSG_CODES.DISCONNECT); }
     ; //todo: figure out all disconnection edge cases before implementing
     //BACK MASTER -> FRONT MASTERS
-    static PATCH_STATE(backServerIndex) { return Protocol.make(MSG_CODES.PATCH_STATE, backServerIndex); }
+    static PATCH_STATE(frontMasterIndex) { return Protocol.make(MSG_CODES.PATCH_STATE, frontMasterIndex); }
+    ;
+    static MESSAGE_CLIENT(frontMasterIndex) { return Protocol.make(MSG_CODES.MESSAGE_CLIENT, frontMasterIndex); }
     ;
     // FRONT -> BACKS
     static CONNECT() { return Protocol.make(MSG_CODES.CONNECT); }

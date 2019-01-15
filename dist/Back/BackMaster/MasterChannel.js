@@ -10,6 +10,7 @@ class BackMasterChannel extends Channel_1.Channel {
         this.backMasterIndex = backMasterIndex;
         this.backChannels = {};
         this.backChannelIds = [];
+        this._linkedClientFrontDataLookup = new Map();
         this._connectedFrontMasters = new Set();
         this._linkedFrontMasterChannels = {};
         this._linkedFrontMasterIndexesArray = [];
@@ -19,6 +20,9 @@ class BackMasterChannel extends Channel_1.Channel {
             this.backChannelIds.push(channelId);
         });
         this.initializeMessageFactories();
+    }
+    get linkedClientFrontDataLookup() {
+        return this._linkedClientFrontDataLookup;
     }
     get linkedFrontMasterChannels() {
         return this._linkedFrontMasterChannels;
@@ -34,13 +38,18 @@ class BackMasterChannel extends Channel_1.Channel {
      * Adds a patch to be sent to front masters that are linked. Then the front master will
      * apply it to the channels which need it.
      * @param frontMasterIndexes - indexes that need the patch.
-     * @param encodedPatchData - patch data that is an encoded array with the channelId as the first element and the patch data as second.
+     * @param patchData - patch data that is an encoded array with the channelId as the first element and the patch data as second.
      */
     addStatePatch(frontMasterIndexes, patchData) {
         for (let i = 0; i < frontMasterIndexes.length; i++) {
             this._linkedFrontMasterChannels[frontMasterIndexes[i]].encodedPatches.push(patchData);
         }
     }
+    /**
+     * sends patch updates to the linked front masters, since the channelId (child channel id)
+     * is present in the message, the front master will be able to correctly push the patched
+     * states to the needed front channels.
+     */
     sendStatePatches() {
         for (let i = 0; i < this._linkedFrontMasterIndexesArray.length; i++) {
             const frontMasterIndex = this._linkedFrontMasterIndexesArray[i];
@@ -50,11 +59,28 @@ class BackMasterChannel extends Channel_1.Channel {
             encodedPatches.length = 0;
         }
     }
+    /**
+     * sends direct message to client from the back. Data of the client is kept in the _linkedClientFrontDataLookup
+     * and is updates when we handle new unlink/link publications from the front channel when the message
+     * is supplied with a clientUid notifying that the link/unlink was for a client.
+     * @param clientUid - uid of client to send direct message to
+     * @param message - message client receives.
+     * @returns {boolean}
+     */
+    messageClient(clientUid, message) {
+        if (this._linkedClientFrontDataLookup.has(clientUid)) {
+            // if the clientUid is discoverable in the lookup we forward message to the front master so it can relay it to the client.
+            this.push.MESSAGE_CLIENT[this._linkedClientFrontDataLookup.get(clientUid).frontMasterIndex]([clientUid, message]);
+            return true;
+        }
+        return false;
+    }
     handleNewFrontMasterConnection(frontMasterIndex) {
         this.pull.SEND_QUEUED.register(frontMasterIndex, (messageQueueData => {
             this.handleQueuedMessages(messageQueueData, frontMasterIndex);
         }));
         this.push.PATCH_STATE.register(frontMasterIndex);
+        this.push.MESSAGE_CLIENT.register(frontMasterIndex);
     }
     /*  ================================================================================================
         These functions get called by the children channels of master everytime a connection
@@ -93,6 +119,33 @@ class BackMasterChannel extends Channel_1.Channel {
     /* ================================================================================================
        ================================================================================================
        ================================================================================================ */
+    /**
+     * adds client to data lookup if its new, otherwise it adds to the listener count.
+     * @param clientUid - identifier of client who is listening to one of the channels on current master
+     * @param frontMasterIndex - front master index of where the client lives.
+     */
+    addedClientLink(clientUid, frontMasterIndex) {
+        if (!(this._linkedClientFrontDataLookup.has(clientUid))) {
+            this._linkedClientFrontDataLookup.set(clientUid, {
+                linkCount: 1,
+                frontMasterIndex: frontMasterIndex,
+            });
+        }
+        else {
+            this._linkedClientFrontDataLookup.get(clientUid).linkCount++;
+        }
+    }
+    /**
+     * decrements the linkCount for given client and if it reaches 0
+     * it is removed completely from the lookup.
+     * @param clientUid
+     */
+    removedClientLink(clientUid) {
+        const clientData = this._linkedClientFrontDataLookup.get(clientUid);
+        if ((--clientData.linkCount) === 0) {
+            this._linkedClientFrontDataLookup.delete(clientUid);
+        }
+    }
     /** messageQueueData is formatted incoming as
      *  [ channelId,  message  ]
      */

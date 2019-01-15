@@ -43,11 +43,3 @@ export enum CONNECTION_CHANGE {
     CONNECTED = CONNECTION_STATUS.CONNECTED,
     DISCONNECTED = CONNECTION_CHANGE.DISCONNECTED,
 }
-
-interface ClusterConfig {
-    back_server_uris: Array<string>,
-    front_server_uris: Array<string>,
-    channels_per_back: number,
-    patch_rate: number,
-    relay_rate: number,
-}

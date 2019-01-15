@@ -9,8 +9,10 @@ class MasterMessages extends MessageFactory_1.MasterMessageFactory {
     }
     initializePushes() {
         this.PATCH_STATE = this.pushCreator(MessageFactory_1.Protocol.PATCH_STATE, 'NONE'); // encoding for states happen in the back channel patchState function
+        this.MESSAGE_CLIENT = this.pushCreator(MessageFactory_1.Protocol.MESSAGE_CLIENT, 'MSGPACK');
         return {
             PATCH_STATE: this.PATCH_STATE,
+            MESSAGE_CLIENT: this.MESSAGE_CLIENT,
         };
     }
     initializePulls() {

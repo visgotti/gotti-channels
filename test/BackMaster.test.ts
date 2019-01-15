@@ -223,7 +223,7 @@ describe('BackMaster', function() {
 
         it('Should return true if the client was linked', (done) => {
             client.onMessage(() => {});
-            client.connectToChannel(FrontChannel1).then(() => {
+            client.connectToChannel(FrontChannel1.channelId).then(() => {
                 assert.strictEqual(BackMaster.messageClient(client.uid, { "foo": "bar" } ), true);
                 done();
             });

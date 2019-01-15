@@ -9,6 +9,7 @@ declare class BackChannel extends Channel {
     private push;
     private pull;
     private _connectedFrontsData;
+    private _linkedClientUids;
     private _mirroredFrontUids;
     state: any;
     private _previousState;
@@ -24,14 +25,26 @@ declare class BackChannel extends Channel {
      */
     onMessage(handler: (message: any, frontUid: string) => void): void;
     /**
-     * sends state patches to mirrored channels
+     * finds the delta of the new and last state then adds the patch update
+     * to the master for it to be queued and then sent out to the needed
+     * front Masters for it to be relayed to the front children who need it.
      * @returns {boolean}
      */
     patchState(): boolean;
     /**
-     *  accepts link from front channel and sends back state for it to be retrieved asynchronously.
+     * called when we receive a link request from the front with no client uid. This means
+     * the front is just linking for a reason that doesnt include relaying data to clients.
+     * @param frontUid
      */
-    acceptLink(frontUid: any, clientUid?: any): void;
+    private acceptLink;
+    /**
+     * gets called when a link publish message is received and a new unique client
+     * has been linked to given channel.
+     * @param frontUid - unique front channel sending link request.
+     * @param frontMasterIndex - front master index the client is connected to.
+     * @param clientUid - uid of client.
+     */
+    private acceptClientLink;
     /**
      * sends message to specific front channel based on frontUid
      * @param message - data sent to back channel.
@@ -45,14 +58,25 @@ declare class BackChannel extends Channel {
      */
     broadcast(message: any, frontUids?: Array<string>): void;
     /**
-     * sends message to all front channels that share channelId with back channel.
+     * Sends message to all mirrored front channels that are currently linked.
      * @param message
      */
     broadcastLinked(message: any): void;
+    /**
+     * sets the previous encoded state in order to find the delta for next state update.
+     * @param newState
+     */
     setState(newState: any): void;
+    /**
+     * Function that's called from the back master when it receives queued messages
+     * from a the front master server.
+     * @param message
+     * @param frontMasterIndex
+     */
     processMessageFromMaster(message: any, frontMasterIndex: number): void;
     readonly connectedFrontsData: Map<string, ConnectedFrontData>;
     readonly mirroredFrontUids: Array<string>;
+    readonly linkedClientUids: Array<string>;
     private _onMessage;
     private onMessageHandler;
     /**

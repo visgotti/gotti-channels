@@ -36,10 +36,11 @@ class Client {
 
     /**
      * Sets connected channel of client also links it.
-     * @param channel
+     * @param channelId
      */
-    public async connectToChannel(channel: FrontChannel) {
+    public async connectToChannel(channelId: string) {
         try {
+            const channel = this.masterChannel.frontChannels[channelId];
             const encodedState = await channel.connectClient(this);
             this.connectedChannels.set(channel.channelId, channel);
             this.addStateUpdate(channel.channelId, encodedState, STATE_UPDATE_TYPES.SET);
@@ -54,18 +55,21 @@ class Client {
      * if the client isnt connected, it will call the connect method first.
      * @param channel
      */
-    public async setProcessorChannel(channel: FrontChannel) {
-        if(!(this.connectedChannels.has(channel.channelId))) {
-            try{
-                await this.connectToChannel(channel);
+    public async setProcessorChannel(channelId: string) {
+        try {
+            const channel = this.masterChannel.frontChannels[channelId];
+            if(!channel) throw new Error('Invalid channelId');
+            if(!(this.connectedChannels.has(channelId))) {
+                await this.connectToChannel(channelId);
                 this.processorChannel = channel;
                 return true;
-            } catch (err) {
-                throw err;
+            } else {
+                this.processorChannel = channel;
+                return true;
             }
-        } else {
-            this.processorChannel = channel;
-            return true;
+        }
+        catch (err) {
+            throw err;
         }
     }
 

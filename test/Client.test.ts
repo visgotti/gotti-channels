@@ -95,7 +95,7 @@ describe('Client', function() {
     describe('client.connectToChannel', () => {
         it('should get encoded state from async response', (done) => {
             BackChannel1.setState({ "foo": "bar" });
-            client.connectToChannel(FrontChannel1).then(encodedState => {
+            client.connectToChannel(FrontChannel1.channelId).then(encodedState => {
                 const state = msgpack.decode(encodedState);
                 assert.deepStrictEqual(state, { "foo": "bar" });
 
@@ -127,14 +127,14 @@ describe('Client', function() {
             done();
         });
         it('throws an error if you are already connected', (done) => {
-            client.connectToChannel(FrontChannel1).then(() => {})
+            client.connectToChannel(FrontChannel1.channelId).then(() => {})
             .catch((err) => {
                 assert.strictEqual(err.message, 'Client is already in connection state.');
                 done();
             });
         });
         it('throws an error if the uid was invalid', (done) => {
-            undefinedClient.connectToChannel(FrontChannel1).then(() => {})
+            undefinedClient.connectToChannel(FrontChannel1.channelId).then(() => {})
                 .catch((err) => {
                     assert.strictEqual(err.message, 'Invalid client uid.');
                     done();
@@ -149,7 +149,7 @@ describe('Client', function() {
         });
         it('sets and connects asynchronously if it wasnt connected first', () => {
             BackChannel2.setState({ "foo": "bar" });
-            client.setProcessorChannel(FrontChannel2).then(set => {
+            client.setProcessorChannel(FrontChannel2.channelId).then(set => {
 
                 assert.strictEqual(FrontChannel2.connectedClientUids.length, 1);
                 assert.strictEqual(FrontChannel2.connectedClientUids[0], client.uid);
@@ -161,7 +161,7 @@ describe('Client', function() {
                 assert.strictEqual(set, true);
             })
         });
-        it('Back master should not have the count of two for the client link count', (done) => {
+        it('Back master should now have the count of two for the client link count', (done) => {
             assert.strictEqual(BackMaster.linkedClientFrontDataLookup.size, 1);
             const clientData = BackMaster.linkedClientFrontDataLookup.get(client.uid);
             assert.strictEqual(clientData.linkCount, 2);
@@ -169,7 +169,7 @@ describe('Client', function() {
             done();
         });
         it('changes processor channel', (done) => {
-            client.setProcessorChannel(FrontChannel1).then(set => {
+            client.setProcessorChannel(FrontChannel1.channelId).then(set => {
                 assert.strictEqual(set, true);
                 done();
             });
@@ -323,7 +323,7 @@ describe('Client', function() {
         });
 
         it('disconnects client from all front channels if no param is passed in', (done) => {
-            client.connectToChannel(FrontChannel1).then(() => {
+            client.connectToChannel(FrontChannel1.channelId).then(() => {
                 // count became 2 on back master
                 assert.strictEqual(BackMaster.linkedFrontMasterChannels[FrontMaster.frontMasterIndex].linkedChannelsCount, 2);
                 client.disconnect();

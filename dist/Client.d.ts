@@ -1,24 +1,30 @@
 import { STATE_UPDATE_TYPES } from './types';
-import FrontChannel from './Front/FrontChannel';
+import { FrontMasterChannel } from './Front/FrontMaster/MasterChannel';
 declare class Client {
     readonly uid: string;
     state: any;
+    private masterChannel;
     private connectedChannels;
     private processorChannel;
     private _queuedEncodedUpdates;
-    constructor(uid: any);
+    constructor(uid: string, masterChannel: FrontMasterChannel);
     readonly queuedEncodedUpdates: any;
     /**
-     * Sets connected channel of client also links it.
-     * @param channel
+     * method to be overridden to handle direct client messages from back channels.
      */
-    connectToChannel(channel: FrontChannel): Promise<{}>;
+    onMessage(handler: any): void;
+    onMessageHandler(message: any): void;
+    /**
+     * Sets connected channel of client also links it.
+     * @param channelId
+     */
+    connectToChannel(channelId: string): Promise<any>;
     /**
      * this sets the channel where client messages get processed.
      * if the client isnt connected, it will call the connect method first.
      * @param channel
      */
-    setProcessorChannel(channel: FrontChannel): Promise<boolean>;
+    setProcessorChannel(channelId: string): Promise<boolean>;
     addStateUpdate(channelId: any, update: any, type: STATE_UPDATE_TYPES): any;
     clearStateUpdates(): void;
     /**

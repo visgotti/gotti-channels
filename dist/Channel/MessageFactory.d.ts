@@ -2,17 +2,18 @@ import { Messenger } from 'centrum-messengers/dist/core/Messenger';
 declare enum MSG_CODES {
     SEND_QUEUED = 0,
     PATCH_STATE = 1,
-    CONNECT = 2,
-    DISCONNECT = 3,
-    SEND_BACK = 4,
-    BROADCAST_ALL_BACK = 5,
-    LINK = 6,
-    UNLINK = 7,
-    ACCEPT_LINK = 8,
-    CONNECTION_CHANGE = 9,
-    BROADCAST_LINKED_FRONTS = 10,
-    BROADCAST_ALL_FRONTS = 11,
-    SEND_FRONT = 12
+    MESSAGE_CLIENT = 2,
+    CONNECT = 3,
+    DISCONNECT = 4,
+    SEND_BACK = 5,
+    BROADCAST_ALL_BACK = 6,
+    LINK = 7,
+    UNLINK = 8,
+    ACCEPT_LINK = 9,
+    CONNECTION_CHANGE = 10,
+    BROADCAST_LINKED_FRONTS = 11,
+    BROADCAST_ALL_FRONTS = 12,
+    SEND_FRONT = 13
 }
 export declare type PublishProtocol = any;
 export declare type PushProtocol = any;
@@ -23,9 +24,10 @@ export declare type PullProtocol = any;
  */
 export declare class Protocol {
     constructor();
-    static SEND_QUEUED(frontServerIndex: any): string;
+    static SEND_QUEUED(backMasterIndex: any): string;
     static DISCONNECT(): string;
-    static PATCH_STATE(backServerIndex: any): string;
+    static PATCH_STATE(frontMasterIndex: any): string;
+    static MESSAGE_CLIENT(frontMasterIndex: any): string;
     static CONNECT(): string;
     static BROADCAST_ALL_BACK(): string;
     static SEND_BACK(backChannelId: any): string;
@@ -91,6 +93,7 @@ export declare abstract class ChannelMessageFactory extends MessageFactory {
 export declare abstract class MasterMessageFactory extends MessageFactory {
     abstract SEND_QUEUED: PushProtocol | PullProtocol;
     abstract PATCH_STATE: PushProtocol | PullProtocol;
+    abstract MESSAGE_CLIENT: PushProtocol | SubscribeProtocol;
     constructor(messenger: any);
 }
 export {};

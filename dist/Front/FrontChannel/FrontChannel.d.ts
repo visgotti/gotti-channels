@@ -12,7 +12,7 @@ declare class FrontChannel extends Channel {
     private CONNECTION_STATUS;
     private linked;
     private connectedClients;
-    private clientConnectedCallbacks;
+    connectedClientUids: Array<string>;
     private clientConnectedTimeouts;
     private backMasterIndex;
     readonly frontUid: string;
@@ -44,18 +44,30 @@ declare class FrontChannel extends Channel {
      */
     onMessage(handler: (message: any, channelId: string) => void): void;
     /**
-     * sends a link message to mirror back channel to notify it that it needs to receive current state and then
-     * receive patches and messages. if theres a client uid to initiate the link, the back server will respond with
-     * the clientUid when it replies with state which gets used to call the callback in clientConnectedCallbacks map
-     * returns back state asynchronously.
+     * Sends link 'request' to back channel. It will respond with the back channel's current
+     * state asynchronously, if we call link with a clientUid it will behave the same but
+     * the parameter will be kept in a lookup on the back master so it can keep track of which
+     * front master a client lives on. This allows the ability to send direct messages to the client
+     * from the back.
+     * @param clientUid (optional)
+     * @returns {Promise<T>}
      */
     link(clientUid?: boolean): Promise<{}>;
     /**
-     * sends an unlink message to back channel so it stops receiving patch updates
+     * sends unlink message, if a clientUid is provided it will
+     * decrement or remove the client lookup data on the back,
+     * if the clientUid is omitted then it will send an unlink message
+     * with no param notifying the back channel that the front channel
+     * does not need updates from back channel at all and the link
+     * relationship will be deleted.
+     * @param clientUid
      */
-    unlink(): void;
+    unlink(clientUid?: boolean): void;
     /**
-     * adds message to queue to master which gets sent to needed back master at a set interval.
+     * adds message to the front master's message queue. These queue up and will then send
+     * to the appropriate back master at a set interval, where upon reaching the back master,
+     * the back master will iterate through the messages received and dispatch them to the child
+     * back channels to process.
      * @param message
      */
     addMessage(message: any): void;
