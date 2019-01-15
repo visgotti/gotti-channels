@@ -60,7 +60,7 @@ export class BackMasterChannel extends Channel {
      * Adds a patch to be sent to front masters that are linked. Then the front master will
      * apply it to the channels which need it.
      * @param frontMasterIndexes - indexes that need the patch.
-     * @param encodedPatchData - patch data that is an encoded array with the channelId as the first element and the patch data as second.
+     * @param patchData - patch data that is an encoded array with the channelId as the first element and the patch data as second.
      */
     public addStatePatch(frontMasterIndexes, patchData) { //patchData [ channelId, patch ]
         for(let i = 0; i < frontMasterIndexes.length; i++) {
@@ -68,6 +68,11 @@ export class BackMasterChannel extends Channel {
         }
     }
 
+    /**
+     * sends patch updates to the linked front masters, since the channelId (child channel id)
+     * is present in the message, the front master will be able to correctly push the patched
+     * states to the needed front channels.
+     */
     public sendStatePatches() {
         for(let i = 0; i < this._linkedFrontMasterIndexesArray.length; i++) {
             const frontMasterIndex = this._linkedFrontMasterIndexesArray[i];
@@ -80,9 +85,13 @@ export class BackMasterChannel extends Channel {
         }
     }
 
-
     /**
-     * sends message to the front master that the channel lives on for it to relay it to client.
+     * sends direct message to client from the back. Data of the client is kept in the _clientFrontDataLookup
+     * and is updates when we handle new unlink/link publications from the front channel when the message
+     * is supplied with a clientUid notifying that the link/unlink was for a client.
+     * @param clientUid - uid of client to send direct message to
+     * @param message - message client receives.
+     * @returns {boolean}
      */
     public messageClient(clientUid, message) : boolean {
         if(this._clientFrontDataLookup.has(clientUid)) {
@@ -159,6 +168,11 @@ export class BackMasterChannel extends Channel {
         }
     }
 
+    /**
+     * decrements the linkCount for given client and if it reaches 0
+     * it is removed completely from the lookup.
+     * @param clientUid
+     */
     public removedClientLink(clientUid) {
         const clientData = this._clientFrontDataLookup.get(clientUid);
 

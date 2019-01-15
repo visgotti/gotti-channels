@@ -65,7 +65,9 @@ class BackChannel extends Channel {
     }
 
     /**
-     * sends state patches to mirrored channels
+     * finds the delta of the new and last state then adds the patch update
+     * to the master for it to be queued and then sent out to the needed
+     * front Masters for it to be relayed to the front children who need it.
      * @returns {boolean}
      */
     public patchState() : boolean {
@@ -91,10 +93,15 @@ class BackChannel extends Channel {
     };
 
     /**
-     *  accepts link from front channel and sends back state for it to be retrieved asynchronously.
-     *  if there was a clientUid it will notify the master as well.
+     * gets called when there is a link request from a front channel and it gets approved
+     * if the client Uid is present that means we must notify the master that there is
+     * a new linked client listening for updates and will allow the master to do a lookup
+     * of the client's frontMasterIndex for when trying to send direct messages to that client.
+     * @param frontUid
+     * @param frontMasterIndex
+     * @param clientUid (optional)
      */
-    public acceptLink(frontUid, frontMasterIndex, clientUid?) {
+    private acceptLink(frontUid, frontMasterIndex, clientUid?) {
         const sendData: any = {};
         if(clientUid) {
             sendData.clientUid = clientUid;
@@ -137,7 +144,7 @@ class BackChannel extends Channel {
     }
 
     /**
-     * sends message to all front channels that share channelId with back channel.
+     * Sends message to all mirrored front channels that are currently linked.
      * @param message
      */
     public broadcastLinked(message: any) {
@@ -146,11 +153,21 @@ class BackChannel extends Channel {
         });
     }
 
+    /**
+     * sets the previous encoded state in order to find the delta for next state update.
+     * @param newState
+     */
     public setState(newState) {
         this._previousStateEncoded = msgpack.encode(newState);
         this.state = newState;
     }
 
+    /**
+     * Function that's called from the back master when it receives queued messages
+     * from a the front master server.
+     * @param message
+     * @param frontMasterIndex
+     */
     public processMessageFromMaster(message, frontMasterIndex: number) {
         const frontUid = this.masterIndexToFrontUidLookup[frontMasterIndex];
         this._onMessage(message, frontUid);
