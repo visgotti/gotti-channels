@@ -1,22 +1,27 @@
 import { Messenger } from 'centrum-messengers/dist/core/Messenger';
 
 enum MSG_CODES {
+    // FRONT MASTER -> BACK MASTER
+    SEND_QUEUED,
+
+    //BACK MASTER -> FRONT MASTER
+    PATCH_STATE,
+    MESSAGE_CLIENT,
+
     // FRONT -> BACK
     CONNECT,
     DISCONNECT,
-    SEND_QUEUED,
     SEND_BACK,
     BROADCAST_ALL_BACK,
     LINK,
     UNLINK,
 
     // BACK -> FRONT
+    ACCEPT_LINK,
     CONNECTION_CHANGE,
     BROADCAST_LINKED_FRONTS,
     BROADCAST_ALL_FRONTS,
     SEND_FRONT,
-    SET_STATE,
-    PATCH_STATE,
 }
 
 export type PublishProtocol = any;
@@ -32,11 +37,17 @@ type SubscriptionHandler = (...any) => void;
 export class Protocol {
     constructor(){};
 
+    //FRONT MASTER -> BACK MASTER
+    static SEND_QUEUED(backMasterIndex) : string  { return Protocol.make(MSG_CODES.SEND_QUEUED, backMasterIndex) };
+    static DISCONNECT() : string  { return Protocol.make(MSG_CODES.DISCONNECT) }; //todo: figure out all disconnection edge cases before implementing
+
+    //BACK MASTER -> FRONT MASTERS
+    static PATCH_STATE(frontMasterIndex) : string  { return Protocol.make(MSG_CODES.PATCH_STATE, frontMasterIndex) };
+    static MESSAGE_CLIENT(frontMasterIndex) : string { return Protocol.make(MSG_CODES.MESSAGE_CLIENT, frontMasterIndex ) };
+
     // FRONT -> BACKS
     static CONNECT() : string  { return Protocol.make(MSG_CODES.CONNECT) };
-    static DISCONNECT() : string  { return Protocol.make(MSG_CODES.DISCONNECT) };
     static BROADCAST_ALL_BACK() : string  { return Protocol.make(MSG_CODES.BROADCAST_ALL_BACK) };
-    static SEND_QUEUED(frontUid) : string  { return Protocol.make(MSG_CODES.SEND_QUEUED, frontUid) };
 
     static SEND_BACK(backChannelId) : string  { return Protocol.make(MSG_CODES.SEND_BACK, backChannelId) };
     static LINK(frontUid) : string { return Protocol.make(MSG_CODES.LINK, frontUid) };
@@ -44,13 +55,13 @@ export class Protocol {
 
     // BACK -> FRONTS
     static BROADCAST_LINKED_FRONTS(frontChannelId) : string  { return Protocol.make(MSG_CODES.BROADCAST_LINKED_FRONTS, frontChannelId) };
-    static SET_STATE(frontChannelId): string  { return Protocol.make(MSG_CODES.SET_STATE, frontChannelId) };
-    static PATCH_STATE(frontChannelId) : string  { return Protocol.make(MSG_CODES.PATCH_STATE, frontChannelId) };
     static BROADCAST_ALL_FRONTS() : string  { return Protocol.make(MSG_CODES.BROADCAST_ALL_FRONTS) };
 
     // BACK -> FRONT
     static CONNECTION_CHANGE(frontUid) : string { return Protocol.make(MSG_CODES.CONNECTION_CHANGE, frontUid) };
     static SEND_FRONT(frontUid) : string  { return Protocol.make(MSG_CODES.SEND_FRONT, frontUid) };
+    static ACCEPT_LINK(frontUid): string  { return Protocol.make(MSG_CODES.ACCEPT_LINK, frontUid) };
+
     /**
      * returns concatenated protocol code if id is provided
      * @param code - unique code for different pub/sub types
@@ -68,40 +79,12 @@ export class Protocol {
  * to keep track of passing in parameters when wanting to register/unregister/call
  * a message since the factory keeps all of that in its scope when instantiated.
  */
-export abstract class MessageFactory {
-    // FRONT -> BACKS
-    public abstract CONNECT: PublishProtocol | SubscribeProtocol; //TODO: req/res
-    public abstract BROADCAST_ALL_BACK: PublishProtocol | SubscribeProtocol;
-
-    // FONT -> BACK
-    public abstract SEND_BACK: PushProtocol | SubscribeProtocol;
-    public abstract DISCONNECT: PushProtocol | SubscribeProtocol; //TODO: req/res
-    public abstract SEND_QUEUED: PublishProtocol | SubscribeProtocol;
-    public abstract LINK: PublishProtocol | SubscribeProtocol; //TODO: req/res
-    public abstract UNLINK: PublishProtocol | SubscribeProtocol;
-
-
-    // BACK -> FRONT
-    public abstract CONNECTION_CHANGE: PushProtocol | SubscribeProtocol; //TODO: wouldnt need if connect had req/res format
-    public abstract BROADCAST_LINKED_FRONTS: PublishProtocol | SubscribeProtocol;
-    public abstract BROADCAST_ALL_FRONTS: PublishProtocol | SubscribeProtocol;
-    public abstract SEND_FRONT: PublishProtocol | SubscribeProtocol;
-    public abstract SET_STATE: PublishProtocol | SubscribeProtocol;
-    public abstract PATCH_STATE: PublishProtocol | SubscribeProtocol;
-
+abstract class MessageFactory {
     protected messenger: Messenger;
-    protected channel: any;
-    readonly channelId: string;
 
-    constructor(messenger, channel) {
-        this.channelId = channel.channelId;
-        this.channel = channel;
+    constructor(messenger) {
         this.messenger = messenger;
     }
-
-    //TODO: even though were using pub/sub zmq sockets it would make some of the code much more legible if I can set up a nice req/res message layer.
-    protected requestCreator(protocolFactory, encoder?) {}
-    protected responseCreator(protocolFactory, encoder?) {};
 
     protected pubCreator(protocol, encoder?) {
         let pub: any = {};
@@ -133,14 +116,6 @@ export abstract class MessageFactory {
      */
     protected pushCreator(protocolFactory: Function, encoder?) {
         let push: any = {};
-
-        push = (function (to, ...args) {
-            if (push[to]) {
-                push[to](to, ...args);
-            } else {
-                throw new Error('Unitialized');
-            }
-        });
 
         push.register = (to) => {
             push[to] = this.messenger.getOrCreatePublish(protocolFactory(to), null, encoder);
@@ -178,15 +153,46 @@ export abstract class MessageFactory {
      * @param protocol
      * @returns {any}
      */
-    protected pullCreator(protocolFactory: Function) {
+    protected pullCreator(protocolFactory: Function, decoder?) {
         let pull: any = {};
 
         pull.register = (from, onSubscriptionHandler: SubscriptionHandler) => {
-            pull.subscriber = this.messenger.createSubscription(protocolFactory(from), protocolFactory(from), onSubscriptionHandler);
+            pull.subscriber = this.messenger.createSubscription(protocolFactory(from), protocolFactory(from), onSubscriptionHandler, decoder);
             pull.unregister = (from) => {
                 this.messenger.removeAllSubscriptionsWithName(protocolFactory(from));
             };
         };
         return pull;
+    }
+}
+
+export abstract class ChannelMessageFactory extends MessageFactory {
+    // FRONT -> BACKS
+    public abstract CONNECT: PublishProtocol | SubscribeProtocol; //TODO: req/res
+    public abstract BROADCAST_ALL_BACK: PublishProtocol | SubscribeProtocol;
+
+    // FONT -> BACK
+    public abstract SEND_BACK: PushProtocol | SubscribeProtocol;
+    public abstract LINK: PublishProtocol | SubscribeProtocol;
+    public abstract UNLINK: PublishProtocol | SubscribeProtocol;
+
+    // BACK -> FRONT
+    public abstract CONNECTION_CHANGE: PushProtocol | SubscribeProtocol;
+    public abstract BROADCAST_LINKED_FRONTS: PublishProtocol | SubscribeProtocol;
+    public abstract BROADCAST_ALL_FRONTS: PublishProtocol | SubscribeProtocol;
+    public abstract SEND_FRONT: PublishProtocol | SubscribeProtocol;
+    public abstract ACCEPT_LINK: PublishProtocol | SubscribeProtocol;
+    constructor(messenger) {
+        super(messenger)
+    }
+}
+
+export abstract class MasterMessageFactory extends MessageFactory {
+    public abstract SEND_QUEUED: PushProtocol | PullProtocol;
+    public abstract PATCH_STATE: PushProtocol | PullProtocol; //todo switch this to subscribe not pull
+    public abstract MESSAGE_CLIENT: PushProtocol | SubscribeProtocol;
+
+    constructor(messenger) {
+        super(messenger)
     }
 }

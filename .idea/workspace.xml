@@ -2,28 +2,15 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="52f8aeae-be83-469f-bcb7-bd5cada003c1" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/lib/Serializers.d.ts" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/lib/Serializers.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/lib/core/Broker.d.ts" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/lib/core/Broker.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/lib/core/Messenger.d.ts" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/lib/core/Messenger.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/lib/core/Messengers/Publisher.d.ts" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/lib/core/Messengers/Publisher.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/lib/core/Messengers/Requester.d.ts" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/lib/core/Messengers/Requester.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/lib/core/Messengers/Responder.d.ts" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/lib/core/Messengers/Responder.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/lib/core/Messengers/Subscriber.d.ts" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/lib/core/Messengers/Subscriber.js" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/package-lock.json" afterPath="$PROJECT_DIR$/package-lock.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/package.json" afterPath="$PROJECT_DIR$/package.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/ChannelCluster.ts" afterPath="$PROJECT_DIR$/src/ChannelCluster.ts" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/core/BackChannel/BackChannel.ts" afterPath="$PROJECT_DIR$/src/core/BackChannel/BackChannel.ts" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/core/Channel/Channel.ts" afterPath="$PROJECT_DIR$/src/core/Channel/Channel.ts" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/core/Channel/MessageFactory.ts" afterPath="$PROJECT_DIR$/src/core/Channel/MessageFactory.ts" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/core/FrontChannel/FrontChannel.ts" afterPath="$PROJECT_DIR$/src/core/FrontChannel/FrontChannel.ts" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/core/Back/BackChannel/BackChannel.ts" afterPath="$PROJECT_DIR$/src/core/Back/BackChannel/BackChannel.ts" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/core/Back/BackMaster/MasterChannel.ts" afterPath="$PROJECT_DIR$/src/core/Back/BackMaster/MasterChannel.ts" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/core/Client.ts" afterPath="$PROJECT_DIR$/src/core/Client.ts" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/core/Front/FrontChannel/FrontChannel.ts" afterPath="$PROJECT_DIR$/src/core/Front/FrontChannel/FrontChannel.ts" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/core/Front/FrontMaster/MasterChannel.ts" afterPath="$PROJECT_DIR$/src/core/Front/FrontMaster/MasterChannel.ts" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/core/Front/FrontMaster/MasterMessages.ts" afterPath="$PROJECT_DIR$/src/core/Front/FrontMaster/MasterMessages.ts" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/BackMaster.test.ts" afterPath="$PROJECT_DIR$/test/BackMaster.test.ts" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/Client.test.ts" afterPath="$PROJECT_DIR$/test/Client.test.ts" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -38,102 +25,121 @@
   <component name="CreatePatchCommitExecutor">
     <option name="PATCH_PATH" value="" />
   </component>
+  <component name="DockManager">
+    <window id="1">
+      <content type="file-editors">
+        <state>
+          <leaf>
+            <file leaf-file-name="MasterChannel.ts" pinned="false" current-in-tab="false">
+              <entry file="file://$PROJECT_DIR$/src/core/Back/BackMaster/MasterChannel.ts">
+                <provider selected="true" editor-type-id="text-editor">
+                  <state relative-caret-position="150">
+                    <caret line="10" column="48" lean-forward="true" selection-start-line="10" selection-start-column="48" selection-end-line="10" selection-end-column="48" />
+                    <folding>
+                      <element signature="e#0#44#0" expanded="true" />
+                    </folding>
+                  </state>
+                </provider>
+              </entry>
+            </file>
+            <file leaf-file-name="BackChannel.ts" pinned="false" current-in-tab="true">
+              <entry file="file://$PROJECT_DIR$/src/core/Back/BackChannel/BackChannel.ts">
+                <provider selected="true" editor-type-id="text-editor">
+                  <state relative-caret-position="136">
+                    <caret line="281" column="27" lean-forward="false" selection-start-line="281" selection-start-column="23" selection-end-line="281" selection-end-column="27" />
+                    <folding />
+                  </state>
+                </provider>
+              </entry>
+            </file>
+          </leaf>
+        </state>
+      </content>
+    </window>
+    <window id="2">
+      <content type="file-editors">
+        <state>
+          <leaf>
+            <file leaf-file-name="BackChannel.test.ts" pinned="false" current-in-tab="true">
+              <entry file="file://$PROJECT_DIR$/test/BackChannel.test.ts">
+                <provider selected="true" editor-type-id="text-editor">
+                  <state relative-caret-position="382">
+                    <caret line="84" column="17" lean-forward="false" selection-start-line="84" selection-start-column="17" selection-end-line="84" selection-end-column="17" />
+                    <folding />
+                  </state>
+                </provider>
+              </entry>
+            </file>
+          </leaf>
+        </state>
+      </content>
+    </window>
+  </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FavoritesManager">
     <favorites_list name="CentrumChannels" />
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="package.json" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/package.json">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="165">
-              <caret line="23" column="19" lean-forward="true" selection-start-line="23" selection-start-column="19" selection-end-line="23" selection-end-column="19" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ChannelCluster.ts" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/ChannelCluster.ts">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="255">
-              <caret line="17" column="1" lean-forward="true" selection-start-line="17" selection-start-column="1" selection-end-line="17" selection-end-column="1" />
-              <folding>
-                <element signature="n#!!doc" expanded="true" />
-                <element signature="e#292#339#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="README.md" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/README.md">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="195">
-              <caret line="13" column="35" lean-forward="true" selection-start-line="13" selection-start-column="35" selection-end-line="13" selection-end-column="35" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="LICENSE" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/LICENSE">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="MessageFactory.ts" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/core/Channel/MessageFactory.ts">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="15">
-              <caret line="1" column="0" lean-forward="false" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="FrontChannel.ts" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/core/FrontChannel/FrontChannel.ts">
+        <entry file="file://$PROJECT_DIR$/src/core/Front/FrontChannel/FrontChannel.ts">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="45">
-              <caret line="3" column="0" lean-forward="false" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
+            <state relative-caret-position="76">
+              <caret line="74" column="13" lean-forward="false" selection-start-line="74" selection-start-column="13" selection-end-line="74" selection-end-column="13" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
       <file leaf-file-name="FrontMessages.ts" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/core/FrontChannel/FrontMessages.ts">
+        <entry file="file://$PROJECT_DIR$/src/core/Front/FrontChannel/FrontMessages.ts">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="795">
-              <caret line="53" column="34" lean-forward="false" selection-start-line="53" selection-start-column="34" selection-end-line="53" selection-end-column="34" />
-              <folding>
-                <element signature="e#0#132#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="types.ts" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/core/types.ts">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-105">
-              <caret line="16" column="37" lean-forward="false" selection-start-line="16" selection-start-column="37" selection-end-line="16" selection-end-column="37" />
+            <state relative-caret-position="15">
+              <caret line="43" column="51" lean-forward="false" selection-start-line="43" selection-start-column="26" selection-end-line="43" selection-end-column="51" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="index.ts" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/core/FrontChannel/index.ts">
+      <file leaf-file-name="Client.test.ts" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/test/Client.test.ts">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="15">
-              <caret line="1" column="28" lean-forward="false" selection-start-line="1" selection-start-column="28" selection-end-line="1" selection-end-column="28" />
+            <state relative-caret-position="196">
+              <caret line="345" column="19" lean-forward="false" selection-start-line="345" selection-start-column="19" selection-end-line="345" selection-end-column="19" />
+              <folding>
+                <element signature="e#0#39#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MasterChannel.ts" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/core/Front/FrontMaster/MasterChannel.ts">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="185">
+              <caret line="154" column="13" lean-forward="true" selection-start-line="154" selection-start-column="13" selection-end-line="154" selection-end-column="13" />
+              <folding>
+                <element signature="e#0#39#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="FrontChannel.test.ts" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/test/FrontChannel.test.ts">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="166">
+              <caret line="66" column="52" lean-forward="false" selection-start-line="66" selection-start-column="52" selection-end-line="66" selection-end-column="52" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MasterMessages.ts" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/core/Front/FrontMaster/MasterMessages.ts">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="81">
+              <caret line="31" column="47" lean-forward="false" selection-start-line="31" selection-start-column="47" selection-end-line="31" selection-end-column="47" />
               <folding />
             </state>
           </provider>
@@ -142,11 +148,43 @@
       <file leaf-file-name="Client.ts" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/core/Client.ts">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1665">
-              <caret line="111" column="23" lean-forward="false" selection-start-line="111" selection-start-column="23" selection-end-line="111" selection-end-column="23" />
+            <state relative-caret-position="185">
+              <caret line="128" column="15" lean-forward="false" selection-start-line="128" selection-start-column="15" selection-end-line="128" selection-end-column="15" />
               <folding>
-                <element signature="e#0#44#0" expanded="true" />
+                <element signature="e#0#45#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="BackMaster.test.ts" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/test/BackMaster.test.ts">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="136">
+              <caret line="18" column="4" lean-forward="false" selection-start-line="18" selection-start-column="4" selection-end-line="18" selection-end-column="4" />
+              <folding>
+                <element signature="e#0#37#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="BackMessages.ts" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/core/Back/BackChannel/BackMessages.ts">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-114">
+              <caret line="66" column="45" lean-forward="false" selection-start-line="66" selection-start-column="45" selection-end-line="66" selection-end-column="45" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MasterMessages.ts" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/core/Back/BackMaster/MasterMessages.ts">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="306">
+              <caret line="32" column="42" lean-forward="false" selection-start-line="32" selection-start-column="42" selection-end-line="32" selection-end-column="42" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -155,53 +193,68 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>LINK</find>
-      <find>connect</find>
-      <find>link</find>
-      <find>broadcast</find>
-      <find>PATCH</find>
-      <find>onPatchStateHandler</find>
-      <find>.set</find>
-      <find>connectedChannelIds</find>
-      <find>.remove</find>
-      <find>sendState</find>
-      <find>_onSetState</find>
-      <find>state became</find>
-      <find>onSetState</find>
-      <find>SET_STATE</find>
-      <find>.add</find>
-      <find>decode</find>
-      <find>console.log</find>
-      <find>mirror</find>
-      <find>fossilDelta</find>
-      <find>connectClient</find>
+      <find>clientConnectedTimeouts</find>
+      <find>TODO</find>
+      <find>this.acceptLink</find>
+      <find>emitClientLinked</find>
+      <find>'linked</find>
+      <find>client.connectToChannel</find>
+      <find>acceptLink</find>
+      <find>_linkedClientUids</find>
+      <find>linkedClientUids</find>
+      <find>get</find>
+      <find>Spy</find>
+      <find>linked</find>
+      <find>sinon</find>
+      <find>frontUnlinkSpy</find>
+      <find>ClientSpy</find>
+      <find>BackMaster_removedClientLinkSpy</find>
+      <find>linkedCount</find>
+      <find>here</find>
+      <find>unlink</find>
+      <find>client =</find>
+      <find>clientConnected</find>
       <find>_connectClient</find>
-      <find>handleSetStateForClient</find>
-      <find>Promise</find>
-      <find>onMessage</find>
-      <find>disconnect</find>
       <find>disconnectClient</find>
-      <find>setProcessor</find>
-      <find>sendLocal</find>
-      <find>centrum</find>
-      <find>Centrum</find>
+      <find>it.only</find>
+      <find>connectToChannel</find>
+      <find>_connectedClients</find>
+      <find>connectClient</find>
+      <find>onChannelDisconnect</find>
+      <find>client.disc</find>
+      <find>console.log</find>
     </findStrings>
     <replaceStrings>
-      <replace>.register()</replace>
-      <replace>.register</replace>
-      <replace>backChannel</replace>
-      <replace>frontServers</replace>
-      <replace>options.totalChannels</replace>
-      <replace>sendState</replace>
-      <replace>BROADCAST_LINKED_FRONTS</replace>
-      <replace>broadcastLinked</replace>
+      <replace>frontMaster</replace>
+      <replace>frontMasterIndex</replace>
+      <replace>patch</replace>
+      <replace>this.frontMessengers</replace>
+      <replace>frontMessengers</replace>
+      <replace>front</replace>
+      <replace>backMessengers</replace>
+      <replace>PATCH_STATE</replace>
+      <replace>onMirrorConnected</replace>
+      <replace>Pub</replace>
+      <replace>SubProtocol</replace>
+      <replace>Subs</replace>
+      <replace>BackMaster</replace>
+      <replace>BackChannel</replace>
+      <replace>_linkedBackMasterLookup</replace>
+      <replace>FrontChannel</replace>
+      <replace>_linkedFrontMasterIndexesArray</replace>
+      <replace>_connectedFrontMasters</replace>
+      <replace>BackChannel1</replace>
+      <replace>FrontMaster</replace>
+      <replace>it(</replace>
+      <replace>it.only(</replace>
+      <replace>_queuedEncodedUpdates</replace>
+      <replace>sub</replace>
+      <replace>linkCount</replace>
+      <replace>SubscribeProtocol</replace>
+      <replace>Sub</replace>
+      <replace>_linkedClientUids</replace>
+      <replace>linkedClientFrontDataLookup</replace>
       <replace>it</replace>
-      <replace>clientConnectedCallbacks</replace>
-      <replace>.set</replace>
-      <replace>serverIndex</replace>
-      <replace>.delete</replace>
-      <replace>Messenger</replace>
-      <replace>messenger</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -210,22 +263,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/core/ChannelState.ts" />
-        <option value="$PROJECT_DIR$/src/core/Channel.ts" />
-        <option value="$PROJECT_DIR$/src/core/base/Client.ts" />
-        <option value="$PROJECT_DIR$/test/centrum.config.json" />
-        <option value="$PROJECT_DIR$/src/core/ClientChannelState.ts" />
-        <option value="$PROJECT_DIR$/lib/Centrum.js" />
-        <option value="$PROJECT_DIR$/src/core/base/Channel.ts" />
-        <option value="$PROJECT_DIR$/src/core/base/ChannelState.ts" />
-        <option value="$PROJECT_DIR$/src/core/ChannelClient.ts" />
-        <option value="$PROJECT_DIR$/src/core/Client/ClientState.ts" />
-        <option value="$PROJECT_DIR$/src/core/Channel/ChannelState.ts" />
-        <option value="$PROJECT_DIR$/test/Channel.test.ts" />
-        <option value="$PROJECT_DIR$/src/core/BackChannel.ts" />
-        <option value="$PROJECT_DIR$/src/core/FrontChannel.ts" />
-        <option value="$PROJECT_DIR$/src/core/Client/Client.ts" />
-        <option value="$PROJECT_DIR$/src/core/Channel/Messages.ts" />
         <option value="$PROJECT_DIR$/test/beforeTest.ts" />
         <option value="$PROJECT_DIR$/test/Cluster.test.ts" />
         <option value="$PROJECT_DIR$/src/core/BackChannel/index.ts" />
@@ -237,29 +274,46 @@
         <option value="$PROJECT_DIR$/dist/base/Channel.d.ts" />
         <option value="$PROJECT_DIR$/dist/BackChannel.js" />
         <option value="$PROJECT_DIR$/dist/BackChannel.d.ts" />
-        <option value="$PROJECT_DIR$/test/BackChannel.test.ts" />
-        <option value="$PROJECT_DIR$/README.md" />
-        <option value="$PROJECT_DIR$/test/testHelpers.ts" />
-        <option value="$PROJECT_DIR$/test/FrontChannel.test.ts" />
         <option value="$PROJECT_DIR$/.gitignore" />
-        <option value="$PROJECT_DIR$/test/Client.test.ts" />
-        <option value="$PROJECT_DIR$/src/core/Client.ts" />
         <option value="$PROJECT_DIR$/coverage/index.html" />
-        <option value="$PROJECT_DIR$/src/core/types.ts" />
         <option value="$PROJECT_DIR$/src/core/Server.ts" />
         <option value="$PROJECT_DIR$/src/core/Cluster.ts" />
         <option value="$PROJECT_DIR$/src/scripts/startFront.ts" />
         <option value="$PROJECT_DIR$/src/core/ChannelCluster.ts" />
         <option value="$PROJECT_DIR$/src/core/BackChannel/BackMessages.ts" />
-        <option value="$PROJECT_DIR$/src/core/FrontChannel/FrontMessages.ts" />
         <option value="$PROJECT_DIR$/lib/Serializers.js" />
         <option value="$PROJECT_DIR$/tsconfig.json" />
-        <option value="$PROJECT_DIR$/src/ChannelCluster.ts" />
         <option value="$PROJECT_DIR$/src/core/BackChannel/BackChannel.ts" />
-        <option value="$PROJECT_DIR$/src/core/Channel/Channel.ts" />
-        <option value="$PROJECT_DIR$/src/core/Channel/MessageFactory.ts" />
+        <option value="$PROJECT_DIR$/.npmignore" />
+        <option value="$PROJECT_DIR$/src/core/BackChannel/MasterChannel.ts" />
+        <option value="$PROJECT_DIR$/src/core/Back/BackMaster/BackChannel.ts" />
         <option value="$PROJECT_DIR$/src/core/FrontChannel/FrontChannel.ts" />
+        <option value="$PROJECT_DIR$/src/core/FrontChannel/FrontMessages.ts" />
+        <option value="$PROJECT_DIR$/src/core/FrontChannel/MasterMessages.ts" />
+        <option value="$PROJECT_DIR$/src/ChannelCluster.ts" />
+        <option value="$PROJECT_DIR$/src/core/Channel/Channel.ts" />
+        <option value="$PROJECT_DIR$/test/MockMasterChannel.ts" />
+        <option value="$PROJECT_DIR$/test/mocks/FrontMasterChannel.ts" />
+        <option value="$PROJECT_DIR$/src/core/types.ts" />
+        <option value="$PROJECT_DIR$/test/mocks/MasterChannels.ts" />
+        <option value="$PROJECT_DIR$/README.md" />
+        <option value="$PROJECT_DIR$/test/testHelpers.ts" />
+        <option value="$PROJECT_DIR$/src/core/Front/FrontChannel/FrontMessages.ts" />
+        <option value="$PROJECT_DIR$/src/core/Back/BackChannel/BackMessages.ts" />
+        <option value="$PROJECT_DIR$/test/FrontMaster.test.ts" />
+        <option value="$PROJECT_DIR$/test/FrontChannel.test.ts" />
         <option value="$PROJECT_DIR$/package.json" />
+        <option value="$PROJECT_DIR$/test/BackChannel.test.ts" />
+        <option value="$PROJECT_DIR$/src/core/Back/BackMaster/MasterMessages.ts" />
+        <option value="$PROJECT_DIR$/src/core/Channel/MessageFactory.ts" />
+        <option value="$PROJECT_DIR$/src/core/Front/FrontMaster/MasterMessages.ts" />
+        <option value="$PROJECT_DIR$/src/core/Back/BackChannel/BackChannel.ts" />
+        <option value="$PROJECT_DIR$/src/core/Back/BackMaster/MasterChannel.ts" />
+        <option value="$PROJECT_DIR$/test/BackMaster.test.ts" />
+        <option value="$PROJECT_DIR$/src/core/Front/FrontChannel/FrontChannel.ts" />
+        <option value="$PROJECT_DIR$/src/core/Client.ts" />
+        <option value="$PROJECT_DIR$/test/Client.test.ts" />
+        <option value="$PROJECT_DIR$/src/core/Front/FrontMaster/MasterChannel.ts" />
       </list>
     </option>
   </component>
@@ -273,9 +327,9 @@
     <handled-path value="$PROJECT_DIR$/node_modules" />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="75" />
-    <option name="y" value="77" />
-    <option name="width" value="1525" />
+    <option name="x" value="108" />
+    <option name="y" value="82" />
+    <option name="width" value="1523" />
     <option name="height" value="818" />
   </component>
   <component name="ProjectView">
@@ -293,7 +347,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -316,7 +369,43 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
+              <option name="myItemId" value="typings" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="CentrumChannels" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="CentrumChannels" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="typings" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="globals" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mocha" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="CentrumChannels" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="CentrumChannels" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="test" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -338,8 +427,167 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="CentrumChannels" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="CentrumChannels" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Front" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="FrontMaster" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="CentrumChannels" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="CentrumChannels" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Front" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="FrontChannel" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="CentrumChannels" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="CentrumChannels" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Channel" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="CentrumChannels" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="CentrumChannels" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Back" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="BackMaster" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="CentrumChannels" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="CentrumChannels" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Back" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="BackChannel" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="CentrumChannels" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="CentrumChannels" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dist" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="CentrumChannels" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="CentrumChannels" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dist" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Front" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
         </subPane>
       </pane>
+      <pane id="Scratches" />
       <pane id="Scope" />
     </panes>
   </component>
@@ -354,14 +602,20 @@
     <property name="HbShouldOpenHtmlAsHb" value="" />
     <property name="SearchEverywhereHistoryKey" value="&#9;FILE&#9;file:///home/gotti/WebstormProjects/CentrumChannels/src/core/Channel/Channel.ts&#10;T&#9;FILE&#9;file:///home/gotti/WebstormProjects/CentrumChannels/src/core/FrontChannel.ts" />
     <property name="nodejs.mocha.mocha_node_package_dir" value="$PROJECT_DIR$/node_modules/mocha" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../CentrumMessengers" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../DodgerIo" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/core/Front/FrontMaster" />
+      <recent name="$PROJECT_DIR$/src/core/Back/BackMaster" />
+      <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/lib" />
       <recent name="$PROJECT_DIR$/test" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/core/Front/FrontMaster" />
+      <recent name="$PROJECT_DIR$/src/core/Front" />
+      <recent name="$PROJECT_DIR$/src/core/Back" />
       <recent name="$PROJECT_DIR$/lib" />
       <recent name="$PROJECT_DIR$/src" />
     </key>
@@ -430,6 +684,9 @@
   <component name="ShelveChangesManager" show_recycled="false">
     <option name="remove_strategy" value="false" />
   </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="52f8aeae-be83-469f-bcb7-bd5cada003c1" name="Default" comment="" />
@@ -443,34 +700,43 @@
       <workItem from="1546792735587" duration="87614000" />
       <workItem from="1546990694236" duration="2106000" />
       <workItem from="1546995486952" duration="526000" />
-      <workItem from="1546996019897" duration="1260000" />
+      <workItem from="1546996019897" duration="1737000" />
+      <workItem from="1546999179183" duration="16258000" />
+      <workItem from="1547059005677" duration="21566000" />
+      <workItem from="1547140252567" duration="18299000" />
+      <workItem from="1547177329794" duration="2281000" />
+      <workItem from="1547273106903" duration="28779000" />
+      <workItem from="1547344175243" duration="4267000" />
+      <workItem from="1547405856458" duration="1202000" />
+      <workItem from="1547407600393" duration="19886000" />
+      <workItem from="1547570720861" duration="6574000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="144936000" />
+    <option name="totallyTimeSpent" value="264525000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="75" y="77" width="1525" height="818" extended-state="0" />
+    <frame x="108" y="82" width="1523" height="818" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info id="TypeScript" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.35397038" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22885247" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="TypeScript" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.36608344" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22915299" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.329602" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32958803" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
     </layout>
     <layout-to-restore>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -479,13 +745,13 @@
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="TypeScript" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32754344" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="TypeScript" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32711443" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22647631" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32960325" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.329602" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
@@ -499,6 +765,7 @@
         <option value="$PROJECT_DIR$/../dodgery/game-servers/Area.js" />
         <option value="$PROJECT_DIR$/../dodgery/game-servers/Master.js" />
         <option value="$PROJECT_DIR$/../dodgery/game-servers/Data.js" />
+        <option value="$USER_HOME$/Gunmo/DodgerIoPrototype/Main.js" />
       </list>
     </option>
   </component>
@@ -512,40 +779,9 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/core/Channel/ChannelState.ts" />
-    <entry file="file://$PROJECT_DIR$/src/core/Client/ClientState.ts" />
-    <entry file="file://$PROJECT_DIR$/src/core/FrontChannel.ts" />
-    <entry file="file://$PROJECT_DIR$/src/core/BackChannel.ts" />
-    <entry file="file://$PROJECT_DIR$/test/beforeTest.ts" />
-    <entry file="file://$PROJECT_DIR$/test/centrum.config.json" />
-    <entry file="file://$PROJECT_DIR$/test/Channel.old.ts" />
-    <entry file="file://$PROJECT_DIR$/lib/core/Centrum.js" />
-    <entry file="file://$PROJECT_DIR$/lib/Centrum.js" />
-    <entry file="file://$PROJECT_DIR$/lib/Serializers.d.ts" />
-    <entry file="file://$PROJECT_DIR$/node_modules/fossil-delta/fossil-delta.min.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="46" lean-forward="false" selection-start-line="0" selection-start-column="46" selection-end-line="0" selection-end-column="46" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/dist/BackChannel/BackMessages.js" />
-    <entry file="file://$PROJECT_DIR$/lib/core/Messengers/Publisher.js" />
-    <entry file="file://$PROJECT_DIR$/lib/core/Messengers/Subscriber.js" />
-    <entry file="file://$PROJECT_DIR$/src/core/BackChannel/BackServer.ts" />
-    <entry file="file://$PROJECT_DIR$/dist/base/Channel.d.ts" />
-    <entry file="file://$PROJECT_DIR$/dist/BackChannel.js" />
-    <entry file="file://$PROJECT_DIR$/dist/BackChannel.d.ts" />
     <entry file="file://$PROJECT_DIR$/test/Client.old.ts" />
     <entry file="file://$PROJECT_DIR$/.nyc_output/306ead92-30fd-4820-bb6a-df0fd8b821a0.json" />
     <entry file="file://$PROJECT_DIR$/.nyc_output/d4aced18-22b1-4f08-bcc2-d8809bb63241.json" />
-    <entry file="file://$PROJECT_DIR$/coverage/index.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="4" column="28" lean-forward="false" selection-start-line="4" selection-start-column="28" selection-end-line="4" selection-end-column="28" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/coverage/sort-arrow-sprite.png">
       <provider selected="true" editor-type-id="images">
         <state />
@@ -558,24 +794,153 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/.gitignore">
+    <entry file="file://$PROJECT_DIR$/src/scripts/startBack.ts" />
+    <entry file="file://$PROJECT_DIR$/src/scripts/startFront.ts" />
+    <entry file="file://$PROJECT_DIR$/package-lock.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="45">
-          <caret line="3" column="11" lean-forward="false" selection-start-line="3" selection-start-column="11" selection-end-line="3" selection-end-column="11" />
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/scripts/startBack.ts" />
-    <entry file="file://$PROJECT_DIR$/src/scripts/startFront.ts" />
-    <entry file="file://$PROJECT_DIR$/src/core/BackChannel/BackMessages.ts">
+    <entry file="file://$PROJECT_DIR$/lib/test" />
+    <entry file="file://$PROJECT_DIR$/lib/Serializers.js" />
+    <entry file="file://$PROJECT_DIR$/lib/core/Broker.js" />
+    <entry file="file://$PROJECT_DIR$/src/core/Front/FrontChannel/index.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="194">
-          <caret line="58" column="43" lean-forward="true" selection-start-line="58" selection-start-column="43" selection-end-line="58" selection-end-column="43" />
+        <state relative-caret-position="15">
+          <caret line="1" column="28" lean-forward="false" selection-start-line="1" selection-start-column="28" selection-end-line="1" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/core/Back/BackMaster/BackChannel.ts" />
+    <entry file="file://$PROJECT_DIR$/src/core/Back/BackChannel/MasterChannel.ts" />
+    <entry file="file://$PROJECT_DIR$/test/ChannelCluster.test.ts" />
+    <entry file="file://$PROJECT_DIR$/test/MockMasterChannel.ts" />
+    <entry file="file://$PROJECT_DIR$/src/ChannelCluster.ts" />
+    <entry file="file://$PROJECT_DIR$/test/mocks/MasterChannels.ts" />
+    <entry file="file://$PROJECT_DIR$/src/core/types.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="19" column="1" lean-forward="false" selection-start-line="19" selection-start-column="1" selection-end-line="19" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/old_FrontChannel.ts" />
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="277">
+          <caret line="24" column="0" lean-forward="true" selection-start-line="24" selection-start-column="0" selection-end-line="24" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/BackChannelold.ts" />
+    <entry file="file://$PROJECT_DIR$/coverage/coverage/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="9" column="31" lean-forward="false" selection-start-line="9" selection-start-column="31" selection-end-line="9" selection-end-column="31" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/coverage/block-navigation.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-45">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/testHelpers.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="30">
+          <caret line="2" column="0" lean-forward="false" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/coverage/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1125">
+          <caret line="75" column="0" lean-forward="false" selection-start-line="75" selection-start-column="0" selection-end-line="75" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.npmignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="6" column="8" lean-forward="false" selection-start-line="6" selection-start-column="8" selection-end-line="6" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/LICENSE">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="300">
+          <caret line="20" column="9" lean-forward="false" selection-start-line="20" selection-start-column="9" selection-end-line="20" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="45">
+          <caret line="3" column="11" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="3" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/package.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="75">
+          <caret line="5" column="19" lean-forward="false" selection-start-line="5" selection-start-column="19" selection-end-line="5" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tsconfig.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="270">
+          <caret line="18" column="3" lean-forward="false" selection-start-line="18" selection-start-column="3" selection-end-line="18" selection-end-column="3" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/core/BackChannel/index.ts">
+    <entry file="file://$PROJECT_DIR$/test/FrontMaster.test.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1080">
+          <caret line="133" column="18" lean-forward="false" selection-start-line="133" selection-start-column="18" selection-end-line="133" selection-end-column="18" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dist/Front/FrontMaster/MasterChannel.d.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-71">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#67#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dist/Front/FrontMaster/MasterChannel.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dist/Client.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="12" column="22" lean-forward="false" selection-start-line="12" selection-start-column="22" selection-end-line="12" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/core/Channel/Channel.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="210">
+          <caret line="14" column="5" lean-forward="false" selection-start-line="14" selection-start-column="5" selection-end-line="14" selection-end-column="5" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/core/Back/BackChannel/index.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="1" selection-end-column="27" />
@@ -583,626 +948,125 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/BackChannel.test.ts">
+    <entry file="file://$PROJECT_DIR$/src/core/Channel/MessageFactory.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="30">
-          <caret line="2" column="39" lean-forward="false" selection-start-line="2" selection-start-column="39" selection-end-line="2" selection-end-column="39" />
-          <folding>
-            <element signature="e#0#37#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test/ChannelCluster.test.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1215">
-          <caret line="82" column="9" lean-forward="false" selection-start-line="82" selection-start-column="8" selection-end-line="82" selection-end-column="9" />
+        <state relative-caret-position="231">
+          <caret line="142" column="32" lean-forward="false" selection-start-line="142" selection-start-column="32" selection-end-line="142" selection-end-column="32" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/Client.test.ts">
+    <entry file="file://$PROJECT_DIR$/src/core/Back/BackChannel/BackMessages.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="705">
-          <caret line="54" column="34" lean-forward="false" selection-start-line="54" selection-start-column="34" selection-end-line="54" selection-end-column="34" />
-          <folding>
-            <element signature="e#0#37#0" expanded="true" />
-            <element signature="e#292#325#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="-114">
+          <caret line="66" column="45" lean-forward="false" selection-start-line="66" selection-start-column="45" selection-end-line="66" selection-end-column="45" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/BackChannel.test.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="382">
+          <caret line="84" column="17" lean-forward="false" selection-start-line="84" selection-start-column="17" selection-end-line="84" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/core/Front/FrontChannel/FrontMessages.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="43" column="51" lean-forward="false" selection-start-line="43" selection-start-column="26" selection-end-line="43" selection-end-column="51" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/core/Back/BackMaster/MasterMessages.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="306">
+          <caret line="32" column="42" lean-forward="false" selection-start-line="32" selection-start-column="42" selection-end-line="32" selection-end-column="42" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/core/Front/FrontMaster/MasterMessages.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="81">
+          <caret line="31" column="47" lean-forward="false" selection-start-line="31" selection-start-column="47" selection-end-line="31" selection-end-column="47" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/test/FrontChannel.test.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="8325">
-          <caret line="559" column="30" lean-forward="false" selection-start-line="559" selection-start-column="30" selection-end-line="559" selection-end-column="30" />
+        <state relative-caret-position="166">
+          <caret line="66" column="52" lean-forward="false" selection-start-line="66" selection-start-column="52" selection-end-line="66" selection-end-column="52" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/testHelpers.ts">
+    <entry file="file://$PROJECT_DIR$/src/core/Front/FrontChannel/FrontChannel.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1050">
-          <caret line="71" column="19" lean-forward="false" selection-start-line="71" selection-start-column="19" selection-end-line="71" selection-end-column="19" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/package-lock.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <marker date="1546998336109" expanded="true" signature="12121:12501" ph="{&quot;version&quot;: &quot;2.4.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="12376:12495" ph="{&quot;ansi-styles&quot;: &quot;^3.2.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="12517:12741" ph="{&quot;version&quot;: &quot;1.1.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="12764:12940" ph="{&quot;version&quot;: &quot;1.1.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="12963:13279" ph="{&quot;version&quot;: &quot;1.9.3&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="13234:13273" ph="{&quot;color-name&quot;: &quot;1.1.3&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="13299:13488" ph="{&quot;version&quot;: &quot;1.1.3&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="13507:13758" ph="{&quot;version&quot;: &quot;2.19.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="13778:13967" ph="{&quot;version&quot;: &quot;0.0.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="14000:14196" ph="{&quot;version&quot;: &quot;1.1.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="14218:14392" ph="{&quot;version&quot;: &quot;1.0.2&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="14407:14700" ph="{&quot;version&quot;: &quot;4.1.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="14662:14694" ph="{&quot;ms&quot;: &quot;^2.1.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="14729:14981" ph="{&quot;version&quot;: &quot;3.3.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="14931:14975" ph="{&quot;mimic-response&quot;: &quot;^1.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="15002:15236" ph="{&quot;version&quot;: &quot;0.6.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="15253:15436" ph="{&quot;version&quot;: &quot;0.1.3&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="15455:15623" ph="{&quot;version&quot;: &quot;1.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="15644:15816" ph="{&quot;version&quot;: &quot;1.0.3&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="15830:16069" ph="{&quot;version&quot;: &quot;3.5.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="16092:16384" ph="{&quot;version&quot;: &quot;1.4.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="16344:16378" ph="{&quot;once&quot;: &quot;^1.4.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="16414:16623" ph="{&quot;version&quot;: &quot;1.0.5&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="16642:17599" ph="{&quot;version&quot;: &quot;1.8.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="16843:17005" ph="{&quot;esprima&quot;: &quot;^2.7.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="17029:17593" ph="{...}" />
-            <marker date="1546998336109" expanded="true" signature="17050:17253" ph="{&quot;version&quot;: &quot;2.7.3&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="17277:17585" ph="{&quot;version&quot;: &quot;0.2.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="17528:17575" ph="{&quot;amdefine&quot;: &quot;&gt;=0.0.4&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="17616:17861" ph="{&quot;version&quot;: &quot;4.0.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="17881:18070" ph="{&quot;version&quot;: &quot;1.9.3&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="18087:18270" ph="{&quot;version&quot;: &quot;2.0.2&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="18295:18537" ph="{&quot;version&quot;: &quot;1.1.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="18563:18764" ph="{&quot;version&quot;: &quot;2.0.6&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="18786:19022" ph="{&quot;version&quot;: &quot;1.0.2&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="19044:19280" ph="{&quot;version&quot;: &quot;1.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="19301:19492" ph="{&quot;version&quot;: &quot;1.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="19507:19967" ph="{&quot;version&quot;: &quot;2.7.4&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="19681:19961" ph="{&quot;aproba&quot;: &quot;^1.0.3&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="19996:20184" ph="{&quot;version&quot;: &quot;0.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="20198:20648" ph="{&quot;version&quot;: &quot;7.1.3&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="20451:20642" ph="{&quot;fs.realpath&quot;: &quot;^1.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="20665:20912" ph="{&quot;version&quot;: &quot;11.9.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="20927:21170" ph="{&quot;version&quot;: &quot;1.10.5&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="21190:21973" ph="{&quot;version&quot;: &quot;4.0.12&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="21457:21585" ph="{&quot;async&quot;: &quot;^2.5.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="21609:21967" ph="{...}" />
-            <marker date="1546998336109" expanded="true" signature="21628:21959" ph="{&quot;version&quot;: &quot;2.6.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="21903:21949" ph="{&quot;lodash&quot;: &quot;^4.17.10&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="21991:22236" ph="{&quot;version&quot;: &quot;2.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="22190:22230" ph="{&quot;ansi-regex&quot;: &quot;^2.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="22254:22439" ph="{&quot;version&quot;: &quot;3.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="22460:22632" ph="{&quot;version&quot;: &quot;2.0.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="22644:22817" ph="{&quot;version&quot;: &quot;1.1.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="22835:23097" ph="{&quot;version&quot;: &quot;1.0.6&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="23034:23091" ph="{&quot;once&quot;: &quot;^1.3.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="23115:23281" ph="{&quot;version&quot;: &quot;2.0.3&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="23294:23512" ph="{&quot;version&quot;: &quot;1.3.5&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="23545:23804" ph="{&quot;version&quot;: &quot;1.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="23755:23798" ph="{&quot;number-is-nan&quot;: &quot;^1.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="23821:23985" ph="{&quot;version&quot;: &quot;1.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="24000:24179" ph="{&quot;version&quot;: &quot;2.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="24197:26243" ph="{&quot;version&quot;: &quot;0.4.5&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="24396:24792" ph="{&quot;abbrev&quot;: &quot;1.0.x&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="24816:26237" ph="{...}" />
-            <marker date="1546998336109" expanded="true" signature="24837:25040" ph="{&quot;version&quot;: &quot;2.7.3&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="25058:25463" ph="{&quot;version&quot;: &quot;5.0.15&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="25271:25453" ph="{&quot;inflight&quot;: &quot;^1.0.4&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="25485:25690" ph="{&quot;version&quot;: &quot;1.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="25711:25914" ph="{&quot;version&quot;: &quot;1.1.7&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="25942:26229" ph="{&quot;version&quot;: &quot;3.2.3&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="26173:26219" ph="{&quot;has-flag&quot;: &quot;^1.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="26274:26547" ph="{&quot;version&quot;: &quot;2.0.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="26580:27137" ph="{&quot;version&quot;: &quot;3.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="26871:27131" ph="{&quot;@babel/generator&quot;: &quot;^7.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="27156:27405" ph="{&quot;version&quot;: &quot;4.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="27422:27756" ph="{&quot;version&quot;: &quot;3.12.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="27683:27750" ph="{&quot;argparse&quot;: &quot;^1.0.7&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="27771:28012" ph="{&quot;version&quot;: &quot;2.5.2&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="28026:28295" ph="{&quot;version&quot;: &quot;0.3.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="28217:28289" ph="{&quot;prelude-ls&quot;: &quot;~1.1.2&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="28311:28558" ph="{&quot;version&quot;: &quot;4.17.11&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="28578:28829" ph="{&quot;version&quot;: &quot;1.3.5&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="28853:29093" ph="{&quot;version&quot;: &quot;1.0.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="29112:29426" ph="{&quot;version&quot;: &quot;3.0.4&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="29375:29420" ph="{&quot;brace-expansion&quot;: &quot;^1.1.7&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="29444:29609" ph="{&quot;version&quot;: &quot;1.2.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="29625:30078" ph="{&quot;version&quot;: &quot;0.5.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="29800:29837" ph="{&quot;minimist&quot;: &quot;0.0.8&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="29861:30072" ph="{...}" />
-            <marker date="1546998336109" expanded="true" signature="29883:30064" ph="{&quot;version&quot;: &quot;0.0.8&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="30093:32461" ph="{&quot;version&quot;: &quot;5.2.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="30348:30681" ph="{&quot;browser-stdout&quot;: &quot;1.3.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="30705:32455" ph="{...}" />
-            <marker date="1546998336109" expanded="true" signature="30728:30998" ph="{&quot;version&quot;: &quot;2.15.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="31017:31341" ph="{&quot;version&quot;: &quot;3.1.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="31292:31331" ph="{&quot;ms&quot;: &quot;2.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="31359:31861" ph="{&quot;version&quot;: &quot;7.1.2&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="31632:31851" ph="{&quot;fs.realpath&quot;: &quot;^1.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="31877:32070" ph="{&quot;version&quot;: &quot;2.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="32098:32447" ph="{&quot;version&quot;: &quot;5.4.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="32391:32437" ph="{&quot;has-flag&quot;: &quot;^3.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="32473:32708" ph="{&quot;version&quot;: &quot;2.1.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="32721:32941" ph="{&quot;version&quot;: &quot;2.11.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="32967:33211" ph="{&quot;version&quot;: &quot;1.0.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="33229:33513" ph="{&quot;version&quot;: &quot;2.5.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="33471:33507" ph="{&quot;semver&quot;: &quot;^5.4.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="33534:33706" ph="{&quot;version&quot;: &quot;0.1.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="33720:33948" ph="{&quot;version&quot;: &quot;3.0.6&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="33911:33942" ph="{&quot;abbrev&quot;: &quot;1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="33969:34203" ph="{&quot;version&quot;: &quot;2.2.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="34219:34615" ph="{&quot;version&quot;: &quot;4.1.2&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="34457:34609" ph="{&quot;are-we-there-yet&quot;: &quot;~1.1.2&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="34638:34814" ph="{&quot;version&quot;: &quot;1.0.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="34827:63364" ph="{&quot;version&quot;: &quot;13.1.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="35080:35950" ph="{&quot;archy&quot;: &quot;^1.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="35974:63358" ph="{...}" />
-            <marker date="1546998336109" expanded="true" signature="35998:36229" ph="{&quot;version&quot;: &quot;0.1.4&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="36102:36219" ph="{&quot;kind-of&quot;: &quot;^3.0.2&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="36251:36341" ph="{&quot;version&quot;: &quot;1.0.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="36365:36455" ph="{&quot;version&quot;: &quot;3.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="36485:36663" ph="{&quot;version&quot;: &quot;1.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="36589:36653" ph="{&quot;default-require-extensions&quot;: &quot;^2.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="36682:36772" ph="{&quot;version&quot;: &quot;1.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="36792:36882" ph="{&quot;version&quot;: &quot;1.0.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="36901:36991" ph="{&quot;version&quot;: &quot;1.5.2&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="37019:37109" ph="{&quot;version&quot;: &quot;1.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="37138:37340" ph="{&quot;version&quot;: &quot;1.1.11&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="37243:37330" ph="{&quot;balanced-match&quot;: &quot;^1.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="37369:37459" ph="{&quot;version&quot;: &quot;1.1.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="37490:37764" ph="{&quot;version&quot;: &quot;2.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="37594:37754" ph="{&quot;make-dir&quot;: &quot;^1.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="37787:37905" ph="{&quot;version&quot;: &quot;1.2.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="37931:38157" ph="{&quot;version&quot;: &quot;0.1.3&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="38063:38147" ph="{&quot;align-text&quot;: &quot;^0.1.3&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="38176:38642" ph="{&quot;version&quot;: &quot;2.1.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="38308:38428" ph="{&quot;center-align&quot;: &quot;^0.1.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="38456:38632" ph="{...}" />
-            <marker date="1546998336109" expanded="true" signature="38482:38620" ph="{&quot;version&quot;: &quot;0.0.2&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="38669:38759" ph="{&quot;version&quot;: &quot;1.1.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="38782:38872" ph="{&quot;version&quot;: &quot;1.0.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="38896:38986" ph="{&quot;version&quot;: &quot;0.0.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="39018:39181" ph="{&quot;version&quot;: &quot;1.6.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="39122:39171" ph="{&quot;safe-buffer&quot;: &quot;~5.1.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="39206:39398" ph="{&quot;version&quot;: &quot;4.0.2&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="39310:39388" ph="{&quot;lru-cache&quot;: &quot;^4.0.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="39417:39570" ph="{&quot;version&quot;: &quot;3.1.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="39521:39560" ph="{&quot;ms&quot;: &quot;2.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="39593:39683" ph="{&quot;version&quot;: &quot;1.0.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="39707:39797" ph="{&quot;version&quot;: &quot;1.2.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="39837:39998" ph="{&quot;version&quot;: &quot;2.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="39941:39988" ph="{&quot;strip-bom&quot;: &quot;^3.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="40020:40183" ph="{&quot;version&quot;: &quot;1.3.2&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="40124:40173" ph="{&quot;is-arrayish&quot;: &quot;^0.2.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="40206:40296" ph="{&quot;version&quot;: &quot;4.1.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="40315:41032" ph="{&quot;version&quot;: &quot;0.7.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="40419:40684" ph="{&quot;cross-spawn&quot;: &quot;^5.0.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="40712:41022" ph="{...}" />
-            <marker date="1546998336109" expanded="true" signature="40741:41010" ph="{&quot;version&quot;: &quot;5.1.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="40861:40996" ph="{&quot;lru-cache&quot;: &quot;^4.0.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="41060:41288" ph="{&quot;version&quot;: &quot;2.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="41164:41278" ph="{&quot;commondir&quot;: &quot;^1.0.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="41309:41472" ph="{&quot;version&quot;: &quot;3.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="41413:41462" ph="{&quot;locate-path&quot;: &quot;^3.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="41502:41698" ph="{&quot;version&quot;: &quot;1.5.6&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="41606:41688" ph="{&quot;cross-spawn&quot;: &quot;^4&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="41723:41813" ph="{&quot;version&quot;: &quot;1.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="41842:41932" ph="{&quot;version&quot;: &quot;1.0.3&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="41956:42046" ph="{&quot;version&quot;: &quot;3.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="42064:42397" ph="{&quot;version&quot;: &quot;7.1.3&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="42168:42387" ph="{&quot;fs.realpath&quot;: &quot;^1.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="42422:42513" ph="{&quot;version&quot;: &quot;4.1.11&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="42537:43055" ph="{&quot;version&quot;: &quot;4.0.11&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="42642:42788" ph="{&quot;async&quot;: &quot;^1.4.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="42816:43045" ph="{...}" />
-            <marker date="1546998336109" expanded="true" signature="42844:43033" ph="{&quot;version&quot;: &quot;0.4.4&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="42964:43019" ph="{&quot;amdefine&quot;: &quot;&gt;=0.0.4&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="43077:43167" ph="{&quot;version&quot;: &quot;3.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="43196:43286" ph="{&quot;version&quot;: &quot;2.7.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="43311:43401" ph="{&quot;version&quot;: &quot;0.1.4&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="43423:43606" ph="{&quot;version&quot;: &quot;1.0.6&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="43527:43596" ph="{&quot;once&quot;: &quot;^1.3.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="43628:43718" ph="{&quot;version&quot;: &quot;2.0.3&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="43741:43831" ph="{&quot;version&quot;: &quot;1.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="43856:43946" ph="{&quot;version&quot;: &quot;0.2.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="43969:44059" ph="{&quot;version&quot;: &quot;1.1.6&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="44090:44257" ph="{&quot;version&quot;: &quot;1.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="44194:44247" ph="{&quot;builtin-modules&quot;: &quot;^1.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="44294:44384" ph="{&quot;version&quot;: &quot;2.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="44407:44497" ph="{&quot;version&quot;: &quot;1.1.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="44516:44606" ph="{&quot;version&quot;: &quot;2.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="44641:44731" ph="{&quot;version&quot;: &quot;2.0.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="44762:44930" ph="{&quot;version&quot;: &quot;2.0.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="44866:44920" ph="{&quot;append-transform&quot;: &quot;^1.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="44963:45210" ph="{&quot;version&quot;: &quot;2.0.2&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="45067:45200" ph="{&quot;istanbul-lib-coverage&quot;: &quot;^2.0.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="45248:45728" ph="{&quot;version&quot;: &quot;2.0.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="45352:45544" ph="{&quot;debug&quot;: &quot;^3.1.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="45572:45718" ph="{...}" />
-            <marker date="1546998336109" expanded="true" signature="45600:45706" ph="{&quot;version&quot;: &quot;0.6.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="45758:45921" ph="{&quot;version&quot;: &quot;2.0.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="45862:45911" ph="{&quot;handlebars&quot;: &quot;^4.0.11&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="45959:46049" ph="{&quot;version&quot;: &quot;1.0.2&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="46070:46231" ph="{&quot;version&quot;: &quot;3.2.2&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="46174:46221" ph="{&quot;is-buffer&quot;: &quot;^1.1.5&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="46255:46373" ph="{&quot;version&quot;: &quot;1.0.4&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="46391:46552" ph="{&quot;version&quot;: &quot;1.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="46495:46542" ph="{&quot;invert-kv&quot;: &quot;^1.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="46580:46844" ph="{&quot;version&quot;: &quot;4.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="46684:46834" ph="{&quot;graceful-fs&quot;: &quot;^4.1.2&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="46869:47066" ph="{&quot;version&quot;: &quot;3.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="46973:47056" ph="{&quot;p-locate&quot;: &quot;^3.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="47098:47188" ph="{&quot;version&quot;: &quot;4.4.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="47209:47299" ph="{&quot;version&quot;: &quot;1.0.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="47322:47516" ph="{&quot;version&quot;: &quot;4.1.3&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="47426:47506" ph="{&quot;pseudomap&quot;: &quot;^1.0.2&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="47538:47694" ph="{&quot;version&quot;: &quot;1.3.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="47642:47684" ph="{&quot;pify&quot;: &quot;^3.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="47715:47878" ph="{&quot;version&quot;: &quot;2.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="47819:47868" ph="{&quot;md5-o-matic&quot;: &quot;^0.1.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="47903:47993" ph="{&quot;version&quot;: &quot;0.1.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="48010:48170" ph="{&quot;version&quot;: &quot;1.1.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="48114:48160" ph="{&quot;mimic-fn&quot;: &quot;^1.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="48200:48536" ph="{&quot;version&quot;: &quot;1.1.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="48304:48352" ph="{&quot;source-map&quot;: &quot;^0.6.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="48380:48526" ph="{...}" />
-            <marker date="1546998336109" expanded="true" signature="48408:48514" ph="{&quot;version&quot;: &quot;0.6.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="48558:48648" ph="{&quot;version&quot;: &quot;1.2.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="48671:48838" ph="{&quot;version&quot;: &quot;3.0.4&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="48775:48828" ph="{&quot;brace-expansion&quot;: &quot;^1.1.7&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="48860:48951" ph="{&quot;version&quot;: &quot;0.0.10&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="48971:49302" ph="{&quot;version&quot;: &quot;0.5.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="49075:49120" ph="{&quot;minimist&quot;: &quot;0.0.8&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="49148:49292" ph="{...}" />
-            <marker date="1546998336109" expanded="true" signature="49174:49280" ph="{&quot;version&quot;: &quot;0.0.8&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="49318:49408" ph="{&quot;version&quot;: &quot;2.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="49444:49750" ph="{&quot;version&quot;: &quot;2.4.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="49548:49740" ph="{&quot;hosted-git-info&quot;: &quot;^2.1.4&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="49776:49936" ph="{&quot;version&quot;: &quot;2.0.2&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="49880:49926" ph="{&quot;path-key&quot;: &quot;^2.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="49963:50053" ph="{&quot;version&quot;: &quot;1.0.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="50071:50224" ph="{&quot;version&quot;: &quot;1.4.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="50175:50214" ph="{&quot;wrappy&quot;: &quot;1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="50246:50440" ph="{&quot;version&quot;: &quot;0.6.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="50350:50430" ph="{&quot;minimist&quot;: &quot;~0.0.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="50464:50554" ph="{&quot;version&quot;: &quot;1.0.2&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="50577:50793" ph="{&quot;version&quot;: &quot;2.1.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="50681:50783" ph="{&quot;execa&quot;: &quot;^0.7.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="50816:50906" ph="{&quot;version&quot;: &quot;1.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="50927:51084" ph="{&quot;version&quot;: &quot;2.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="51031:51074" ph="{&quot;p-try&quot;: &quot;^2.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="51106:51265" ph="{&quot;version&quot;: &quot;3.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="51210:51255" ph="{&quot;p-limit&quot;: &quot;^2.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="51284:51374" ph="{&quot;version&quot;: &quot;2.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="51400:51680" ph="{&quot;version&quot;: &quot;2.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="51504:51670" ph="{&quot;graceful-fs&quot;: &quot;^4.1.11&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="51704:51914" ph="{&quot;version&quot;: &quot;4.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="51808:51904" ph="{&quot;error-ex&quot;: &quot;^1.3.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="51939:52029" ph="{&quot;version&quot;: &quot;3.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="52059:52149" ph="{&quot;version&quot;: &quot;1.0.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="52171:52261" ph="{&quot;version&quot;: &quot;2.0.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="52284:52440" ph="{&quot;version&quot;: &quot;3.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="52388:52430" ph="{&quot;pify&quot;: &quot;^3.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="52458:52548" ph="{&quot;version&quot;: &quot;3.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="52569:52728" ph="{&quot;version&quot;: &quot;3.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="52673:52718" ph="{&quot;find-up&quot;: &quot;^3.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="52751:52841" ph="{&quot;version&quot;: &quot;1.0.2&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="52863:53112" ph="{&quot;version&quot;: &quot;3.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="52967:53102" ph="{&quot;load-json-file&quot;: &quot;^4.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="53137:53330" ph="{&quot;version&quot;: &quot;4.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="53241:53320" ph="{&quot;find-up&quot;: &quot;^3.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="53357:53518" ph="{&quot;version&quot;: &quot;1.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="53461:53508" ph="{&quot;es6-error&quot;: &quot;^4.0.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="53545:53635" ph="{&quot;version&quot;: &quot;1.6.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="53666:53756" ph="{&quot;version&quot;: &quot;2.1.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="53791:53881" ph="{&quot;version&quot;: &quot;1.0.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="53907:53997" ph="{&quot;version&quot;: &quot;4.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="54022:54212" ph="{&quot;version&quot;: &quot;0.1.3&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="54154:54202" ph="{&quot;align-text&quot;: &quot;^0.1.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="54232:54388" ph="{&quot;version&quot;: &quot;2.6.2&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="54336:54378" ph="{&quot;glob&quot;: &quot;^7.0.5&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="54413:54503" ph="{&quot;version&quot;: &quot;5.1.2&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="54523:54613" ph="{&quot;version&quot;: &quot;5.5.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="54639:54729" ph="{&quot;version&quot;: &quot;2.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="54758:54923" ph="{&quot;version&quot;: &quot;1.2.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="54862:54913" ph="{&quot;shebang-regex&quot;: &quot;^1.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="54950:55040" ph="{&quot;version&quot;: &quot;1.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="55065:55155" ph="{&quot;version&quot;: &quot;3.0.2&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="55179:55297" ph="{&quot;version&quot;: &quot;0.5.7&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="55321:55657" ph="{&quot;version&quot;: &quot;1.4.2&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="55425:55647" ph="{&quot;foreground-child&quot;: &quot;^1.5.6&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="55683:55898" ph="{&quot;version&quot;: &quot;3.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="55787:55888" ph="{&quot;spdx-expression-parse&quot;: &quot;^3.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="55927:56017" ph="{&quot;version&quot;: &quot;2.1.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="56052:56261" ph="{&quot;version&quot;: &quot;3.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="56156:56251" ph="{&quot;spdx-exceptions&quot;: &quot;^2.1.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="56291:56381" ph="{&quot;version&quot;: &quot;3.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="56407:56618" ph="{&quot;version&quot;: &quot;2.1.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="56511:56608" ph="{&quot;is-fullwidth-code-point&quot;: &quot;^2.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="56642:56804" ph="{&quot;version&quot;: &quot;4.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="56746:56794" ph="{&quot;ansi-regex&quot;: &quot;^3.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="56827:56917" ph="{&quot;version&quot;: &quot;3.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="56940:57030" ph="{&quot;version&quot;: &quot;1.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="57058:57218" ph="{&quot;version&quot;: &quot;5.4.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="57162:57208" ph="{&quot;has-flag&quot;: &quot;^3.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="57244:57521" ph="{&quot;version&quot;: &quot;5.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="57348:57511" ph="{&quot;arrify&quot;: &quot;^1.0.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="57544:58213" ph="{&quot;version&quot;: &quot;2.8.29&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="57677:57803" ph="{&quot;source-map&quot;: &quot;~0.5.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="57831:58203" ph="{...}" />
-            <marker date="1546998336109" expanded="true" signature="57854:58191" ph="{&quot;version&quot;: &quot;3.10.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="58007:58177" ph="{&quot;camelcase&quot;: &quot;^1.0.2&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="58247:58365" ph="{&quot;version&quot;: &quot;1.0.2&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="58383:58473" ph="{&quot;version&quot;: &quot;3.3.2&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="58515:58726" ph="{&quot;version&quot;: &quot;3.0.3&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="58619:58716" ph="{&quot;spdx-correct&quot;: &quot;^3.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="58745:58902" ph="{&quot;version&quot;: &quot;1.3.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="58849:58892" ph="{&quot;isexe&quot;: &quot;^2.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="58928:59018" ph="{&quot;version&quot;: &quot;2.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="59043:59161" ph="{&quot;version&quot;: &quot;0.1.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="59183:59273" ph="{&quot;version&quot;: &quot;0.0.3&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="59296:60438" ph="{&quot;version&quot;: &quot;2.1.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="59400:59486" ph="{&quot;string-width&quot;: &quot;^1.0.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="59514:60428" ph="{...}" />
-            <marker date="1546998336109" expanded="true" signature="59542:59648" ph="{&quot;version&quot;: &quot;2.1.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="59689:59882" ph="{&quot;version&quot;: &quot;1.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="59809:59868" ph="{&quot;number-is-nan&quot;: &quot;^1.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="59912:60198" ph="{&quot;version&quot;: &quot;1.0.2&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="60032:60184" ph="{&quot;code-point-at&quot;: &quot;^1.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="60226:60416" ph="{&quot;version&quot;: &quot;3.0.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="60346:60402" ph="{&quot;ansi-regex&quot;: &quot;^2.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="60458:60548" ph="{&quot;version&quot;: &quot;1.0.2&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="60579:60817" ph="{&quot;version&quot;: &quot;2.3.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="60683:60807" ph="{&quot;graceful-fs&quot;: &quot;^4.1.11&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="60835:60925" ph="{&quot;version&quot;: &quot;3.2.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="60946:61036" ph="{&quot;version&quot;: &quot;2.1.2&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="61055:62990" ph="{&quot;version&quot;: &quot;11.1.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="61160:61620" ph="{&quot;cliui&quot;: &quot;^4.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="61648:62980" ph="{...}" />
-            <marker date="1546998336109" expanded="true" signature="61671:61942" ph="{&quot;version&quot;: &quot;4.1.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="61791:61928" ph="{&quot;string-width&quot;: &quot;^2.1.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="61967:62158" ph="{&quot;version&quot;: &quot;2.1.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="62087:62144" ph="{&quot;locate-path&quot;: &quot;^2.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="62187:62416" ph="{&quot;version&quot;: &quot;2.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="62307:62402" ph="{&quot;p-locate&quot;: &quot;^2.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="62441:62626" ph="{&quot;version&quot;: &quot;1.3.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="62561:62612" ph="{&quot;p-try&quot;: &quot;^1.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="62652:62839" ph="{&quot;version&quot;: &quot;2.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="62772:62825" ph="{&quot;p-limit&quot;: &quot;^1.1.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="62862:62968" ph="{&quot;version&quot;: &quot;1.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="63016:63350" ph="{&quot;version&quot;: &quot;9.0.2&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="63120:63167" ph="{&quot;camelcase&quot;: &quot;^4.1.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="63195:63340" ph="{...}" />
-            <marker date="1546998336109" expanded="true" signature="63222:63328" ph="{&quot;version&quot;: &quot;4.1.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="63387:63563" ph="{&quot;version&quot;: &quot;4.1.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="63577:63786" ph="{&quot;version&quot;: &quot;1.4.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="63749:63780" ph="{&quot;wrappy&quot;: &quot;1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="63804:64565" ph="{&quot;version&quot;: &quot;0.6.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="64003:64071" ph="{&quot;minimist&quot;: &quot;~0.0.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="64095:64559" ph="{...}" />
-            <marker date="1546998336109" expanded="true" signature="64117:64324" ph="{&quot;version&quot;: &quot;0.0.10&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="64346:64551" ph="{&quot;version&quot;: &quot;0.0.3&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="64585:64989" ph="{&quot;version&quot;: &quot;0.8.2&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="64788:64983" ph="{&quot;deep-is&quot;: &quot;~0.1.3&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="65009:65178" ph="{&quot;version&quot;: &quot;1.0.2&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="65204:65404" ph="{&quot;version&quot;: &quot;1.0.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="65424:65675" ph="{&quot;version&quot;: &quot;1.0.6&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="65701:66482" ph="{&quot;version&quot;: &quot;5.2.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="65959:66476" ph="{&quot;detect-libc&quot;: &quot;^1.0.3&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="66502:66691" ph="{&quot;version&quot;: &quot;1.1.2&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="66721:66973" ph="{&quot;version&quot;: &quot;2.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="66987:67296" ph="{&quot;version&quot;: &quot;2.0.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="67221:67290" ph="{&quot;end-of-stream&quot;: &quot;^1.1.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="67308:67681" ph="{&quot;version&quot;: &quot;1.2.8&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="67538:67675" ph="{&quot;deep-extend&quot;: &quot;^0.6.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="67706:68215" ph="{&quot;version&quot;: &quot;2.3.6&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="67961:68209" ph="{&quot;core-util-is&quot;: &quot;~1.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="68232:68537" ph="{&quot;version&quot;: &quot;1.8.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="68491:68531" ph="{&quot;path-parse&quot;: &quot;^1.0.5&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="68558:68792" ph="{&quot;version&quot;: &quot;5.1.2&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="68808:69032" ph="{&quot;version&quot;: &quot;5.6.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="69054:69228" ph="{&quot;version&quot;: &quot;2.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="69249:69421" ph="{&quot;version&quot;: &quot;3.0.2&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="69444:69620" ph="{&quot;version&quot;: &quot;1.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="69640:70002" ph="{&quot;version&quot;: &quot;2.8.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="69886:69996" ph="{&quot;decompress-response&quot;: &quot;^3.3.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="70022:70273" ph="{&quot;version&quot;: &quot;0.6.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="70301:70661" ph="{&quot;version&quot;: &quot;0.5.9&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="70582:70655" ph="{&quot;buffer-from&quot;: &quot;^1.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="70681:70869" ph="{&quot;version&quot;: &quot;1.0.3&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="70891:71204" ph="{&quot;version&quot;: &quot;1.0.2&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="71078:71198" ph="{&quot;code-point-at&quot;: &quot;^1.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="71228:71528" ph="{&quot;version&quot;: &quot;1.1.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="71481:71522" ph="{&quot;safe-buffer&quot;: &quot;~5.1.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="71548:71777" ph="{&quot;version&quot;: &quot;3.0.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="71731:71771" ph="{&quot;ansi-regex&quot;: &quot;^2.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="71806:71994" ph="{&quot;version&quot;: &quot;2.0.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="72018:72335" ph="{&quot;version&quot;: &quot;5.5.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="72291:72329" ph="{&quot;has-flag&quot;: &quot;^3.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="72351:73110" ph="{&quot;version&quot;: &quot;1.16.3&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="72591:72713" ph="{&quot;chownr&quot;: &quot;^1.0.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="72737:73104" ph="{...}" />
-            <marker date="1546998336109" expanded="true" signature="72755:73096" ph="{&quot;version&quot;: &quot;1.0.3&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="73005:73086" ph="{&quot;end-of-stream&quot;: &quot;^1.1.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="73130:73612" ph="{&quot;version&quot;: &quot;1.6.2&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="73376:73606" ph="{&quot;bl&quot;: &quot;^1.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="73631:73861" ph="{&quot;version&quot;: &quot;1.1.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="73889:74094" ph="{&quot;version&quot;: &quot;2.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="74114:74303" ph="{&quot;version&quot;: &quot;1.0.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="74320:74834" ph="{&quot;version&quot;: &quot;7.0.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="74579:74828" ph="{&quot;arrify&quot;: &quot;^1.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="74849:75090" ph="{&quot;version&quot;: &quot;1.9.3&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="75106:75678" ph="{&quot;version&quot;: &quot;5.11.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="75303:75672" ph="{&quot;babel-code-frame&quot;: &quot;^6.22.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="75695:75997" ph="{&quot;version&quot;: &quot;2.29.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="75956:75991" ph="{&quot;tslib&quot;: &quot;^1.8.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="76019:76254" ph="{&quot;version&quot;: &quot;0.6.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="76207:76248" ph="{&quot;safe-buffer&quot;: &quot;^5.0.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="76274:76523" ph="{&quot;version&quot;: &quot;0.3.2&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="76477:76517" ph="{&quot;prelude-ls&quot;: &quot;~1.1.2&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="76543:76794" ph="{&quot;version&quot;: &quot;3.2.2&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="76813:77532" ph="{&quot;version&quot;: &quot;3.4.9&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="77100:77172" ph="{&quot;commander&quot;: &quot;~2.17.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="77196:77526" ph="{...}" />
-            <marker date="1546998336109" expanded="true" signature="77219:77518" ph="{&quot;version&quot;: &quot;2.17.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="77546:78040" ph="{&quot;version&quot;: &quot;0.10.3&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="77738:77775" ph="{&quot;inherits&quot;: &quot;2.0.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="77799:78034" ph="{...}" />
-            <marker date="1546998336109" expanded="true" signature="77821:78026" ph="{&quot;version&quot;: &quot;2.0.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="78064:78242" ph="{&quot;version&quot;: &quot;1.0.2&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="78257:78553" ph="{&quot;version&quot;: &quot;1.3.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="78512:78547" ph="{&quot;isexe&quot;: &quot;^2.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="78576:78752" ph="{&quot;version&quot;: &quot;1.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="78772:79071" ph="{&quot;version&quot;: &quot;1.1.3&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="79018:79065" ph="{&quot;string-width&quot;: &quot;^1.0.2 || 2&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="79089:79274" ph="{&quot;version&quot;: &quot;1.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="79290:79452" ph="{&quot;version&quot;: &quot;1.0.2&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="79467:79627" ph="{&quot;version&quot;: &quot;4.0.1&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="79639:79812" ph="{&quot;version&quot;: &quot;2.0.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="79828:80143" ph="{&quot;version&quot;: &quot;5.1.0&quot;...}" />
-            <marker date="1546998336109" expanded="true" signature="80066:80137" ph="{&quot;nan&quot;: &quot;^2.10.0&quot;...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/lib/test" />
-    <entry file="file://$PROJECT_DIR$/lib/Serializers.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="285">
-          <caret line="32" column="5" lean-forward="true" selection-start-line="32" selection-start-column="5" selection-end-line="32" selection-end-column="5" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/lib/core/Broker.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tsconfig.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="4" column="26" lean-forward="true" selection-start-line="4" selection-start-column="26" selection-end-line="4" selection-end-column="26" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/core/BackChannel/BackChannel.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="4" column="0" lean-forward="false" selection-start-line="4" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/core/Channel/Channel.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="45">
-          <caret line="3" column="0" lean-forward="false" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/core/Channel/MessageFactory.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="1" column="0" lean-forward="false" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/core/FrontChannel/FrontChannel.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="45">
-          <caret line="3" column="0" lean-forward="false" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/core/FrontChannel/FrontMessages.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="795">
-          <caret line="53" column="34" lean-forward="false" selection-start-line="53" selection-start-column="34" selection-end-line="53" selection-end-column="34" />
-          <folding>
-            <element signature="e#0#132#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/core/FrontChannel/index.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="1" column="28" lean-forward="false" selection-start-line="1" selection-start-column="28" selection-end-line="1" selection-end-column="28" />
+        <state relative-caret-position="76">
+          <caret line="74" column="13" lean-forward="false" selection-start-line="74" selection-start-column="13" selection-end-line="74" selection-end-column="13" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/core/Client.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1665">
-          <caret line="111" column="23" lean-forward="false" selection-start-line="111" selection-start-column="23" selection-end-line="111" selection-end-column="23" />
+        <state relative-caret-position="185">
+          <caret line="128" column="15" lean-forward="false" selection-start-line="128" selection-start-column="15" selection-end-line="128" selection-end-column="15" />
+          <folding>
+            <element signature="e#0#45#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/Client.test.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="196">
+          <caret line="345" column="19" lean-forward="false" selection-start-line="345" selection-start-column="19" selection-end-line="345" selection-end-column="19" />
+          <folding>
+            <element signature="e#0#39#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/BackMaster.test.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="136">
+          <caret line="18" column="4" lean-forward="false" selection-start-line="18" selection-start-column="4" selection-end-line="18" selection-end-column="4" />
+          <folding>
+            <element signature="e#0#37#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/core/Back/BackMaster/MasterChannel.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="10" column="48" lean-forward="true" selection-start-line="10" selection-start-column="48" selection-end-line="10" selection-end-column="48" />
           <folding>
             <element signature="e#0#44#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/core/types.ts">
+    <entry file="file://$PROJECT_DIR$/src/core/Back/BackChannel/BackChannel.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-105">
-          <caret line="16" column="37" lean-forward="false" selection-start-line="16" selection-start-column="37" selection-end-line="16" selection-end-column="37" />
+        <state relative-caret-position="136">
+          <caret line="281" column="27" lean-forward="false" selection-start-line="281" selection-start-column="23" selection-end-line="281" selection-end-column="27" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/ChannelCluster.ts">
+    <entry file="file://$PROJECT_DIR$/src/core/Front/FrontMaster/MasterChannel.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="17" column="1" lean-forward="true" selection-start-line="17" selection-start-column="1" selection-end-line="17" selection-end-column="1" />
+        <state relative-caret-position="185">
+          <caret line="154" column="13" lean-forward="true" selection-start-line="154" selection-start-column="13" selection-end-line="154" selection-end-column="13" />
           <folding>
-            <element signature="n#!!doc" expanded="true" />
-            <element signature="e#292#339#0" expanded="true" />
+            <element signature="e#0#39#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/README.md">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="195">
-          <caret line="13" column="35" lean-forward="true" selection-start-line="13" selection-start-column="35" selection-end-line="13" selection-end-column="35" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/LICENSE">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/package.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="23" column="19" lean-forward="true" selection-start-line="23" selection-start-column="19" selection-end-line="23" selection-end-column="19" />
-          <folding />
         </state>
       </provider>
     </entry>

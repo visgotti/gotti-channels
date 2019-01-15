@@ -1,233 +1,184 @@
 import {clearInterval} from "timers";
-import { ChannelCluster } from '../src/ChannelCluster';
 import * as msgpack from 'notepack.io';
 
-const { TEST_CLUSTER_OPTIONS, makeRandomMessages, arrayAverage, getRandomChannelIds, formatBytes } = require('./testHelpers');
-const options = TEST_CLUSTER_OPTIONS;
-import * as assert from 'assert';
-import * as mocha from 'mocha'
-import * as fs from 'fs';
-import * as path from 'path';
+import FrontChannel from '../src/core/Front/FrontChannel';
+import BackChannel from '../src/core/Back/BackChannel';
 
-let frontServers, frontChannels, backServers, backChannels, channelsById;
+import { FrontMasterChannel } from '../src/core/Front/FrontMaster/MasterChannel';
+import { BackMasterChannel } from '../src/core/Back/BackMaster/MasterChannel';
+
+import { Messenger } from 'centrum-messengers/dist/core/Messenger';
+
+import * as assert from 'assert';
+import * as mocha from 'mocha';
+
+
+const TEST_FRONT_URI = 'tcp://127.0.0.1:4000';
+const TEST_BACK_URI = 'tcp://127.0.0.1:5000';
 
 describe('BackChannel', function() {
-    let cluster: ChannelCluster;
 
-    before('Creates Channel Cluster and connects all the front servers.', function(done) {
-        this.timeout(10000);
-        cluster = new ChannelCluster(options);
-        ({ frontServers, frontChannels, backServers, backChannels, channelsById } = cluster.createChannels());
+    let FrontMaster: FrontMasterChannel;
+    let BackMaster: BackMasterChannel;
+    let FrontChannel1: FrontChannel;
+    let FrontChannel2: FrontChannel;
+    let BackChannel1: BackChannel;
+    let BackChannel2; BackChannel;
+
+    before('Initialize a centrum messenger for the Front Channels and the Back Channels', (done) => {
+        const frontMessenger = new Messenger({ id: 'testFront', publish: { pubSocketURI: TEST_FRONT_URI } , subscribe: { pubSocketURIs: [TEST_BACK_URI] } });
+        const backMessenger = new Messenger({ id: 'testBack', publish: { pubSocketURI: TEST_BACK_URI } , subscribe: { pubSocketURIs: [TEST_FRONT_URI] } });
+
+        FrontMaster = new FrontMasterChannel([0, 1], 2, 0, frontMessenger);
+        BackMaster = new BackMasterChannel([0, 1], 0, backMessenger);
+
+        FrontChannel1 = FrontMaster.frontChannels[0];
+        FrontChannel2 = FrontMaster.frontChannels[1];
+        BackChannel1 = BackMaster.backChannels[0];
+        BackChannel2 = BackMaster.backChannels[1];
+
+        assert.strictEqual(FrontChannel1.channelId, 0);
+        assert.strictEqual(FrontChannel2.channelId, 1);
+
+        assert.strictEqual(BackChannel1.channelId, 0);
+        assert.strictEqual(BackChannel2.channelId, 1);
 
         setTimeout(() => {
-            cluster.connectAll().then(connected => {
-                if(connected) {
-                    done();
-                }
-            });
-        }, 250);
+            done();
+        }, 200);
+    });
+
+    afterEach(() => {
+        FrontChannel1.onConnected(() => {});
+        FrontChannel2.onConnected(() => {});
     });
 
     after(done => {
-        cluster.closeAll();
+        FrontChannel1.close();
+        FrontChannel2.close();
+        BackChannel1.close();
+        BackChannel2.close();
         setTimeout(() => {
             done();
-        }, 50);
+        }, 200);
     });
-
-    describe('backChannel getters', () => {
-        it('backChannel.mirroredFrontUids has one for each front server made.', (done) => {
-            backChannels.forEach(backChannel => {
-                assert.strictEqual(backChannel.mirroredFrontUids.length, options.frontServers)
-            });
+    describe('BackChannel getters', () => {
+        it('BackChannel.mirroredFrontUids is 0 when theres no connections', (done) => {
+            assert.strictEqual(BackChannel1.mirroredFrontUids.length, 0);
             done();
         });
-        it('backChannel.connectedFrontsData has data for each frontUid', (done) => {
-            backChannels.forEach(backChannel => {
-                const dataMap = backChannel.connectedFrontsData;
-
-                const keys = Array.from(dataMap.keys());
-
-                assert.strictEqual(keys.length, frontChannels.length);
+        it('BackChannel.mirroredFrontUids is 1 since each front channel is connected', (done) => {
+            FrontChannel1.connect().then(() => {
+                assert.strictEqual(BackChannel1.mirroredFrontUids.length, 1);
+                assert.strictEqual(BackChannel2.mirroredFrontUids.length, 0);
+                FrontChannel2.connect().then(() =>{
+                    assert.strictEqual(BackChannel1.mirroredFrontUids.length, 1);
+                    done();
+               })
             });
+        });
+        it('BackChannel.connectedFrontsData has data for each frontUid regardless of it being a mirror', (done) => {
+            const dataMap = BackChannel1.connectedFrontsData;
+
+            const keys = Array.from(dataMap.keys());
+
+            assert.strictEqual(keys.length, 2);
             done();
         });
     });
 
-    describe('backChannel.send', () => {
+    describe('BackChannel.send', () => {
         it('tests it sends to correct frontUid with correct data', (done) => {
-            frontChannels[0].onMessage((message, channelId) => {
-                assert.strictEqual(channelId, backChannels[0].channelId);
+            FrontChannel1.onMessage((message, channelId) => {
+                assert.strictEqual(channelId, BackChannel1.channelId);
                 assert.deepStrictEqual(message, { "foo": "bar"});
                 done();
             });
-            backChannels[0].send({ "foo": "bar"}, frontChannels[0].frontUid)
+            BackChannel1.send({ "foo": "bar"}, FrontChannel1.frontUid)
         });
     });
 
-    describe('backChannel.broadcast', () => {
+    describe('BackChannel.broadcast', () => {
         it('sends to all front channels if no second parameter is passed in.', (done) => {
             let actualReceived = 0;
             // each front channel should get it
-            const expectedReceived = frontChannels.length;
+            const expectedReceived = 2;
 
-            frontChannels.forEach(frontChannel => {
-                frontChannel.onMessage((message, channelId) => {
-                    assert.strictEqual(channelId, backChannels[0].channelId);
-                    actualReceived += message;
-                    if(actualReceived === expectedReceived) {
-                        setTimeout(() => {
-                            assert.strictEqual(actualReceived, expectedReceived);
-                            done();
-                        }, 50)
-                    }
-                });
+            FrontChannel1.onMessage((message, channelId) => {
+                assert.strictEqual(channelId, BackChannel1.channelId);
+                actualReceived += message;
+                if(actualReceived === expectedReceived) {
+                    setTimeout(() => {
+                        assert.strictEqual(actualReceived, expectedReceived);
+                        done();
+                    }, 50)
+                }
             });
-            backChannels[0].broadcast(1);
+
+            FrontChannel2.onMessage((message, channelId) => {
+                assert.strictEqual(channelId, BackChannel1.channelId);
+                actualReceived += message;
+                if(actualReceived === expectedReceived) {
+                    setTimeout(() => {
+                        assert.strictEqual(actualReceived, expectedReceived);
+                        done();
+                    }, 50)
+                }
+            });
+            BackChannel1.broadcast(1);
         });
 
         it('only sends to front channels specified by uid as the second parameter.', (done) => {
             let actualReceived = 0;
 
-            // get random front channels to send to.
-            const randomUids = frontChannels.reduce((uids, frontChannel) => {
-                if(Math.random() > .8) {
-                    uids.push(frontChannel.frontUid)
-                }
-                return uids
-            }, []);
-
-            frontChannels.forEach(frontChannel => {
-                frontChannel.onMessage((message, channelId) => {
-                    actualReceived += message;
-                    assert.strictEqual(channelId, backChannels[0].channelId);
-                    if(actualReceived === randomUids.length) {
-                        setTimeout(() => {
-                            assert.strictEqual(actualReceived, randomUids.length);
-                            done();
-                        }, 50)
-                    }
-                });
+            FrontChannel2.onMessage((message, channelId) => {
+                actualReceived+=message;
+                assert.strictEqual(channelId, BackChannel1.channelId)
+                assert.strictEqual(actualReceived, 1);
+                done();
             });
 
-            backChannels[0].broadcast(1, randomUids);
+            BackChannel1.broadcast(1, [FrontChannel2.frontUid]);
         });
     });
 
-    describe('backChannel.broadcastLinked with NO LINKED FRONTS', () => {
-        it('no channels receive the broadcast', (done) => {
+    describe('BackChannel.broadcastLinked', () => {
+        it('no channels receive the broadcast since none are linked', (done) => {
             let actualReceived = 0;
             let expectedReceive = 0;
 
-            frontChannels.forEach(frontChannel => {
-                frontChannel.onMessage((message, channelId) => {
-                    assert.strictEqual(frontChannel.channelId, channelId);
-                    assert.strictEqual(frontChannel.channelId, backChannels[0].channelId);
-                    actualReceived+=message;
-                });
+            FrontChannel1.onMessage((message, channelId) => {
+                assert.strictEqual(FrontChannel1.channelId, channelId);
+                assert.strictEqual(FrontChannel1.channelId, BackChannel1.channelId);
+                actualReceived+=message;
             });
-            backChannels[0].broadcastLinked(1);
+            BackChannel1.broadcastLinked(1);
 
             setTimeout(() => {
                 assert.strictEqual(actualReceived, expectedReceive);
                 done();
             }, 100);
         });
-    });
-
-    describe('backChannel.broadcastLinked with LINKED FRONT', () => {
-        it('sends to all front channels since theyre all connected as well as a state broadcast when they connect', (done) => {
-            backChannels[0].setState({ "foo": "bar" });
-
-            setTimeout(() => {
-
-            }, 1000);
-
-            let expectedReceive = options.frontServers;
-
-            let broadcastsReceived = 0;
-            let statesReceived = 0;
-
-            frontChannels.forEach(frontChannel => {
-                if(frontChannel.channelId === backChannels[0].channelId) {
-                    frontChannel.link();
-                }
-                frontChannel.onMessage((message, channelId) => {
-                    assert.strictEqual(frontChannel.channelId, channelId);
-                    assert.strictEqual(frontChannel.channelId, backChannels[0].channelId);
-                    broadcastsReceived+=message;
-                });
-                frontChannel.onSetState((newState) => {
-                    statesReceived+=1;
-                });
-            });
-
-            setTimeout(() => {
-                backChannels[0].broadcastLinked(1);
-            }, 100);
-
-            setTimeout(() => {
-                assert.strictEqual(broadcastsReceived, expectedReceive);
-                assert.strictEqual(statesReceived, expectedReceive);
-                done();
-            }, 200);
-        });
-    });
-
-    describe('backChannel.setState', () => {
-        it('sets and gets state correctly', (done) => {
-            backChannels[0].setState({ 'foo': 'bar' });
-            assert.deepStrictEqual(backChannels[0].state, {'foo':'bar'});
-            done();
-        })
-    });
-
-    describe('backChannel.sendState', () => {
-        it('throws if state is null', (done) => {
-            backChannels[0].setState(null);
-            assert.throws(() => { backChannels[0].sendState() });
-            done();
-        });
-        it('sends state to linked front channels', (done) => {
+        it('receives the broadcast when linked', (done) => {
             let actualReceived = 0;
-            let expectedReceive = options.frontServers;
+            let expectedReceive = 1;
 
+            BackChannel1.setState({ "foo": "bar" });
 
-            backChannels[0].setState({ "foo": "bar" });
+            FrontChannel1.onMessage((message, channelId) => {
+                assert.strictEqual(FrontChannel1.channelId, channelId);
+                assert.strictEqual(FrontChannel1.channelId, BackChannel1.channelId);
+                actualReceived+=message;
 
-            frontChannels.forEach(frontChannel => {
-                if(frontChannel.channelId === backChannels[0].channelId) {
-                    backChannels[0].sendState(frontChannel.frontUid);
-                }
-                frontChannel.onSetState(state => {
-                   actualReceived++;
-                   if(actualReceived === expectedReceive) {
-                       setTimeout(() => {
-                           assert.strictEqual(actualReceived, expectedReceive);
-                           done();
-                       }, 100)
-                   }
-                });
+                setTimeout(() => {
+                    assert.strictEqual(actualReceived, expectedReceive);
+                    done();
+                }, 100);
             });
-        });
-    });
-    describe('backChannel.broadcastPatch', () => {
-        it('throws if state is null', (done) => {
-            backChannels[0].setState(null);
-            assert.throws(() => { backChannels[0].broadcastPatch() });
-            done();
-        });
-        it('returns false if theres no state differences', (done) => {
-            backChannels[0].setState({ "foo": "bar" });
-            backChannels[0].setState({ "foo": "bar" });
-            assert.strictEqual(backChannels[0].broadcastPatch(), false);
-            done();
-        });
-        it('returns true if state was changed', (done) => {
-            backChannels[0].setState({ "foo": "bar" });
-            backChannels[0].state.foo = "baz";
-            assert.strictEqual(backChannels[0].broadcastPatch(), true);
-            done();
+
+            FrontChannel1.link().then(() => {
+                BackChannel1.broadcastLinked(1);
+            });
         });
     });
 });
