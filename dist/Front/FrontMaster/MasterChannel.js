@@ -136,10 +136,8 @@ class FrontMasterChannel extends Channel_1.Channel {
             }
         });
     }
-    close() {
-        for (let i = 0; i < this.frontChannelIds.length; i++) {
-            this.frontChannels[this.frontChannelIds[i]].close();
-        }
+    disconnect() {
+        this.messenger.close();
     }
 }
 exports.FrontMasterChannel = FrontMasterChannel;

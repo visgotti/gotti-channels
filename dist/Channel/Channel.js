@@ -8,8 +8,5 @@ class Channel extends EventEmitter {
         this.messenger = messenger;
         this.serverId = messenger.serverId;
     }
-    close() {
-        this.messenger.close();
-    }
 }
 exports.Channel = Channel;

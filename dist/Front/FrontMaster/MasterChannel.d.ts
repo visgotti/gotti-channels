@@ -40,5 +40,5 @@ export declare class FrontMasterChannel extends Channel {
      * initializes needed message factories for front channels.
      */
     private initializeMessageFactories;
-    close(): void;
+    disconnect(): void;
 }

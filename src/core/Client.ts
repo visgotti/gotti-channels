@@ -41,6 +41,7 @@ class Client {
     public async connectToChannel(channelId: string) {
         try {
             const channel = this.masterChannel.frontChannels[channelId];
+            if(!channel) throw new Error(`Invalid channelId ${channelId}`);
             const encodedState = await channel.connectClient(this);
             this.connectedChannels.set(channel.channelId, channel);
             this.addStateUpdate(channel.channelId, encodedState, STATE_UPDATE_TYPES.SET);
@@ -58,7 +59,7 @@ class Client {
     public async setProcessorChannel(channelId: string) {
         try {
             const channel = this.masterChannel.frontChannels[channelId];
-            if(!channel) throw new Error('Invalid channelId');
+            if(!channel) throw new Error(`Invalid channelId ${channelId}`);
             if(!(this.connectedChannels.has(channelId))) {
                 await this.connectToChannel(channelId);
                 this.processorChannel = channel;

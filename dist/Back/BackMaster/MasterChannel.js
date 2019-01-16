@@ -164,10 +164,8 @@ class BackMasterChannel extends Channel_1.Channel {
         this.push = push;
         this.pull = pull;
     }
-    close() {
-        for (let i = 0; i < this.backChannelIds.length; i++) {
-            this.backChannels[this.backChannelIds[i]].close();
-        }
+    disconnect() {
+        this.messenger.close();
     }
 }
 exports.BackMasterChannel = BackMasterChannel;

@@ -93,7 +93,7 @@ class MessageFactory {
         });
         pub.register = () => {
             pub.publisher = this.messenger.getOrCreatePublish(protocol, null, encoder);
-            pub.unregister = (...args) => {
+            pub.unregister = () => {
                 this.messenger.removePublish(protocol);
             };
         };
@@ -141,7 +141,7 @@ class MessageFactory {
         let pull = {};
         pull.register = (from, onSubscriptionHandler) => {
             pull.subscriber = this.messenger.createSubscription(protocolFactory(from), protocolFactory(from), onSubscriptionHandler, decoder);
-            pull.unregister = (from) => {
+            pull.unregister = () => {
                 this.messenger.removeAllSubscriptionsWithName(protocolFactory(from));
             };
         };

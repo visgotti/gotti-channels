@@ -1,6 +1,6 @@
 {
   "name": "centrum",
-  "version": "0.2.01",
+  "version": "0.2.02",
   "description": "Isolated channel communication for centrum servers.",
   "main": "./dist/index.js",
   "scripts": {

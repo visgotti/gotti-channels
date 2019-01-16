@@ -67,5 +67,5 @@ export declare class BackMasterChannel extends Channel {
      * initializes needed message factories for front channels.
      */
     private initializeMessageFactories;
-    close(): void;
+    disconnect(): void;
 }
