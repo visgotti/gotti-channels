@@ -42,9 +42,13 @@ class BackMessages extends MessageFactory_1.ChannelMessageFactory {
     initializePulls() {
         this.LINK = this.pullCreator(MessageFactory_1.Protocol.LINK);
         this.UNLINK = this.pullCreator(MessageFactory_1.Protocol.UNLINK);
+        this.ADD_CLIENT_WRITE = this.pullCreator(MessageFactory_1.Protocol.ADD_CLIENT_WRITE);
+        this.REMOVE_CLIENT_WRITE = this.pullCreator(MessageFactory_1.Protocol.REMOVE_CLIENT_WRITE);
         return {
             LINK: this.LINK,
             UNLINK: this.UNLINK,
+            ADD_CLIENT_WRITE: this.ADD_CLIENT_WRITE,
+            REMOVE_CLIENT_WRITE: this.REMOVE_CLIENT_WRITE,
         };
     }
 }

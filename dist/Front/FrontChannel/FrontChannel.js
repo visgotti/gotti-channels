@@ -18,9 +18,9 @@ class FrontChannel extends Channel_1.Channel {
         this.master = master;
         this.CONNECTION_STATUS = types_1.CONNECTION_STATUS.DISCONNECTED;
         this.connectedChannelIds = new Set();
-        this.clientConnectedTimeouts = new Map();
-        this.connectedClients = new Map();
-        this.connectedClientUids = [];
+        this.clientLinkTimeouts = new Map();
+        this.linkedClients = new Map();
+        this.listeningClientUids = [];
         this.linked = false;
         // front id is used for 1:1 back to front communication.
         this.frontUid = `${channelId}-${this.master.frontMasterIndex.toString()}`;
@@ -33,29 +33,6 @@ class FrontChannel extends Channel_1.Channel {
         this.registerPreConnectedPubs();
     }
     ;
-    /**
-     *
-     * @param client
-     * @param timeout
-     */
-    connectClient(client, timeout) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                if (!(client.uid))
-                    throw new Error('Invalid client uid.');
-                if (!(this.clientCanConnect(client.uid)))
-                    throw new Error('Client is already in connection state.');
-                const state = yield this._connectClient(client.uid);
-                this.connectedClients.set(client.uid, client);
-                this.connectedClientUids.push(client.uid);
-                return state;
-            }
-            catch (err) {
-                throw err;
-            }
-            // add client to awaiting connections with a callback to initialize the client with the state
-        });
-    }
     /**
      * sets the onConnectedHandler function
      * @param handler - function that gets executed when a channel succesfully connects to a backChannel.
@@ -90,52 +67,81 @@ class FrontChannel extends Channel_1.Channel {
      * the parameter will be kept in a lookup on the back master so it can keep track of which
      * front master a client lives on. This allows the ability to send direct messages to the client
      * from the back.
-     * @param clientUid (optional)
+     * @param client - Centrum client instance
+     * @param options (optional) if you want to send data as a client connects
      * @returns {Promise<T>}
      */
-    link(clientUid = false) {
+    linkClient(client, options) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!(this.linked)) {
+            const clientUid = client.uid;
+            if (!(this.linked))
                 this.linked = true;
-            }
-            this.master.linkChannel(this.backMasterIndex);
-            this.pub.LINK(clientUid);
+            if (!(this.clientCanLink(clientUid)))
+                throw new Error('Client is already in connection state.');
+            // set timeout for client linking
+            this.clientLinkTimeouts.set(clientUid, setTimeout(() => {
+                this.clientLinkTimeouts.delete(clientUid);
+                this.emitClientLinked(clientUid, null, { error: `Client ${clientUid} connection request to ${this.channelId} timed out` });
+            }, this.clientTimeout));
+            options ? this.pub.LINK([clientUid, options]) : this.pub.LINK([clientUid]);
             return new Promise((resolve, reject) => {
                 // if the link is for a uid it registers the event with the uid in it.
-                const linkedEventId = clientUid ? `linked_${clientUid}` : 'linked';
-                this.once(linkedEventId, (data) => {
-                    if (data.error) {
-                        return reject(data.error);
+                const linkedEventId = `linked_${clientUid}`;
+                this.once(linkedEventId, (encodedState, responseOptions) => {
+                    timers_1.clearTimeout(this.clientLinkTimeouts.get(clientUid));
+                    this.clientLinkTimeouts.delete(clientUid);
+                    if (responseOptions && responseOptions.error) {
+                        return reject(responseOptions.error);
                     }
-                    else {
-                        return resolve(data.state);
-                    }
+                    this.linkedClients.set(clientUid, client);
+                    this.listeningClientUids.push(clientUid);
+                    this.master.linkChannel(this.backMasterIndex);
+                    return resolve({ encodedState, responseOptions });
                 });
             });
         });
     }
     /**
-     * sends unlink message, if a clientUid is provided it will
-     * decrement or remove the client lookup data on the back,
-     * if the clientUid is omitted then it will send an unlink message
-     * with no param notifying the back channel that the front channel
-     * does not need updates from back channel at all and the link
-     * relationship will be deleted.
+     * sends unlink message, it will decrement or remove the client lookup data on the back,
+     * the back channel checks if there are any clients left with a link to the front master
+     * and if not it will stop keeping track of it until it receives another link.
      * @param clientUid
      */
-    unlink(clientUid = false) {
-        if (clientUid !== false) {
-            this.pub.UNLINK(clientUid);
-            return;
+    unlinkClient(clientUid, options) {
+        if (this.linkedClients.has(clientUid)) {
+            const index = this.listeningClientUids.indexOf(clientUid);
+            if (index > -1) {
+                this.listeningClientUids.splice(index, 1);
+            }
+            this.linkedClients.get(clientUid).onChannelDisconnect(this.channelId);
+            this.linkedClients.delete(clientUid);
         }
-        // if it gets here no clientUid was provided and means that we are unlinking the channel.
-        this.linked = false;
-        this.master.unlinkChannel(this.backMasterIndex);
-        this.pub.UNLINK(false);
-        // make sure all clients become unlinked with it.
-        if (this.clientConnectedTimeouts.size > 0 || this.connectedClients.size > 0) {
-            this.disconnectAllClients();
+        else if (this.clientLinkTimeouts.has(clientUid)) {
+            timers_1.clearTimeout(this.clientLinkTimeouts.get(clientUid));
+            this.clientLinkTimeouts.delete(clientUid);
         }
+        options ? this.pub.UNLINK([clientUid, options]) : this.pub.UNLINK([clientUid]);
+        if (this.linkedClients.size === 0 && this.clientLinkTimeouts.size === 0) {
+            this.linked = false;
+            this.master.unlinkChannel(this.backMasterIndex);
+        }
+    }
+    /**
+     * sends notification to mirror back channel that it will be receiving messages
+     * from client to process.
+     * @param clientUid
+     * @param options
+     */
+    addClientWrite(clientUid, options) {
+        this.pub.ADD_CLIENT_WRITE([clientUid, options]);
+    }
+    /**
+     * sends notification to mirror back channel that it will no longer
+     * be receiving messages from client.
+     * @param clientUid
+     */
+    removeClientWrite(clientUid) {
+        this.pub.REMOVE_CLIENT_WRITE([clientUid]);
     }
     /**
      * adds message to the front master's message queue. These queue up and will then send
@@ -225,50 +231,13 @@ class FrontChannel extends Channel_1.Channel {
             isLinked: this.linked,
         };
     }
-    // business logic for connecting client
-    _connectClient(uid) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                // setup a timeout if client takes too long to receive successful connect
-                this.clientConnectedTimeouts.set(uid, setTimeout(() => {
-                    this.clientConnectedTimeouts.delete(uid);
-                    this.emitClientLinked(uid, { error: `Client ${uid} connection request to ${this.channelId} timed out` });
-                }, this.clientTimeout));
-                const state = yield this.link(uid);
-                timers_1.clearTimeout(this.clientConnectedTimeouts.get(uid));
-                this.clientConnectedTimeouts.delete(uid);
-                return state;
-            }
-            catch (err) {
-                this.emitClientLinked(uid, err.message);
-            }
-        });
-    }
-    emitClientLinked(clientUid, data) {
-        this.emit(`linked_${clientUid}`, data);
-    }
-    disconnectClient(clientUid) {
-        if (this.connectedClients.has(clientUid)) {
-            const index = this.connectedClientUids.indexOf(clientUid);
-            if (index > -1) {
-                this.connectedClientUids.splice(index, 1);
-            }
-            this.connectedClients.get(clientUid).onChannelDisconnect(this.channelId);
-            this.connectedClients.delete(clientUid);
-        }
-        else if (this.clientConnectedTimeouts.has(clientUid)) {
-            timers_1.clearTimeout(this.clientConnectedTimeouts.get(clientUid));
-            this.clientConnectedTimeouts.delete(clientUid);
-        }
-        this.unlink(clientUid);
-        if (this.connectedClients.size === 0 && this.clientConnectedTimeouts.size === 0) {
-            this.unlink();
-        }
+    emitClientLinked(clientUid, encodedState, responseOptions) {
+        this.emit(`linked_${clientUid}`, encodedState, responseOptions);
     }
     _onPatchState(patch) {
         if (!this.linked)
             return;
-        for (let client of this.connectedClients.values()) {
+        for (let client of this.linkedClients.values()) {
             client.addStateUpdate(this.channelId, patch, types_1.STATE_UPDATE_TYPES.PATCH);
         }
         this.onPatchStateHandler(patch);
@@ -305,26 +274,16 @@ class FrontChannel extends Channel_1.Channel {
                 //TODO: maybe this should be handled in a seperate onMirroredMessage or something similar.. will do if it seems needed.
                 this._onMessage(message, this.channelId);
             });
-            this.sub.ACCEPT_LINK.register((response) => {
-                // check if the accepted link was for a client.
-                let data = {};
-                if (response.error) {
-                    data.error = response.error;
-                }
-                else {
-                    data.error = null;
-                    const state = Buffer.from(response.encodedState.data);
-                    data.state = state;
-                }
-                if (response['clientUid'] !== undefined) {
-                    this.emitClientLinked(response.clientUid, data);
-                }
-                else {
-                    this.emit('linked', data);
-                }
+            this.sub.ACCEPT_LINK.register((data) => {
+                // data[0] - encodedState
+                // data[1] - clientUid
+                // data[2] - responseOptions
+                this.emitClientLinked(data[1], data[0], data[2]);
             });
             this.pub.LINK.register();
             this.pub.UNLINK.register();
+            this.pub.ADD_CLIENT_WRITE.register();
+            this.pub.REMOVE_CLIENT_WRITE.register();
         }
         this.push.SEND_BACK.register(backChannelId);
         this.emit('connected', backChannelId, backMasterIndex);
@@ -380,8 +339,8 @@ class FrontChannel extends Channel_1.Channel {
         this.push = push;
         this.sub = sub;
     }
-    clientCanConnect(clientUid) {
-        return (!(this.clientConnectedTimeouts.has(clientUid)) && !(this.connectedClients.has(clientUid)));
+    clientCanLink(clientUid) {
+        return (!(this.clientLinkTimeouts.has(clientUid)) && !(this.linkedClients.has(clientUid)));
     }
 }
 exports.default = FrontChannel;

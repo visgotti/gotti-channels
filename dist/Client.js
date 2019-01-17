@@ -11,16 +11,24 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const types_1 = require("./types");
 class Client {
     constructor(uid, masterChannel) {
+        if (!(uid))
+            throw new Error('Invalid client uid.');
         this.uid = uid;
         this.masterChannel = masterChannel;
         this.masterChannel.clientConnected(this);
-        this.processorChannel = null;
-        this.connectedChannels = new Map();
+        this._processorChannel = null;
+        this.linkedChannels = new Map();
         this._queuedEncodedUpdates = {};
         this.state = null;
     }
     get queuedEncodedUpdates() {
         return this._queuedEncodedUpdates;
+    }
+    get processorChannel() {
+        return this._processorChannel ? this._processorChannel.channelId : null;
+    }
+    isLinkedToChannel(channelId) {
+        return this.linkedChannels.has(channelId);
     }
     /**
      * method to be overridden to handle direct client messages from back channels.
@@ -33,15 +41,18 @@ class Client {
     /**
      * Sets connected channel of client also links it.
      * @param channelId
+     * @param options to send to back channel
      */
-    connectToChannel(channelId) {
+    linkChannel(channelId, options) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const channel = this.masterChannel.frontChannels[channelId];
-                const encodedState = yield channel.connectClient(this);
-                this.connectedChannels.set(channel.channelId, channel);
-                this.addStateUpdate(channel.channelId, encodedState, types_1.STATE_UPDATE_TYPES.SET);
-                return encodedState;
+                if (!channel)
+                    throw new Error(`Invalid channelId ${channelId}`);
+                const response = yield channel.linkClient(this, options);
+                this.linkedChannels.set(channelId, channel);
+                this.addStateUpdate(channelId, response.encodedState, types_1.STATE_UPDATE_TYPES.SET);
+                return response;
             }
             catch (err) {
                 throw err;
@@ -49,33 +60,33 @@ class Client {
         });
     }
     /**
-     * this sets the channel where client messages get processed.
-     * if the client isnt connected, it will call the connect method first.
-     * @param channel
+     * setProcessorChannel will set the channel in which a client will relay its messages through.
+     * The processor channel will forward the clients messages to the mirrored back channel in which
+     * it will process the message and wind up sending back messages/state updates to any linked clients.
+     * @param {string} channelId - channelId to set as processor channel.
+     * @param {boolean=false} unlinkOld - if you want to unlink from the old processor channel after you set the new one.
+     * @returns {boolean}
      */
-    setProcessorChannel(channelId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const channel = this.masterChannel.frontChannels[channelId];
-                if (!channel)
-                    throw new Error('Invalid channelId');
-                if (!(this.connectedChannels.has(channelId))) {
-                    yield this.connectToChannel(channelId);
-                    this.processorChannel = channel;
-                    return true;
-                }
-                else {
-                    this.processorChannel = channel;
-                    return true;
-                }
-            }
-            catch (err) {
-                throw err;
-            }
-        });
+    setProcessorChannel(channelId, unlinkOld = false, options) {
+        const channel = this.masterChannel.frontChannels[channelId];
+        // confirm channel id was valid
+        if (!channel)
+            throw new Error(`Invalid channelId ${channelId} trying to be set as processor for client ${this.uid}`);
+        // confirm its not already set as processor
+        if (this._processorChannel && channelId === this._processorChannel.channelId)
+            throw new Error(`ChannelId ${channelId} is already set as processor for client ${this.uid}`);
+        // confirm that the client was previously linked to channel before setting it as processor
+        if (!(this.linkedChannels.has(channelId)))
+            throw new Error(`Please make sure there is a linkage to ${channelId} before setting it as processor for client ${this.uid}`);
+        this._processorChannel && this._processorChannel.removeClientWrite(this.uid);
+        channel.addClientWrite(this.uid, options);
+        if (unlinkOld)
+            this.unlinkChannel(this._processorChannel.channelId);
+        this._processorChannel = channel;
+        return true;
     }
     addStateUpdate(channelId, update, type) {
-        if (!(this.connectedChannels.has(channelId)))
+        if (!(this.linkedChannels.has(channelId)))
             return false;
         if (!(channelId in this._queuedEncodedUpdates)) {
             this._queuedEncodedUpdates[channelId] = [];
@@ -93,47 +104,53 @@ class Client {
      * @param message
      */
     sendGlobal(message) {
-        if (!(this.processorChannel)) {
+        if (!(this._processorChannel)) {
             throw new Error('Client must have a channel set as its processor channel to send messages. See Client.setProcessor');
         }
         const data = {
             clientUid: this.uid,
             message,
         };
-        this.processorChannel.broadcast(data);
+        this._processorChannel.broadcast(data);
     }
     /**
      * sends message to back channel with processorId.
      * @param message
      */
     sendLocal(message) {
-        if (!(this.processorChannel)) {
+        if (!(this._processorChannel)) {
             throw new Error('Client must have a channel set as its processor channel to send messages. See Client.setProcessor');
         }
         const data = {
             clientUid: this.uid,
             message,
         };
-        this.processorChannel.addMessage(data);
+        this._processorChannel.addMessage(data);
     }
-    disconnect(channelId) {
-        if (this.connectedChannels.has(channelId)) {
-            this.connectedChannels.get(channelId).disconnectClient(this.uid);
+    unlinkChannel(channelId, options) {
+        if (this.linkedChannels.has(channelId)) {
+            const linkedChannel = this.linkedChannels.get(channelId);
+            linkedChannel.unlinkClient(this.uid, options);
+            // checks to see if the current processor channel is the channel we're unlinking from, if so
+            // send notification that were removing the client write.
+            if (this._processorChannel && linkedChannel.channelId === this._processorChannel.channelId) {
+                linkedChannel.removeClientWrite(this.uid);
+            }
         }
         else {
-            this.connectedChannels.forEach(channel => {
-                channel.disconnectClient(this.uid);
+            this.linkedChannels.forEach(channel => {
+                channel.unlinkClient(this.uid);
             });
             this.masterChannel.clientDisconnected(this.uid);
         }
     }
-    // removes queued updates from channel.
     onChannelDisconnect(channelId) {
-        if (this.processorChannel && this.processorChannel.channelId === channelId) {
-            this.processorChannel = null;
+        if (this._processorChannel && this._processorChannel.channelId === channelId) {
+            this._processorChannel.removeClientWrite(this.uid);
+            this._processorChannel = null;
         }
         delete this._queuedEncodedUpdates[channelId];
-        this.connectedChannels.delete(channelId);
+        this.linkedChannels.delete(channelId);
     }
 }
 exports.default = Client;

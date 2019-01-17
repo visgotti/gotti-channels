@@ -4,11 +4,13 @@ declare class Client {
     readonly uid: string;
     state: any;
     private masterChannel;
-    private connectedChannels;
-    private processorChannel;
+    private linkedChannels;
+    private _processorChannel;
     private _queuedEncodedUpdates;
     constructor(uid: string, masterChannel: FrontMasterChannel);
     readonly queuedEncodedUpdates: any;
+    readonly processorChannel: string;
+    isLinkedToChannel(channelId: string): boolean;
     /**
      * method to be overridden to handle direct client messages from back channels.
      */
@@ -17,14 +19,18 @@ declare class Client {
     /**
      * Sets connected channel of client also links it.
      * @param channelId
+     * @param options to send to back channel
      */
-    connectToChannel(channelId: string): Promise<any>;
+    linkChannel(channelId: string, options?: any): Promise<any>;
     /**
-     * this sets the channel where client messages get processed.
-     * if the client isnt connected, it will call the connect method first.
-     * @param channel
+     * setProcessorChannel will set the channel in which a client will relay its messages through.
+     * The processor channel will forward the clients messages to the mirrored back channel in which
+     * it will process the message and wind up sending back messages/state updates to any linked clients.
+     * @param {string} channelId - channelId to set as processor channel.
+     * @param {boolean=false} unlinkOld - if you want to unlink from the old processor channel after you set the new one.
+     * @returns {boolean}
      */
-    setProcessorChannel(channelId: string): Promise<boolean>;
+    setProcessorChannel(channelId: string, unlinkOld?: boolean, options?: any): boolean;
     addStateUpdate(channelId: any, update: any, type: STATE_UPDATE_TYPES): any;
     clearStateUpdates(): void;
     /**
@@ -37,7 +43,7 @@ declare class Client {
      * @param message
      */
     sendLocal(message: any): void;
-    disconnect(channelId?: any): void;
+    unlinkChannel(channelId?: any, options?: any): void;
     onChannelDisconnect(channelId: any): void;
 }
 export default Client;

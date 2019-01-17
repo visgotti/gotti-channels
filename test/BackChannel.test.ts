@@ -234,13 +234,16 @@ describe('BackChannel', function() {
     describe('BackChannel.onRemoveClientWrite', () => {
         it('correctly registers a handler for the remove_client_write event', (done) => {
             const mockUid = 'client_foo';
-
-            BackChannel1.onRemoveClientWrite((clientUid) => {
+            const mockOptions = {
+                'foo': 'bar'
+            };
+            BackChannel1.onRemoveClientWrite((clientUid, options?) => {
                 assert.strictEqual(clientUid, mockUid);
+                assert.deepStrictEqual(options, mockOptions);
                 assert.strictEqual(BackChannel1.writingClientUids.length, 0);
                 done();
             });
-            BackChannel1.emit('remove_client_write', mockUid);
+            BackChannel1.emit('remove_client_write', mockUid, mockOptions);
         });
     });
 });

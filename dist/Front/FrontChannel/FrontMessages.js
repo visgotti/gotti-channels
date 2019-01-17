@@ -15,12 +15,16 @@ class FrontMessages extends MessageFactory_1.ChannelMessageFactory {
         this.BROADCAST_ALL_BACK = this.pubCreator(MessageFactory_1.Protocol.BROADCAST_ALL_BACK());
         this.LINK = this.pubCreator(MessageFactory_1.Protocol.LINK(this.frontUid));
         this.UNLINK = this.pubCreator(MessageFactory_1.Protocol.UNLINK(this.frontUid));
+        this.ADD_CLIENT_WRITE = this.pubCreator(MessageFactory_1.Protocol.ADD_CLIENT_WRITE(this.frontUid));
+        this.REMOVE_CLIENT_WRITE = this.pubCreator(MessageFactory_1.Protocol.REMOVE_CLIENT_WRITE(this.frontUid));
         //todo figure out cleanest way to do this inside parent class implicitly
         return {
             CONNECT: this.CONNECT,
             BROADCAST_ALL_BACK: this.BROADCAST_ALL_BACK,
             LINK: this.LINK,
             UNLINK: this.UNLINK,
+            ADD_CLIENT_WRITE: this.ADD_CLIENT_WRITE,
+            REMOVE_CLIENT_WRITE: this.REMOVE_CLIENT_WRITE,
         };
     }
     initializePushes() {

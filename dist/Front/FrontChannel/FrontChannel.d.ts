@@ -11,21 +11,15 @@ declare class FrontChannel extends Channel {
     private push;
     private CONNECTION_STATUS;
     private linked;
-    private connectedClients;
-    connectedClientUids: Array<string>;
-    private clientConnectedTimeouts;
+    private linkedClients;
+    listeningClientUids: Array<string>;
+    private clientLinkTimeouts;
     private backMasterIndex;
     readonly frontUid: string;
     readonly frontMasterIndex: number;
     readonly totalChannels: number;
     readonly clientTimeout: number;
     constructor(channelId: any, totalChannels: any, messenger: Messenger, master: FrontMasterChannel);
-    /**
-     *
-     * @param client
-     * @param timeout
-     */
-    connectClient(client: Client, timeout?: any): Promise<{}>;
     /**
      * sets the onConnectedHandler function
      * @param handler - function that gets executed when a channel succesfully connects to a backChannel.
@@ -49,20 +43,31 @@ declare class FrontChannel extends Channel {
      * the parameter will be kept in a lookup on the back master so it can keep track of which
      * front master a client lives on. This allows the ability to send direct messages to the client
      * from the back.
-     * @param clientUid (optional)
+     * @param client - Centrum client instance
+     * @param options (optional) if you want to send data as a client connects
      * @returns {Promise<T>}
      */
-    link(clientUid?: boolean): Promise<{}>;
+    linkClient(client: Client, options?: any): Promise<any>;
     /**
-     * sends unlink message, if a clientUid is provided it will
-     * decrement or remove the client lookup data on the back,
-     * if the clientUid is omitted then it will send an unlink message
-     * with no param notifying the back channel that the front channel
-     * does not need updates from back channel at all and the link
-     * relationship will be deleted.
+     * sends unlink message, it will decrement or remove the client lookup data on the back,
+     * the back channel checks if there are any clients left with a link to the front master
+     * and if not it will stop keeping track of it until it receives another link.
      * @param clientUid
      */
-    unlink(clientUid?: boolean): void;
+    unlinkClient(clientUid: string, options?: any): void;
+    /**
+     * sends notification to mirror back channel that it will be receiving messages
+     * from client to process.
+     * @param clientUid
+     * @param options
+     */
+    addClientWrite(clientUid: string, options?: any): void;
+    /**
+     * sends notification to mirror back channel that it will no longer
+     * be receiving messages from client.
+     * @param clientUid
+     */
+    removeClientWrite(clientUid: string): void;
     /**
      * adds message to the front master's message queue. These queue up and will then send
      * to the appropriate back master at a set interval, where upon reaching the back master,
@@ -90,9 +95,7 @@ declare class FrontChannel extends Channel {
      */
     connect(timeout?: number): Promise<{}>;
     readonly connectionInfo: any;
-    private _connectClient;
     private emitClientLinked;
-    disconnectClient(clientUid: any): void;
     private _onPatchState;
     private onPatchStateHandler;
     private _onMessage;
@@ -119,6 +122,6 @@ declare class FrontChannel extends Channel {
      * initializes needed message factories for front channels.
      */
     private initializeMessageFactories;
-    private clientCanConnect;
+    private clientCanLink;
 }
 export default FrontChannel;

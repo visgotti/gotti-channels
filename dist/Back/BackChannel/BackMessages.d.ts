@@ -17,6 +17,8 @@ export interface BackSubs {
 export interface BackPulls {
     LINK: PullProtocol;
     UNLINK: PullProtocol;
+    ADD_CLIENT_WRITE: PullProtocol;
+    REMOVE_CLIENT_WRITE: PullProtocol;
 }
 export declare class BackMessages extends ChannelMessageFactory {
     CONNECT: SubscribeProtocol;
@@ -24,6 +26,8 @@ export declare class BackMessages extends ChannelMessageFactory {
     SEND_BACK: SubscribeProtocol;
     LINK: PullProtocol;
     UNLINK: PullProtocol;
+    ADD_CLIENT_WRITE: PullProtocol;
+    REMOVE_CLIENT_WRITE: PullProtocol;
     SEND_FRONT: PushProtocol;
     CONNECTION_CHANGE: PushProtocol;
     BROADCAST_LINKED_FRONTS: PublishProtocol;

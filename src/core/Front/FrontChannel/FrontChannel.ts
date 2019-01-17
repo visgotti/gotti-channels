@@ -184,9 +184,10 @@ class FrontChannel extends Channel {
      * sends notification to mirror back channel that it will no longer
      * be receiving messages from client.
      * @param clientUid
+     * @param options
      */
-    public removeClientWrite(clientUid: string) {
-        this.pub.REMOVE_CLIENT_WRITE([clientUid]);
+    public removeClientWrite(clientUid: string, options?: any) {
+        this.pub.REMOVE_CLIENT_WRITE([clientUid, options]);
     }
 
     /**

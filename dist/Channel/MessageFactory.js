@@ -14,12 +14,14 @@ var MSG_CODES;
     MSG_CODES[MSG_CODES["BROADCAST_ALL_BACK"] = 6] = "BROADCAST_ALL_BACK";
     MSG_CODES[MSG_CODES["LINK"] = 7] = "LINK";
     MSG_CODES[MSG_CODES["UNLINK"] = 8] = "UNLINK";
+    MSG_CODES[MSG_CODES["ADD_CLIENT_WRITE"] = 9] = "ADD_CLIENT_WRITE";
+    MSG_CODES[MSG_CODES["REMOVE_CLIENT_WRITE"] = 10] = "REMOVE_CLIENT_WRITE";
     // BACK -> FRONT
-    MSG_CODES[MSG_CODES["ACCEPT_LINK"] = 9] = "ACCEPT_LINK";
-    MSG_CODES[MSG_CODES["CONNECTION_CHANGE"] = 10] = "CONNECTION_CHANGE";
-    MSG_CODES[MSG_CODES["BROADCAST_LINKED_FRONTS"] = 11] = "BROADCAST_LINKED_FRONTS";
-    MSG_CODES[MSG_CODES["BROADCAST_ALL_FRONTS"] = 12] = "BROADCAST_ALL_FRONTS";
-    MSG_CODES[MSG_CODES["SEND_FRONT"] = 13] = "SEND_FRONT";
+    MSG_CODES[MSG_CODES["ACCEPT_LINK"] = 11] = "ACCEPT_LINK";
+    MSG_CODES[MSG_CODES["CONNECTION_CHANGE"] = 12] = "CONNECTION_CHANGE";
+    MSG_CODES[MSG_CODES["BROADCAST_LINKED_FRONTS"] = 13] = "BROADCAST_LINKED_FRONTS";
+    MSG_CODES[MSG_CODES["BROADCAST_ALL_FRONTS"] = 14] = "BROADCAST_ALL_FRONTS";
+    MSG_CODES[MSG_CODES["SEND_FRONT"] = 15] = "SEND_FRONT";
 })(MSG_CODES || (MSG_CODES = {}));
 /**
  * helper class with functions to make sure protocol codes stay synchronized between front and back channels.
@@ -47,6 +49,10 @@ class Protocol {
     static LINK(frontUid) { return Protocol.make(MSG_CODES.LINK, frontUid); }
     ;
     static UNLINK(frontUid) { return Protocol.make(MSG_CODES.UNLINK, frontUid); }
+    ;
+    static ADD_CLIENT_WRITE(frontUid) { return Protocol.make(MSG_CODES.ADD_CLIENT_WRITE, frontUid); }
+    ;
+    static REMOVE_CLIENT_WRITE(frontUid) { return Protocol.make(MSG_CODES.REMOVE_CLIENT_WRITE, frontUid); }
     ;
     // BACK -> FRONTS
     static BROADCAST_LINKED_FRONTS(frontChannelId) { return Protocol.make(MSG_CODES.BROADCAST_LINKED_FRONTS, frontChannelId); }

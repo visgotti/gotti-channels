@@ -9,13 +9,15 @@ declare class BackChannel extends Channel {
     private push;
     private pull;
     private _connectedFrontsData;
-    private _linkedClientUids;
+    private _listeningClientUids;
+    private _writingClientUids;
     private _mirroredFrontUids;
     state: any;
     private _previousState;
     private _previousStateEncoded;
-    private linkedFrontUids;
+    private linkedFrontAndClientUids;
     private linkedFrontMasterIndexes;
+    private linkedFrontUids;
     private masterIndexToFrontUidLookup;
     readonly backMasterIndex: number;
     constructor(channelId: any, messenger: Messenger, master: BackMasterChannel);
@@ -24,6 +26,26 @@ declare class BackChannel extends Channel {
      * @param handler - function that gets executed, gets parameters message and frontUid
      */
     onMessage(handler: (message: any, frontUid: string) => void): void;
+    /**
+     * @param handler - handler called when a client is added as a writer.
+     */
+    onAddClientWrite(handler: (clientUid: string, options?: any) => void): void;
+    /**
+     * @param handler - handler called when a client is added as a writer.
+     */
+    onRemoveClientWrite(handler: (clientUid: string) => void): void;
+    /**
+     * handler that is called when a client is linked to the back channel.
+     * if it returns anything data it will be sent back to the front channel asynchronously
+     * at index 2 with the currently encoded state at index 0 and the client uid at index 1.
+     * @param handler
+     */
+    onAddClientListen(handler: (clientUid: string, options?: any) => any): void;
+    /**
+     * sets the onClientListenHandler function
+     * @param handler - function that gets executed when a new client is succesfully linked/listening to state updates.
+     */
+    onRemoveClientListen(handler: (clientUid: string, options?: any) => void): void;
     /**
      * finds the delta of the new and last state then adds the patch update
      * to the master for it to be queued and then sent out to the needed
@@ -43,6 +65,7 @@ declare class BackChannel extends Channel {
      * @param frontUid - unique front channel sending link request.
      * @param frontMasterIndex - front master index the client is connected to.
      * @param clientUid - uid of client.
+     * @param options - additional options client passed upon link request
      */
     private acceptClientLink;
     /**
@@ -76,7 +99,8 @@ declare class BackChannel extends Channel {
     processMessageFromMaster(message: any, frontMasterIndex: number): void;
     readonly connectedFrontsData: Map<string, ConnectedFrontData>;
     readonly mirroredFrontUids: Array<string>;
-    readonly linkedClientUids: Array<string>;
+    readonly listeningClientUids: Array<string>;
+    readonly writingClientUids: Array<string>;
     private _onMessage;
     private onMessageHandler;
     /**

@@ -5,6 +5,8 @@ export interface FrontPubs {
     BROADCAST_ALL_BACK: PublishProtocol;
     LINK: PublishProtocol;
     UNLINK: PublishProtocol;
+    ADD_CLIENT_WRITE: PublishProtocol;
+    REMOVE_CLIENT_WRITE: PublishProtocol;
 }
 export interface FrontSubs {
     CONNECTION_CHANGE: SubscribeProtocol;
@@ -21,6 +23,8 @@ export declare class FrontMessages extends ChannelMessageFactory {
     BROADCAST_ALL_BACK: PublishProtocol;
     LINK: PublishProtocol;
     UNLINK: PublishProtocol;
+    ADD_CLIENT_WRITE: PublishProtocol;
+    REMOVE_CLIENT_WRITE: PublishProtocol;
     SEND_BACK: PushProtocol;
     CONNECTION_CHANGE: SubscribeProtocol;
     BROADCAST_LINKED_FRONTS: SubscribeProtocol;

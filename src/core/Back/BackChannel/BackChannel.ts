@@ -91,12 +91,12 @@ class BackChannel extends Channel {
     /**
      * @param handler - handler called when a client is added as a writer.
      */
-    public onRemoveClientWrite(handler: (clientUid: string) => void) : void {
+    public onRemoveClientWrite(handler: (clientUid: string, options?: any) => void) : void {
         this.listenerCount('remove_client_write') && this.removeAllListeners('remove_client_write');
 
-        this.on('remove_client_write', (clientUid: string) => {
+        this.on('remove_client_write', (clientUid: string, options?: any) => {
             this._writingClientUids.delete(clientUid);
-            handler(clientUid);
+            handler(clientUid, options);
         });
     }
 

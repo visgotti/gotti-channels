@@ -9,11 +9,13 @@ declare enum MSG_CODES {
     BROADCAST_ALL_BACK = 6,
     LINK = 7,
     UNLINK = 8,
-    ACCEPT_LINK = 9,
-    CONNECTION_CHANGE = 10,
-    BROADCAST_LINKED_FRONTS = 11,
-    BROADCAST_ALL_FRONTS = 12,
-    SEND_FRONT = 13
+    ADD_CLIENT_WRITE = 9,
+    REMOVE_CLIENT_WRITE = 10,
+    ACCEPT_LINK = 11,
+    CONNECTION_CHANGE = 12,
+    BROADCAST_LINKED_FRONTS = 13,
+    BROADCAST_ALL_FRONTS = 14,
+    SEND_FRONT = 15
 }
 export declare type PublishProtocol = any;
 export declare type PushProtocol = any;
@@ -33,6 +35,8 @@ export declare class Protocol {
     static SEND_BACK(backChannelId: any): string;
     static LINK(frontUid: any): string;
     static UNLINK(frontUid: any): string;
+    static ADD_CLIENT_WRITE(frontUid: any): string;
+    static REMOVE_CLIENT_WRITE(frontUid: any): string;
     static BROADCAST_LINKED_FRONTS(frontChannelId: any): string;
     static BROADCAST_ALL_FRONTS(): string;
     static CONNECTION_CHANGE(frontUid: any): string;
@@ -81,8 +85,10 @@ export declare abstract class ChannelMessageFactory extends MessageFactory {
     abstract CONNECT: PublishProtocol | SubscribeProtocol;
     abstract BROADCAST_ALL_BACK: PublishProtocol | SubscribeProtocol;
     abstract SEND_BACK: PushProtocol | SubscribeProtocol;
-    abstract LINK: PublishProtocol | SubscribeProtocol;
-    abstract UNLINK: PublishProtocol | SubscribeProtocol;
+    abstract LINK: PublishProtocol | PullProtocol;
+    abstract UNLINK: PublishProtocol | PullProtocol;
+    abstract ADD_CLIENT_WRITE: PublishProtocol | PullProtocol;
+    abstract REMOVE_CLIENT_WRITE: PublishProtocol | PullProtocol;
     abstract CONNECTION_CHANGE: PushProtocol | SubscribeProtocol;
     abstract BROADCAST_LINKED_FRONTS: PublishProtocol | SubscribeProtocol;
     abstract BROADCAST_ALL_FRONTS: PublishProtocol | SubscribeProtocol;
