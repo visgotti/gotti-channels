@@ -66,8 +66,9 @@ declare class FrontChannel extends Channel {
      * sends notification to mirror back channel that it will no longer
      * be receiving messages from client.
      * @param clientUid
+     * @param options
      */
-    removeClientWrite(clientUid: string): void;
+    removeClientWrite(clientUid: string, options?: any): void;
     /**
      * adds message to the front master's message queue. These queue up and will then send
      * to the appropriate back master at a set interval, where upon reaching the back master,

@@ -187,13 +187,12 @@ export class BackMasterChannel extends Channel {
 
 
     /** messageQueueData is formatted incoming as
-     *  [ channelId,  message  ]
+     *  [ channelId,  message, clientId? ]
      */
     private handleQueuedMessages(messageQueueData, frontMasterIndex) {
         for(let i = 0; i < messageQueueData.length; i++) {
-            const channelId = messageQueueData[i][0];
-            const message = messageQueueData[i][1];
-            this.backChannels[channelId].processMessageFromMaster(message, frontMasterIndex);
+            const data = messageQueueData[i];
+            this.backChannels[data[0]].processMessageFromMaster(data[1], frontMasterIndex, data[2]);
         }
     }
 

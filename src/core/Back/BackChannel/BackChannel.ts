@@ -72,7 +72,7 @@ class BackChannel extends Channel {
      * sets the onMessageHandler function
      * @param handler - function that gets executed, gets parameters message and frontUid
      */
-    public onMessage(handler: (message: any, frontUid: string) => void) : void {
+    public onMessage(handler: (message: any, frontUid: string, clientUid?: string) => void) : void {
         this.onMessageHandler = handler;
     }
 
@@ -244,9 +244,9 @@ class BackChannel extends Channel {
      * @param message
      * @param frontMasterIndex
      */
-    public processMessageFromMaster(message, frontMasterIndex: number) {
+    public processMessageFromMaster(message, frontMasterIndex: number, clientUid?) {
         const frontUid = this.masterIndexToFrontUidLookup[frontMasterIndex];
-        this._onMessage(message, frontUid);
+        this._onMessage(message, frontUid, clientUid);
     }
 
     get connectedFrontsData() : Map<string, ConnectedFrontData> {
@@ -265,11 +265,12 @@ class BackChannel extends Channel {
         return Array.from(this._writingClientUids);
     }
 
-    private _onMessage(message: any, frontUid: string) : void {
-        this.onMessageHandler(message, frontUid);
+    //TODO: replace all instances of onMessage receiving frontUid with frontMaster and use the lookup to get the frontUid.
+    private _onMessage(message: any, frontUid: string, clientUid?: string) : void {
+        this.onMessageHandler(message, frontUid, clientUid);
     }
 
-    private onMessageHandler(message: any, frontUid: string) : void {
+    private onMessageHandler(message: any, frontUid: string, clientUid?: string) : void {
         throw new Error(`Unimplemented onMessageHandler in back channel ${this.channelId} Use backChannel.onMessage to implement.`);
     }
 
@@ -281,14 +282,14 @@ class BackChannel extends Channel {
         // registers sub that handles requests the same regardless of the frontUid.
         this.sub.CONNECT.register(this.onMirrorConnected.bind(this));
 
-        this.sub.BROADCAST_ALL_BACK.register((data: FrontToBackMessage) => {
-            const { message, frontUid } = data;
-            this._onMessage(message, frontUid);
+        this.sub.BROADCAST_ALL_BACK.register((data: Array<any>) => {
+            this._onMessage(data[0], data[1], data[2]);
+            //how it looks on frontChannel -> this.pub.BROADCAST_ALL_BACK([message, this.frontUid, clientUid])
         });
 
-        this.sub.SEND_BACK.register((data: FrontToBackMessage) => {
-            const { message, frontUid } = data;
-            this._onMessage(message, frontUid);
+        this.sub.SEND_BACK.register((data: Array<any>) => {
+            this._onMessage(data[0], data[1], data[2]);
+            //how it looks on frontChannel -> this.push.SEND_BACK[backChannelId]([message, this.frontUid, clientUid]);
         });
     }
 

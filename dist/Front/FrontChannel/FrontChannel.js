@@ -139,9 +139,10 @@ class FrontChannel extends Channel_1.Channel {
      * sends notification to mirror back channel that it will no longer
      * be receiving messages from client.
      * @param clientUid
+     * @param options
      */
-    removeClientWrite(clientUid) {
-        this.pub.REMOVE_CLIENT_WRITE([clientUid]);
+    removeClientWrite(clientUid, options) {
+        this.pub.REMOVE_CLIENT_WRITE([clientUid, options]);
     }
     /**
      * adds message to the front master's message queue. These queue up and will then send

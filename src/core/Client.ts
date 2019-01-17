@@ -119,12 +119,7 @@ class Client {
             throw new Error('Client must have a channel set as its processor channel to send messages. See Client.setProcessor');
         }
 
-        const data = {
-            clientUid: this.uid,
-            message,
-        };
-
-        this._processorChannel.broadcast(data);
+        this._processorChannel.broadcast(message, null, this.uid);
     }
 
     /**
@@ -135,13 +130,7 @@ class Client {
         if(!(this._processorChannel)) {
             throw new Error('Client must have a channel set as its processor channel to send messages. See Client.setProcessor');
         }
-
-        const data = {
-            clientUid: this.uid,
-            message,
-        };
-
-        this._processorChannel.addMessage(data);
+        this._processorChannel.addMessage(message, this.uid);
     }
 
     public unlinkChannel(channelId?, options?) {

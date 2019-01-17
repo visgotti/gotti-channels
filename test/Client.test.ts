@@ -268,10 +268,11 @@ describe('Client', function() {
         it('only sends to processor channel with correct data format', (done) => {
             let received = 0;
             const expectedReceived = 1;
-            BackChannel1.onMessage(message => {
-                assert.strictEqual(message.message, 1);
-                assert.strictEqual(message.clientUid, client.uid);
-                received+=message.message;
+            BackChannel1.onMessage((message, frontUid, clientUid) => {
+                assert.strictEqual(message, 1);
+                assert.strictEqual(frontUid, FrontChannel1.frontUid);
+                assert.strictEqual(clientUid, client.uid);
+                received+=message;
                 if(received === expectedReceived) {
                     setTimeout(() => {
                         assert.strictEqual(received, expectedReceived);
@@ -281,7 +282,7 @@ describe('Client', function() {
             });
             // shouldnt reach this
             BackChannel2.onMessage(message => {
-                received+=message.message;
+                received+=message;
             });
 
             client.sendLocal(1);
@@ -292,10 +293,11 @@ describe('Client', function() {
         it('is received by all back channels', (done) => {
             let received = 0;
             const expectedReceived = 2;
-            BackChannel1.onMessage(message => {
-                assert.strictEqual(message.message, 1);
-                assert.strictEqual(message.clientUid, client.uid);
-                received+=message.message;
+            BackChannel1.onMessage((message, frontUid, clientUid) => {
+                assert.strictEqual(message, 1);
+                assert.strictEqual(frontUid, FrontChannel1.frontUid);
+                assert.strictEqual(clientUid, client.uid);
+                received+=message;
                 if(received === expectedReceived) {
                     setTimeout(() => {
                         assert.strictEqual(received, expectedReceived);
@@ -304,10 +306,13 @@ describe('Client', function() {
                 }
             });
 
-            BackChannel2.onMessage(message => {
-                assert.strictEqual(message.message, 1);
-                assert.strictEqual(message.clientUid, client.uid);
-                received+=message.message;
+            BackChannel2.onMessage((message, frontUid, clientUid) => {
+                assert.strictEqual(message, 1);
+                assert.strictEqual(frontUid, FrontChannel1.frontUid);
+                assert.strictEqual(clientUid, client.uid);
+
+                received+=message;
+
                 if(received === expectedReceived) {
                     setTimeout(() => {
                         assert.strictEqual(received, expectedReceived);

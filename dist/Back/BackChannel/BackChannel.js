@@ -54,9 +54,9 @@ class BackChannel extends Channel_1.Channel {
      */
     onRemoveClientWrite(handler) {
         this.listenerCount('remove_client_write') && this.removeAllListeners('remove_client_write');
-        this.on('remove_client_write', (clientUid) => {
+        this.on('remove_client_write', (clientUid, options) => {
             this._writingClientUids.delete(clientUid);
-            handler(clientUid);
+            handler(clientUid, options);
         });
     }
     /**

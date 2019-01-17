@@ -65,9 +65,11 @@ class Client {
      * it will process the message and wind up sending back messages/state updates to any linked clients.
      * @param {string} channelId - channelId to set as processor channel.
      * @param {boolean=false} unlinkOld - if you want to unlink from the old processor channel after you set the new one.
+     * @param {any} addOptions - options that get sent to the new processor channel
+     * @param {any} removeOptions - options that get sent to the old processor channel
      * @returns {boolean}
      */
-    setProcessorChannel(channelId, unlinkOld = false, options) {
+    setProcessorChannel(channelId, unlinkOld = false, addOptions, removeOptions) {
         const channel = this.masterChannel.frontChannels[channelId];
         // confirm channel id was valid
         if (!channel)
@@ -78,8 +80,8 @@ class Client {
         // confirm that the client was previously linked to channel before setting it as processor
         if (!(this.linkedChannels.has(channelId)))
             throw new Error(`Please make sure there is a linkage to ${channelId} before setting it as processor for client ${this.uid}`);
-        this._processorChannel && this._processorChannel.removeClientWrite(this.uid);
-        channel.addClientWrite(this.uid, options);
+        this._processorChannel && this._processorChannel.removeClientWrite(this.uid, removeOptions);
+        channel.addClientWrite(this.uid, addOptions);
         if (unlinkOld)
             this.unlinkChannel(this._processorChannel.channelId);
         this._processorChannel = channel;

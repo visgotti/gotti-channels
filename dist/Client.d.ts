@@ -28,9 +28,11 @@ declare class Client {
      * it will process the message and wind up sending back messages/state updates to any linked clients.
      * @param {string} channelId - channelId to set as processor channel.
      * @param {boolean=false} unlinkOld - if you want to unlink from the old processor channel after you set the new one.
+     * @param {any} addOptions - options that get sent to the new processor channel
+     * @param {any} removeOptions - options that get sent to the old processor channel
      * @returns {boolean}
      */
-    setProcessorChannel(channelId: string, unlinkOld?: boolean, options?: any): boolean;
+    setProcessorChannel(channelId: string, unlinkOld?: boolean, addOptions?: any, removeOptions?: any): boolean;
     addStateUpdate(channelId: any, update: any, type: STATE_UPDATE_TYPES): any;
     clearStateUpdates(): void;
     /**
