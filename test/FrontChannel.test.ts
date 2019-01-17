@@ -6,6 +6,7 @@ import { Messenger } from 'centrum-messengers/dist/core/Messenger';
 import FrontChannel from '../src/core/Front/FrontChannel';
 import BackChannel from '../src/core/Back/BackChannel';
 
+import Client from '../src/core/Client';
 import { FrontMasterChannel } from '../src/core/Front/FrontMaster/MasterChannel';
 import { BackMasterChannel } from '../src/core/Back/BackMaster/MasterChannel';
 
@@ -24,6 +25,9 @@ describe('FrontChannel', function() {
     let FrontChannel2: FrontChannel;
     let BackChannel1: BackChannel;
     let BackChannel2; BackChannel;
+
+    let client: Client;
+
     before('Initialize a centrum messenger for the Front Channels and the Back Channels', (done) => {
         const frontMessenger = new Messenger({ id: 'testFront', publish: { pubSocketURI: TEST_FRONT_URI } , subscribe: { pubSocketURIs: [TEST_BACK_URI] } });
         const backMessenger = new Messenger({ id: 'testBack', publish: { pubSocketURI: TEST_BACK_URI } , subscribe: { pubSocketURIs: [TEST_FRONT_URI] } });
@@ -35,6 +39,8 @@ describe('FrontChannel', function() {
         FrontChannel2 = FrontMaster.frontChannels[1];
         BackChannel1 = BackMaster.backChannels[0];
         BackChannel2 = BackMaster.backChannels[1];
+
+        client = new Client('1', FrontMaster);
 
         assert.strictEqual(FrontChannel1.channelId, 0);
         assert.strictEqual(FrontChannel2.channelId, 1);
@@ -50,6 +56,7 @@ describe('FrontChannel', function() {
     afterEach(() => {
         FrontChannel1.onConnected(() => {});
         FrontChannel2.onConnected(() => {});
+        BackChannel1.onAddClient((...args) => {});
     });
 
     after(done => {
@@ -111,36 +118,40 @@ describe('FrontChannel', function() {
         });
     });
 
-    describe('FrontChannel.link', () => {
-        it('link fails asynchronously if the back state was null', (done) => {
-            FrontChannel1.link().then(() => {})
-                .catch(err => {
-                    assert.strictEqual(err, 'null state on back channel, failed to link.');
-                    done();
-            })
-        });
-        it('link responds asynchronously with a msgpack encoded state', (done) => {
+    describe('FrontChannel.linkClient', () => {
+        it('link responds asynchronously with a msgpack encoded state and receives correct responseData', (done) => {
             const state = { "foo": "bar" };
             BackChannel1.setState(state);
-             FrontChannel1.link().then(encodedState => {
-                 let decoded = msgpack.decode(encodedState);
+
+            BackChannel1.onAddClient((clientUid, options) => {
+                assert.strictEqual(clientUid, client.uid);
+                assert.deepStrictEqual(options, { "foo": "bar" });
+                options.foo = 'baz';
+                return options;
+            });
+
+             FrontChannel1.linkClient(client, { "foo": "bar" }).then(data => {
+                 let decoded = msgpack.decode(Buffer.from(data.encodedState));
+                 assert.deepStrictEqual(data.responseOptions, { "foo": "baz" });
                  assert.deepStrictEqual(decoded, state);
                  done();
              });
         });
     });
 
-    describe('FrontChannel.unlink', () => {
+    describe('FrontChannel.unlinkClient', () => {
         it('unlinks the channel', (done) => {
-            assert.doesNotThrow(() => { FrontChannel1.unlink()  });
+            assert.doesNotThrow(() => { FrontChannel1.unlinkClient(client.uid)  });
+            done();
+        });
+        it('throws if we unlink when were already unlinked', (done) => {
+            assert.throws(() => { FrontChannel1.unlinkClient(client.uid)  }, 'Already unlinked!');
             done();
         });
     });
 
     describe('FrontChannel.onPatchState & FrontChannel.patchState', () => {
         it('does NOT fire off the onPatchState function when patchState is executed because its UNLINKED', (done) => {
-            FrontChannel1.unlink();
-
             let called = false;
 
             FrontChannel1.onPatchState((patch) => {
@@ -155,7 +166,7 @@ describe('FrontChannel', function() {
         it('does fire off the onPatchState when its linked', (done) => {
 
             let called = null;
-            FrontChannel1.link().then(() => {
+            FrontChannel1.linkClient(client).then(() => {
                 FrontChannel1.onPatchState((patch) => {
                     called = patch;
                 });
@@ -163,19 +174,21 @@ describe('FrontChannel', function() {
                 FrontChannel1.patchState(true);
                 assert.strictEqual(called, true);
                 done();
+            }).catch(err => {
+                console.log(err);
             });
 
         });
     });
 
     describe('FrontChannel.addMessage', () => {
-        it('Throws error because were not linked to any back channels', (done) => {
-            FrontChannel1.unlink();
+        it('Throws error because theres no links to any back channels', (done) => {
+            FrontChannel1.unlinkClient(client.uid);
             assert.throws(() => { FrontChannel1.addMessage({"foo": "bar"}) });
             done();
         });
         it('Doesnt throw after linking.', (done) => {
-            FrontChannel1.link().then(() => {
+            FrontChannel1.linkClient(client).then(() => {
                 assert.doesNotThrow(() => { FrontChannel1.addMessage({"foo": "bar"}) });
                 done();
             });

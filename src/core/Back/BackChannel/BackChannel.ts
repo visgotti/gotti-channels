@@ -28,8 +28,9 @@ class BackChannel extends Channel {
     private _previousState: any;
     private _previousStateEncoded: string;
 
-    private linkedFrontUids: Set<string>;
+    private linkedFrontAndClientUids: Map<string, Set<string> >;
     private linkedFrontMasterIndexes: Array<number>;
+    private linkedFrontUids: Array<string>;
     private masterIndexToFrontUidLookup: {frontUid: string};
 
     readonly backMasterIndex: number;
@@ -42,7 +43,8 @@ class BackChannel extends Channel {
         // frontUid defines a unique channel that lives on a frontMaster which is identified
         // by frontMasterIndex (index of the server in the cluster) but it's literally
         // just the id of the server all the channels live on.
-        this.linkedFrontUids = new Set();
+        this.linkedFrontAndClientUids = new Map();
+        this.linkedFrontUids = [];
         this.linkedFrontMasterIndexes = [];
         // keep track of all frontUids by their master's id/index.
         this.masterIndexToFrontUidLookup = {} as {frontUid: string};
@@ -57,6 +59,9 @@ class BackChannel extends Channel {
         this.initializeMessageFactories();
         this.registerPreConnectedSubs();
         this.registerPreConnectedPubs();
+
+        // register initially so if theres no hooking logic the user needs the event is still registered and fired.
+        this.onAddClient((...args) => {});
     }
 
     /**
@@ -68,6 +73,36 @@ class BackChannel extends Channel {
     }
 
     /**
+     * sets the onClientListenHandler function
+     * @param handler - function that gets executed when a new client is succesfully linked/listening to state updates.
+     */
+    public onRemoveClient(handler: (clientUid: string, options?: any) => any) : void {
+        this.listenerCount('remove_client') && this.removeAllListeners('remove_client');
+
+        this.on('remove_client', (clientUid: string, options?: any) => {
+            handler(clientUid, options);
+        });
+    }
+
+    /**
+     * handler that is called when a client is linked to the back channel.
+     * if it returns anything data it will be sent back to the front channel asynchronously
+     * at index 2 with the currently encoded state at index 0 and the client uid at index 1.
+     * @param handler
+     */
+    //TODO: onRequestAddClient - have another hook that a user can decide if there's an allowed link to the client
+    public onAddClient(handler: (clientUid: string, options?: any) => any) : void {
+        this.listenerCount('add_client') && this.removeAllListeners('add_client');
+
+        this.on('add_client', (frontUid: string, clientUid: string, encodedState: string, options?: any) => {
+            // if handler returns data we want to send it back as options to front channel.
+            const responseOptions = handler(clientUid, options);
+            responseOptions ?
+                this.push.ACCEPT_LINK[frontUid]([encodedState, clientUid, responseOptions]) :
+                this.push.ACCEPT_LINK[frontUid]([encodedState, clientUid]);
+        });
+    }
+    /**
      * finds the delta of the new and last state then adds the patch update
      * to the master for it to be queued and then sent out to the needed
      * front Masters for it to be relayed to the front children who need it.
@@ -76,7 +111,7 @@ class BackChannel extends Channel {
     public patchState() : boolean {
         if(!(this.state)) { throw new Error ('null state')}
 
-        if(this.linkedFrontUids.size > 0) {
+        if(this.linkedFrontAndClientUids.size > 0) {
             const currentState = this.state;
             const currentStateEncoded = msgpack.encode(currentState);
 
@@ -101,14 +136,7 @@ class BackChannel extends Channel {
      * @param frontUid
      */
     private acceptLink(frontUid) {
-        const sendData: any = {};
-
-        if(!(this.state)) {
-            sendData.error = 'null state on back channel, failed to link.';
-        } else {
-            sendData.encodedState = this._previousStateEncoded
-        }
-        this.push.ACCEPT_LINK[frontUid](sendData);
+        this.push.ACCEPT_LINK[frontUid](this._previousStateEncoded);
     };
 
     /**
@@ -117,11 +145,9 @@ class BackChannel extends Channel {
      * @param frontUid - unique front channel sending link request.
      * @param frontMasterIndex - front master index the client is connected to.
      * @param clientUid - uid of client.
+     * @param options - additional options client passed upon link request
      */
-    private acceptClientLink(frontUid, frontMasterIndex, clientUid) {
-        const sendData: any = {};
-
-        sendData.clientUid = clientUid;
+    private acceptClientLink(frontUid, frontMasterIndex, clientUid, options?) {
 
         // add to set.
         this._linkedClientUids.add(clientUid);
@@ -131,12 +157,9 @@ class BackChannel extends Channel {
         // send direct messages to the client by sending it to the front master.
         this.master.addedClientLink(clientUid, frontMasterIndex);
 
-        if(!(this.state)) {
-            sendData.error = 'null state on back channel, failed to link.';
-        } else {
-            sendData.encodedState = this._previousStateEncoded
-        }
-        this.push.ACCEPT_LINK[frontUid](sendData);
+        const encodedState = this.state ? this._previousStateEncoded : '';
+
+        this.emit('add_client', frontUid, clientUid, encodedState, options);
     }
 
     /**
@@ -171,9 +194,10 @@ class BackChannel extends Channel {
      * @param message
      */
     public broadcastLinked(message: any) {
-        this.linkedFrontUids.forEach(frontUid => {
-            this.push.BROADCAST_LINKED_FRONTS[frontUid](message);
-        });
+        let length = this.linkedFrontUids.length;
+        while (length--) {
+            this.push.BROADCAST_LINKED_FRONTS[this.linkedFrontUids[length]](message);
+        }
     }
 
     /**
@@ -264,34 +288,45 @@ class BackChannel extends Channel {
             this.push.BROADCAST_LINKED_FRONTS.register(frontUid);
 
             //TODO: these should be seperate actions for room link and client link..
-            this.pull.LINK.register(frontUid, (clientUid?) => {
-                this.linkedFrontMasterIndexes.push(frontMasterIndex);
-                this.linkedFrontUids.add(frontUid);
-
-                if(clientUid && !this._linkedClientUids.has(clientUid)) {
-                    this.acceptClientLink(frontUid, frontMasterIndex, clientUid);
-                } else {
-                    this.acceptLink(frontUid);
+            this.pull.LINK.register(frontUid, (message) => {
+                const clientUid = message[0];
+                const options = message[1];
+                if(!(this.linkedFrontAndClientUids.has(frontUid))) {
+                    this.linkedFrontAndClientUids.set(frontUid, new Set());
+                    this.master.linkedChannelFrom(frontMasterIndex);
+                    this.linkedFrontMasterIndexes.push(frontMasterIndex);
+                    this.linkedFrontUids = Array.from(this.linkedFrontAndClientUids.keys());
                 }
+                this.linkedFrontAndClientUids.get(frontUid).add(clientUid);
 
-                // notify the master with the front master index of connected channel.
-                this.master.linkedChannelFrom(frontMasterIndex);
+                this.acceptClientLink(frontUid, frontMasterIndex, clientUid, options);
+                // notify the master with the front master index of connected channel if its a new front uid
+
             });
 
-            this.pull.UNLINK.register(frontUid, (clientUid?) => {
-                // if there is no client uid supplied that means that all the channels from front channel unlinked.
-                if(clientUid === false) {
-                    this.linkedFrontMasterIndexes.splice(this.linkedFrontMasterIndexes.indexOf(frontMasterIndex), 1);
-                    this.linkedFrontUids.delete(frontUid);
-                    this.master.unlinkedChannelFrom(frontMasterIndex);
-                } else {
-                    // if clientUid was provided that means were trying to unlink client
-                    // but only want to do that if the linkedClientUids has the client
-                    // makes sure the master keeps a correct state of clients linked count.
-                    if(this._linkedClientUids.has(clientUid)) {
-                        this.master.removedClientLink(clientUid);
-                        this._linkedClientUids.delete(clientUid);
+            this.pull.UNLINK.register(frontUid, (message) => {
+                const clientUid = message[0];
+                const options = message[1];
+                // makes sure linkedClientUids has the client
+                //  master keeps a correct state of clients linked count.
+                if(this._linkedClientUids.has(clientUid)) {
+                    const clientUidSet = this.linkedFrontAndClientUids.get(frontUid);
+                    this.linkedFrontAndClientUids.get(frontUid).delete(clientUid);
+
+                    clientUidSet.delete(clientUid);
+
+                    // no more clients exist on the frontUid or the front master that are listening, remove from lookups.
+                    if(clientUidSet.size === 0) {
+                        this.linkedFrontAndClientUids.delete(frontUid);
+                        this.linkedFrontUids = Array.from(this.linkedFrontAndClientUids.keys());
+                        this.linkedFrontMasterIndexes.splice(this.linkedFrontMasterIndexes.indexOf(frontMasterIndex), 1);
+                        this.master.unlinkedChannelFrom(frontMasterIndex);
                     }
+
+                    this.master.removedClientLink(clientUid);
+                    this._linkedClientUids.delete(clientUid);
+
+                    this.emit('remove_client', clientUid, options);
                 }
             });
         }

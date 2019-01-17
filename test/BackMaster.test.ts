@@ -27,10 +27,14 @@ describe('BackMaster', function() {
     let FrontChannel2: FrontChannel;
     let BackChannel1: BackChannel;
     let BackChannel2; BackChannel;
-    let client: Client;
+    let client1: Client;
+    let client2: Client;
+
     let linkedChannelFromSpy: any;
     let unlinkedChannelFromSpy: any;
     let addStatePatchSpy: any;
+    let addedClientLinkSpy: any;
+    let removedClientLinkSpy: any;
 
 
     before('Initialize front/back channels and front/back master channels.', (done) => {
@@ -43,13 +47,17 @@ describe('BackMaster', function() {
         linkedChannelFromSpy = sinon.spy(BackMaster, 'linkedChannelFrom');
         unlinkedChannelFromSpy = sinon.spy(BackMaster, 'unlinkedChannelFrom');
         addStatePatchSpy = sinon.spy(BackMaster, 'addStatePatch');
+        addedClientLinkSpy = sinon.spy(BackMaster, 'addedClientLink');
+        removedClientLinkSpy = sinon.spy(BackMaster, 'removedClientLink');
+
 
         FrontChannel1 = FrontMaster.frontChannels[0];
         FrontChannel2 = FrontMaster.frontChannels[1];
         BackChannel1 = BackMaster.backChannels[0];
         BackChannel2 = BackMaster.backChannels[1];
 
-        client = new Client('TEST', FrontMaster);
+        client1 = new Client('1', FrontMaster);
+        client2 = new Client('2', FrontMaster);
 
         assert.strictEqual(FrontChannel1.channelId, 0);
         assert.strictEqual(FrontChannel2.channelId, 1);
@@ -96,8 +104,9 @@ describe('BackMaster', function() {
         it('Gets called when a frontChannel links', (done) => {
             BackChannel1.setState({ "foo": "bar" });
 
-            FrontChannel1.link().then(() => {
+            client1.linkChannel(FrontChannel1.channelId).then(() => {
                 sinon.assert.calledOnce(linkedChannelFromSpy);
+                sinon.assert.calledOnce(addedClientLinkSpy);
                 done();
             })
         });
@@ -113,16 +122,17 @@ describe('BackMaster', function() {
             assert.strictEqual(BackMaster.linkedFrontMasterIndexesArray[0], FrontMaster.frontMasterIndex);
             done();
         });
-        it('Gets called when a second frontChannel links', (done) => {
-            FrontChannel1.link().then(() => {
-                sinon.assert.callCount(linkedChannelFromSpy, 2);
+        it('Gets when the same channel connects another client', (done) => {
+            client2.linkChannel(FrontChannel1.channelId).then(() => {
+                sinon.assert.callCount(linkedChannelFromSpy, 1);
+                sinon.assert.callCount(addedClientLinkSpy, 2);
                 done();
             })
         });
         it('linkedFrontMasterChannels updated master lookup channel count correctly', (done) => {
             assert.strictEqual(Object.keys(BackMaster.linkedFrontMasterChannels).length, 1);
             assert.strictEqual(BackMaster.linkedFrontMasterChannels.hasOwnProperty(FrontMaster.frontMasterIndex), true);
-            assert.strictEqual(BackMaster.linkedFrontMasterChannels[FrontMaster.frontMasterIndex].linkedChannelsCount, 2);
+            assert.strictEqual(BackMaster.linkedFrontMasterChannels[FrontMaster.frontMasterIndex].linkedChannelsCount, 1);
             assert.strictEqual(BackMaster.linkedFrontMasterChannels[FrontMaster.frontMasterIndex].encodedPatches.length, 0);
             done();
         });
@@ -134,40 +144,38 @@ describe('BackMaster', function() {
     });
 
     describe('BackMaster.unlinkedChannelFrom', () => {
-        it('Gets called when a frontChannel unlinks', (done) => {
+        it('Gets called when a frontChannel unlinks all of its linked uids', (done) => {
             BackChannel1.setState({ "foo": "bar" });
 
-            FrontChannel1.unlink();
+            client1.unlinkChannel(FrontChannel1.channelId);
+            client2.unlinkChannel(FrontChannel1.channelId);
+
             setTimeout(() => {
                 sinon.assert.calledOnce(unlinkedChannelFromSpy);
+                sinon.assert.callCount(removedClientLinkSpy, 2);
                 done();
             }, 50);
         });
         it('linkedFrontMasterChannels updates channel count correctly', (done) => {
-            assert.strictEqual(Object.keys(BackMaster.linkedFrontMasterChannels).length, 1);
-            assert.strictEqual(BackMaster.linkedFrontMasterChannels.hasOwnProperty(FrontMaster.frontMasterIndex), true);
-            assert.strictEqual(BackMaster.linkedFrontMasterChannels[FrontMaster.frontMasterIndex].linkedChannelsCount, 1);
-            assert.strictEqual(BackMaster.linkedFrontMasterChannels[FrontMaster.frontMasterIndex].encodedPatches.length, 0);
+            assert.strictEqual(Object.keys(BackMaster.linkedFrontMasterChannels).length, 0);
+            assert.strictEqual(BackMaster.linkedFrontMasterChannels.hasOwnProperty(FrontMaster.frontMasterIndex), false);
             done();
         });
-        it('linkedFrontMasterIndexesArray still has an element since not all channels from master unlinked', (done) => {
-            assert.strictEqual(BackMaster.linkedFrontMasterIndexesArray.length, 1);
-            assert.strictEqual(BackMaster.linkedFrontMasterIndexesArray[0], FrontMaster.frontMasterIndex);
+        it('linkedFrontMasterIndexesArray has no more front channels from any front masters linked', (done) => {
+            assert.strictEqual(BackMaster.linkedFrontMasterIndexesArray.length, 0);
             done();
         });
         it('Gets called a second time when other frontChannel unlinks', (done) => {
-            FrontChannel1.unlink();
-            setTimeout(() => {
-                sinon.assert.callCount(unlinkedChannelFromSpy, 2);
-                done();
-            }, 50);
+            client2.linkChannel(FrontChannel2.channelId).then(() => {
+                client2.unlinkChannel(FrontChannel2.channelId);
+                setTimeout(() => {
+                    sinon.assert.callCount(unlinkedChannelFromSpy, 2);
+                    done();
+                }, 50);
+            });
         });
         it('linkedFrontMasterChannels has no keys since theres no more channels from master linked', (done) => {
             assert.strictEqual(Object.keys(BackMaster.linkedFrontMasterChannels).length, 0);
-            done();
-        });
-        it('linkedFrontMasterIndexesArray has no elements since there are no more channels from master linked', (done) => {
-            assert.strictEqual(BackMaster.linkedFrontMasterIndexesArray.length, 0);
             done();
         });
     });
@@ -176,8 +184,8 @@ describe('BackMaster', function() {
         it('Gets called when a linked BackChannel calls patchState', (done) => {
             BackChannel1.setState({"foo": "bar"});
 
-            FrontChannel1.link().then(encodedState => {
-                let decoded = msgpack.decode(encodedState);
+            client1.linkChannel(FrontChannel1.channelId).then(data => {
+                let decoded = msgpack.decode(Buffer.from(data.encodedState));
                 assert.deepStrictEqual(decoded, {"foo": "bar"});
 
                 BackChannel1.state['foo'] = 'baz';
@@ -217,27 +225,31 @@ describe('BackMaster', function() {
 
     describe('BackMaster.messageClient', () => {
         it('Should return false if the client is not linked', (done) => {
-            assert.strictEqual(BackMaster.messageClient(client.uid, { "foo": "bar" } ), false);
-            done();
+            client1.unlinkChannel(FrontChannel1.channelId);
+            setTimeout(() => {
+                assert.strictEqual(BackMaster.messageClient(client1.uid, { "foo": "bar" } ), false);
+                done();
+            }, 20)
+
         });
 
         it('Should return true if the client was linked', (done) => {
-            client.onMessage(() => {});
-            client.connectToChannel(FrontChannel1.channelId).then(() => {
-                assert.strictEqual(BackMaster.messageClient(client.uid, { "foo": "bar" } ), true);
+            client1.onMessage(() => {});
+            client1.linkChannel(FrontChannel1.channelId).then(() => {
+                assert.strictEqual(BackMaster.messageClient(client1.uid, { "foo": "bar" } ), true);
                 done();
             });
         });
         it('Should succesfully call the clients onMessageHandler', (done) => {
             let called = 0;
-            client.onMessage(message => {
+            client1.onMessage(message => {
                 called+=message;
                 setTimeout(() => {
                    assert.strictEqual(called, 1);
                    done();
                 }, 30);
             });
-            assert.strictEqual(BackMaster.messageClient(client.uid, 1), true);
+            assert.strictEqual(BackMaster.messageClient(client1.uid, 1), true);
         });
     });
 });

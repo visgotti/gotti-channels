@@ -7,16 +7,17 @@ class Client {
     readonly uid: string;
     public state: any;
     private masterChannel: FrontMasterChannel;
-    private connectedChannels: Map<string, FrontChannel>;
+    private linkedChannels: Map<string, FrontChannel>;
     private processorChannel: FrontChannel;
     private _queuedEncodedUpdates: any;
 
     constructor(uid: string, masterChannel: FrontMasterChannel) {
+        if(!(uid)) throw new Error('Invalid client uid.');
         this.uid = uid;
         this.masterChannel = masterChannel;
         this.masterChannel.clientConnected(this);
         this.processorChannel = null;
-        this.connectedChannels = new Map();
+        this.linkedChannels = new Map();
         this._queuedEncodedUpdates = {};
         this.state = null;
     }
@@ -37,15 +38,16 @@ class Client {
     /**
      * Sets connected channel of client also links it.
      * @param channelId
+     * @param options to send to back channel
      */
-    public async connectToChannel(channelId: string) {
+    public async linkChannel(channelId: string, options?: any) {
         try {
             const channel = this.masterChannel.frontChannels[channelId];
             if(!channel) throw new Error(`Invalid channelId ${channelId}`);
-            const encodedState = await channel.connectClient(this);
-            this.connectedChannels.set(channel.channelId, channel);
-            this.addStateUpdate(channel.channelId, encodedState, STATE_UPDATE_TYPES.SET);
-            return encodedState;
+            const response = await channel.linkClient(this, options);
+            this.linkedChannels.set(channelId, channel);
+            this.addStateUpdate(channelId, response.encodedState, STATE_UPDATE_TYPES.SET);
+            return response;
         } catch (err) {
             throw err;
         }
@@ -55,13 +57,14 @@ class Client {
      * this sets the channel where client messages get processed.
      * if the client isnt connected, it will call the connect method first.
      * @param channel
+     * @param options to send to back channel
      */
-    public async setProcessorChannel(channelId: string) {
+    public async setProcessorChannel(channelId: string, options?: any) {
         try {
             const channel = this.masterChannel.frontChannels[channelId];
-            if(!channel) throw new Error(`Invalid channelId ${channelId}`);
-            if(!(this.connectedChannels.has(channelId))) {
-                await this.connectToChannel(channelId);
+            if(!channel) throw new Error(`Invalid channelId${channelId}`);
+            if(!(this.linkedChannels.has(channelId))) {
+                await this.linkChannel(channelId, options);
                 this.processorChannel = channel;
                 return true;
             } else {
@@ -75,7 +78,7 @@ class Client {
     }
 
     public addStateUpdate(channelId, update, type: STATE_UPDATE_TYPES) {
-        if(!(this.connectedChannels.has(channelId))) return false;
+        if(!(this.linkedChannels.has(channelId))) return false;
 
         if(!(channelId in this._queuedEncodedUpdates)) {
             this._queuedEncodedUpdates[channelId] = [];
@@ -125,12 +128,12 @@ class Client {
         this.processorChannel.addMessage(data);
     }
 
-    public disconnect(channelId?) {
-        if(this.connectedChannels.has(channelId)) {
-            this.connectedChannels.get(channelId).disconnectClient(this.uid)
+    public unlinkChannel(channelId?, options?) {
+        if(this.linkedChannels.has(channelId)) {
+            this.linkedChannels.get(channelId).unlinkClient(this.uid, options);
         } else {
-            this.connectedChannels.forEach(channel => {
-                channel.disconnectClient(this.uid);
+            this.linkedChannels.forEach(channel => {
+                channel.unlinkClient(this.uid);
             });
             this.masterChannel.clientDisconnected(this.uid)
         }
@@ -142,7 +145,7 @@ class Client {
             this.processorChannel = null;
         }
         delete this._queuedEncodedUpdates[channelId];
-        this.connectedChannels.delete(channelId);
+        this.linkedChannels.delete(channelId);
     }
 }
 

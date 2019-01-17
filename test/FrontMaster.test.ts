@@ -1,6 +1,7 @@
 import {clearInterval} from "timers";
 import * as msgpack from 'notepack.io';
 
+import Client from '../src/core/Client';
 import FrontChannel from '../src/core/Front/FrontChannel';
 import BackChannel from '../src/core/Back/BackChannel';
 
@@ -24,6 +25,8 @@ describe('FrontChannel', function() {
     let FrontChannel2: FrontChannel;
     let BackChannel1: BackChannel;
     let BackChannel2; BackChannel;
+    let client: Client;
+
     before('Initialize front/back channels and front/back master channels.', (done) => {
         const frontMessenger = new Messenger({ id: 'testFront', publish: { pubSocketURI: TEST_FRONT_URI } , subscribe: { pubSocketURIs: [TEST_BACK_URI] } });
         const backMessenger = new Messenger({ id: 'testBack', publish: { pubSocketURI: TEST_BACK_URI } , subscribe: { pubSocketURIs: [TEST_FRONT_URI] } });
@@ -35,6 +38,8 @@ describe('FrontChannel', function() {
         FrontChannel2 = FrontMaster.frontChannels[1];
         BackChannel1 = BackMaster.backChannels[0];
         BackChannel2 = BackMaster.backChannels[1];
+        client = new Client('1', FrontMaster);
+
 
         assert.strictEqual(FrontChannel1.channelId, 0);
         assert.strictEqual(FrontChannel2.channelId, 1);
@@ -120,7 +125,7 @@ describe('FrontChannel', function() {
         it('FrontMaster.linkChannel gets called when child FrontChannel1 links asynchronously', (done) => {
             BackChannel1.setState({ "foo": "bar" });
             assert.strictEqual(FrontMaster.linkedBackMasterLookup.hasOwnProperty(BackMaster.backMasterIndex), false);
-            FrontChannel1.link().then(() => {
+            FrontChannel1.linkClient(client).then(() => {
                 FrontMaster.linkChannel(BackMaster.backMasterIndex);
                 assert.strictEqual(FrontMaster.linkedBackMasterLookup.hasOwnProperty(BackMaster.backMasterIndex), true);
                 done();
@@ -128,7 +133,7 @@ describe('FrontChannel', function() {
         });
         it('FrontMaster.unlinkChannel gets called when child FrontChannel1 unlinks', (done) => {
             assert.strictEqual(FrontMaster.linkedBackMasterLookup.hasOwnProperty(BackMaster.backMasterIndex), true);
-            FrontChannel1.unlink();
+            FrontChannel1.unlinkClient(client.uid);
             FrontMaster.unlinkChannel(BackChannel1.backMasterIndex);
             assert.strictEqual(FrontMaster.linkedBackMasterLookup.hasOwnProperty(BackMaster.backMasterIndex), false);
             done();
@@ -142,7 +147,7 @@ describe('FrontChannel', function() {
         });
         it('doesnt fail after linking one of the channels', (done) => {
             BackChannel1.setState({ "foo": "baz" });
-            FrontChannel1.link().then(() => {
+            FrontChannel1.linkClient(client).then(() => {
                 assert.doesNotThrow(() => { FrontMaster.addQueuedMessage({"foo": "bar"}, BackMaster.backMasterIndex, FrontChannel1.channelId)} );
                 done();
             });

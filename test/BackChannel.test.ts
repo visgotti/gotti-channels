@@ -1,6 +1,7 @@
 import {clearInterval} from "timers";
 import * as msgpack from 'notepack.io';
 
+import Client from '../src/core/Client';
 import FrontChannel from '../src/core/Front/FrontChannel';
 import BackChannel from '../src/core/Back/BackChannel';
 
@@ -25,6 +26,8 @@ describe('BackChannel', function() {
     let BackChannel1: BackChannel;
     let BackChannel2; BackChannel;
 
+    let client: Client;
+
     before('Initialize a centrum messenger for the Front Channels and the Back Channels', (done) => {
         const frontMessenger = new Messenger({ id: 'testFront', publish: { pubSocketURI: TEST_FRONT_URI } , subscribe: { pubSocketURIs: [TEST_BACK_URI] } });
         const backMessenger = new Messenger({ id: 'testBack', publish: { pubSocketURI: TEST_BACK_URI } , subscribe: { pubSocketURIs: [TEST_FRONT_URI] } });
@@ -36,6 +39,7 @@ describe('BackChannel', function() {
         FrontChannel2 = FrontMaster.frontChannels[1];
         BackChannel1 = BackMaster.backChannels[0];
         BackChannel2 = BackMaster.backChannels[1];
+        client = new Client('1', FrontMaster);
 
         assert.strictEqual(FrontChannel1.channelId, 0);
         assert.strictEqual(FrontChannel2.channelId, 1);
@@ -174,9 +178,39 @@ describe('BackChannel', function() {
                 }, 100);
             });
 
-            FrontChannel1.link().then(() => {
+            FrontChannel1.linkClient(client).then(() => {
                 BackChannel1.broadcastLinked(1);
             });
+        });
+    });
+
+    describe('BackChannel.onRemoveClient', () => {
+        it('correctly registers a handler for the remove_client event', (done) => {
+            const mockUid = 'client_foo';
+            const mockOptions = {
+                'foo': 'bar'
+            };
+            BackChannel1.onRemoveClient((clientUid, options?) => {
+                assert.strictEqual(clientUid, mockUid);
+                assert.deepStrictEqual(options, mockOptions);
+                done();
+            });
+            BackChannel1.emit('remove_client', mockUid, mockOptions);
+        });
+    });
+
+    describe('BackChannel.onAddClient', () => {
+        it('correctly registers a handler for the add_client event', (done) => {
+            const mockUid = 'client_foo';
+            const mockOptions = {
+                'foo': 'bar'
+            };
+            BackChannel1.onAddClient((clientUid, options?) => {
+                assert.strictEqual(clientUid, mockUid);
+                assert.deepStrictEqual(options, mockOptions);
+                done();
+            });
+            BackChannel1.emit('add_client', FrontChannel1.frontUid, mockUid, 'mock_state', mockOptions);
         });
     });
 });

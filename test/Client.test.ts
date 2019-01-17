@@ -19,7 +19,6 @@ const TEST_BACK_URI = 'tcp://127.0.0.1:5000';
 
 describe('Client', function() {
     let client: Client;
-    let undefinedClient: Client;
 
     let FrontMaster: FrontMasterChannel;
     let BackMaster: BackMasterChannel;
@@ -33,8 +32,7 @@ describe('Client', function() {
     let BackMaster_removedClientLinkSpy;
     let BackChannel1_acceptClientLinkSpy;
     let BackChannel2_acceptClientLinkSpy;
-    let FrontChannel1_disconnectClientSpy;
-    let FrontChannel1_unlinkSpy;
+    let FrontChannel1_unlinkClientSpy;
     let FrontMaster_clientConnected;
     let FrontMaster_clientDisconnected;
 
@@ -54,8 +52,7 @@ describe('Client', function() {
         BackMaster_removedClientLinkSpy = sinon.spy(BackMaster, 'removedClientLink');
         BackChannel1_acceptClientLinkSpy = sinon.spy(BackChannel1, 'acceptClientLink');
         BackChannel2_acceptClientLinkSpy = sinon.spy(BackChannel2, 'acceptClientLink');
-        FrontChannel1_disconnectClientSpy = sinon.spy(FrontChannel1, 'disconnectClient');
-        FrontChannel1_unlinkSpy = sinon.spy(FrontChannel1, 'unlink');
+        FrontChannel1_unlinkClientSpy = sinon.spy(FrontChannel1, 'unlinkClient');
         FrontMaster_clientConnected = sinon.spy(FrontMaster, 'clientConnected');
         FrontMaster_clientDisconnected = sinon.spy(FrontMaster, 'clientDisconnected');
 
@@ -63,8 +60,6 @@ describe('Client', function() {
 
         // should have called the clientConnected function in FrontMaster upon initialization
         sinon.assert.calledOnce(FrontMaster_clientConnected);
-
-        undefinedClient = new Client(null, FrontMaster);
 
         assert.strictEqual(FrontChannel1.channelId, 0);
         assert.strictEqual(FrontChannel2.channelId, 1);
@@ -92,15 +87,39 @@ describe('Client', function() {
         }, 200);
     });
 
-    describe('client.connectToChannel', () => {
-        it('should get encoded state from async response', (done) => {
+    describe('Creating a client with a falsey uid is invalid', () => {
+        it('throws an error when constructing', (done) => {
+            assert.throws(() => { new Client(undefined, FrontMaster) });
+            assert.throws(() => { new Client(null, FrontMaster) });
+            assert.throws(() => { new Client('', FrontMaster) });
+            done();
+        });
+    });
+
+    describe('client.linkChannel', () => {
+        it('should get encoded state and empty response options from async response', (done) => {
             BackChannel1.setState({ "foo": "bar" });
-            client.connectToChannel(FrontChannel1.channelId).then(encodedState => {
-                const state = msgpack.decode(encodedState);
+
+            let mockOptions = { "foo" : "bar" };
+
+            let receivedClientUid;
+            let receivedOptions;
+
+            BackChannel1.onAddClient((clientUid, options) => {
+                receivedClientUid = clientUid;
+                receivedOptions = options;
+            });
+
+            client.linkChannel(FrontChannel1.channelId, mockOptions).then(data => {
+                const { encodedState, responseOptions } = data;
+                const state = msgpack.decode(Buffer.from(encodedState));
                 assert.deepStrictEqual(state, { "foo": "bar" });
 
-                assert.strictEqual(FrontChannel1.connectedClientUids.length, 1);
-                assert.strictEqual(FrontChannel1.connectedClientUids[0], client.uid);
+                assert.strictEqual(responseOptions, undefined);
+                assert.strictEqual(receivedClientUid, client.uid);
+                assert.deepStrictEqual(receivedOptions, mockOptions);
+                assert.strictEqual(FrontChannel1.linkedClientUids.length, 1);
+                assert.strictEqual(FrontChannel1.linkedClientUids[0], client.uid);
                 assert.strictEqual(client.queuedEncodedUpdates.hasOwnProperty(BackChannel1.channelId), true);
                 assert.strictEqual(client.queuedEncodedUpdates[BackChannel1.channelId].length, 1);
                 done();
@@ -127,18 +146,11 @@ describe('Client', function() {
             done();
         });
         it('throws an error if you are already connected', (done) => {
-            client.connectToChannel(FrontChannel1.channelId).then(() => {})
+            client.linkChannel(FrontChannel1.channelId).then(() => {})
             .catch((err) => {
                 assert.strictEqual(err.message, 'Client is already in connection state.');
                 done();
             });
-        });
-        it('throws an error if the uid was invalid', (done) => {
-            undefinedClient.connectToChannel(FrontChannel1.channelId).then(() => {})
-                .catch((err) => {
-                    assert.strictEqual(err.message, 'Invalid client uid.');
-                    done();
-                });
         });
     });
     describe('client.setProcessorChannel', () => {
@@ -147,19 +159,21 @@ describe('Client', function() {
             assert.throws(() => { client.sendLocal("test") }, 'Client must have a channel set as its processor channel to send messages. See Client.setProcessor');
             done();
         });
-        it('sets and connects asynchronously if it wasnt connected first', () => {
+        it('sets and connects asynchronously if it wasnt connected first', (done) => {
             BackChannel2.setState({ "foo": "bar" });
             client.setProcessorChannel(FrontChannel2.channelId).then(set => {
+                console.log('the set was', set);
+                console.log('the liubfwe bhku', BackMaster.linkedFrontMasterChannels);
 
-                assert.strictEqual(FrontChannel2.connectedClientUids.length, 1);
-                assert.strictEqual(FrontChannel2.connectedClientUids[0], client.uid);
+                assert.strictEqual(FrontChannel2.linkedClientUids.length, 1);
+                assert.strictEqual(FrontChannel2.linkedClientUids[0], client.uid);
                 assert.strictEqual(client.queuedEncodedUpdates.hasOwnProperty(BackChannel1.channelId), true);
                 assert.strictEqual(client.queuedEncodedUpdates.hasOwnProperty(BackChannel2.channelId), true);
                 assert.strictEqual(client.queuedEncodedUpdates[BackChannel1.channelId].length, 1);
                 assert.strictEqual(client.queuedEncodedUpdates[BackChannel2.channelId].length, 1);
-
                 assert.strictEqual(set, true);
-            })
+                done();
+            });
         });
         it('Back master should now have the count of two for the client link count', (done) => {
             assert.strictEqual(BackMaster.linkedClientFrontDataLookup.size, 1);
@@ -177,8 +191,9 @@ describe('Client', function() {
     });
     describe('client.addStateUpdate', () => {
         it('adds a set state update', (done) => {
-            // should be 2 counting the state that gets added when connectToChannel receives
-            const count = client.addStateUpdate(FrontChannel1.channelId,'bur', STATE_UPDATE_TYPES.SET);
+            // should be 2 counting the state that gets added when linkChannel receives
+            const count = client.addStateUpdate(FrontChannel1.channelId, 'bur', STATE_UPDATE_TYPES.SET);
+            console.log('the queuedEncodedUpdates was', client.queuedEncodedUpdates);
             assert.strictEqual(client.queuedEncodedUpdates.hasOwnProperty(BackChannel1.channelId), true);
             assert.strictEqual(client.queuedEncodedUpdates.hasOwnProperty(BackChannel2.channelId), true);
             assert.strictEqual(client.queuedEncodedUpdates[BackChannel1.channelId].length, 2);
@@ -282,20 +297,17 @@ describe('Client', function() {
             client.sendGlobal(1);
         });
     });
-    describe('client.disconnect', () => {
-        it('disconnects client from front channel and then unlinks channel since it was the only client', (done) => {
+    describe('client.unlink', () => {
+        it('unlinks client from front channel and then unlinks channel since it was the only client', (done) => {
 
             // count was 2 on back master
             assert.strictEqual(BackMaster.linkedFrontMasterChannels[FrontMaster.frontMasterIndex].linkedChannelsCount, 2);
 
-            client.disconnect(FrontChannel1.channelId);
-            assert.strictEqual(FrontChannel1.connectedClientUids.length, 0);
+            client.unlinkChannel(FrontChannel1.channelId);
+            assert.strictEqual(FrontChannel1.linkedClientUids.length, 0);
+            sinon.assert.calledOnce(FrontChannel1_unlinkClientSpy);
 
-            sinon.assert.calledOnce(FrontChannel1_disconnectClientSpy);
             setTimeout(() => {
-                // front unlink should have been called twice, one for the client unlink
-                // and then again for the channel unlink since theres no more clients
-                sinon.assert.callCount(FrontChannel1_unlinkSpy, 2);
 
                 // back master should only have 1 front master linked now.
                 assert.strictEqual(client.queuedEncodedUpdates.hasOwnProperty(BackChannel1.channelId), false);
@@ -323,13 +335,15 @@ describe('Client', function() {
         });
 
         it('disconnects client from all front channels if no param is passed in', (done) => {
-            client.connectToChannel(FrontChannel1.channelId).then(() => {
+            client.linkChannel(FrontChannel1.channelId).then(() => {
                 // count became 2 on back master
+                console.log('the liubfwe bhku', BackMaster.linkedFrontMasterChannels);
                 assert.strictEqual(BackMaster.linkedFrontMasterChannels[FrontMaster.frontMasterIndex].linkedChannelsCount, 2);
-                client.disconnect();
+                client.unlinkChannel();
+
                 setTimeout(() => {
-                    assert.strictEqual(FrontChannel1.connectedClientUids.length, 0);
-                    assert.strictEqual(FrontChannel2.connectedClientUids.length, 0);
+                    assert.strictEqual(FrontChannel1.linkedClientUids.length, 0);
+                    assert.strictEqual(FrontChannel2.linkedClientUids.length, 0);
 
                     // should no longer have any channel ids for queued encoded updates.
                     assert.strictEqual(client.queuedEncodedUpdates.hasOwnProperty(BackChannel1.channelId), false);
