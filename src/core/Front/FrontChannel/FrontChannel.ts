@@ -119,7 +119,6 @@ class FrontChannel extends Channel {
             this.emitClientLinked(clientUid, null, { error: `Client ${clientUid} connection request to ${this.channelId} timed out`});
         }, this.clientTimeout));
 
-
         options ? this.pub.LINK([clientUid, options]) : this.pub.LINK([clientUid]);
 
         return new Promise((resolve, reject) => {
