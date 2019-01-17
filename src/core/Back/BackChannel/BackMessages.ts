@@ -22,6 +22,8 @@ export interface BackSubs {
 export interface BackPulls {
     LINK: PullProtocol,
     UNLINK: PullProtocol,
+    ADD_CLIENT_WRITE: PullProtocol,
+    REMOVE_CLIENT_WRITE: PullProtocol,
 }
 
 export class BackMessages extends ChannelMessageFactory {
@@ -31,6 +33,8 @@ export class BackMessages extends ChannelMessageFactory {
 
     public LINK: PullProtocol;
     public UNLINK: PullProtocol;
+    public ADD_CLIENT_WRITE: PullProtocol;
+    public REMOVE_CLIENT_WRITE: PullProtocol;
 
     public SEND_FRONT: PushProtocol;
 
@@ -93,10 +97,14 @@ export class BackMessages extends ChannelMessageFactory {
     private initializePulls(): BackPulls {
         this.LINK = this.pullCreator(Protocol.LINK);
         this.UNLINK = this.pullCreator(Protocol.UNLINK);
+        this.ADD_CLIENT_WRITE = this.pullCreator(Protocol.ADD_CLIENT_WRITE);
+        this.REMOVE_CLIENT_WRITE = this.pullCreator(Protocol.REMOVE_CLIENT_WRITE);
 
         return {
             LINK: this.LINK,
             UNLINK: this.UNLINK,
+            ADD_CLIENT_WRITE: this.ADD_CLIENT_WRITE,
+            REMOVE_CLIENT_WRITE: this.REMOVE_CLIENT_WRITE,
         }
     }
 }

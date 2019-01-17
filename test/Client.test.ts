@@ -105,7 +105,7 @@ describe('Client', function() {
             let receivedClientUid;
             let receivedOptions;
 
-            BackChannel1.onAddClient((clientUid, options) => {
+            BackChannel1.onAddClientListen((clientUid, options) => {
                 receivedClientUid = clientUid;
                 receivedOptions = options;
             });
@@ -118,16 +118,16 @@ describe('Client', function() {
                 assert.strictEqual(responseOptions, undefined);
                 assert.strictEqual(receivedClientUid, client.uid);
                 assert.deepStrictEqual(receivedOptions, mockOptions);
-                assert.strictEqual(FrontChannel1.linkedClientUids.length, 1);
-                assert.strictEqual(FrontChannel1.linkedClientUids[0], client.uid);
+                assert.strictEqual(FrontChannel1.listeningClientUids.length, 1);
+                assert.strictEqual(FrontChannel1.listeningClientUids[0], client.uid);
                 assert.strictEqual(client.queuedEncodedUpdates.hasOwnProperty(BackChannel1.channelId), true);
                 assert.strictEqual(client.queuedEncodedUpdates[BackChannel1.channelId].length, 1);
                 done();
             });
         });
         it('Should have added a linkedClientUid to the back channel', (done) => {
-            assert.strictEqual(BackChannel1.linkedClientUids.length, 1);
-            assert.strictEqual(BackChannel1.linkedClientUids[0], client.uid);
+            assert.strictEqual(BackChannel1.listeningClientUids.length, 1);
+            assert.strictEqual(BackChannel1.listeningClientUids[0], client.uid);
             done();
         });
         it('should have called the acceptClientLink method in back channel', (done) => {
@@ -173,8 +173,8 @@ describe('Client', function() {
                const set = client.setProcessorChannel(FrontChannel2.channelId);
                assert.strictEqual(client.processorChannel, FrontChannel2.channelId);
                assert.strictEqual(set, true);
-               assert.strictEqual(FrontChannel2.linkedClientUids.length, 1);
-               assert.strictEqual(FrontChannel2.linkedClientUids[0], client.uid);
+               assert.strictEqual(FrontChannel2.listeningClientUids.length, 1);
+               assert.strictEqual(FrontChannel2.listeningClientUids[0], client.uid);
                assert.strictEqual(client.queuedEncodedUpdates.hasOwnProperty(BackChannel1.channelId), true);
                assert.strictEqual(client.queuedEncodedUpdates.hasOwnProperty(BackChannel2.channelId), true);
                assert.strictEqual(client.queuedEncodedUpdates[BackChannel1.channelId].length, 1);
@@ -182,6 +182,14 @@ describe('Client', function() {
                done();
            });
         });
+
+        it('added writingClientUid to back channel 2 while back channel 1 has 0', (done) => {
+            assert.strictEqual(BackChannel2.writingClientUids.length, 1);
+            assert.strictEqual(BackChannel2.writingClientUids[0], client.uid);
+            assert.strictEqual(BackChannel1.writingClientUids.length, 0);
+            done();
+        });
+
         it('Back master should now have the count of two for the client link count', (done) => {
             assert.strictEqual(BackMaster.linkedClientFrontDataLookup.size, 1);
             const clientData = BackMaster.linkedClientFrontDataLookup.get(client.uid);
@@ -193,6 +201,13 @@ describe('Client', function() {
             const set = client.setProcessorChannel(FrontChannel1.channelId);
             assert.strictEqual(client.processorChannel, FrontChannel1.channelId);
             assert.strictEqual(set, true);
+            done();
+        });
+        it('added writingClientUids to back channel 1 and removed from back channel 2', (done) => {
+            assert.strictEqual(BackChannel1.writingClientUids.length, 1);
+            assert.strictEqual(BackChannel1.writingClientUids[0], client.uid);
+
+            assert.strictEqual(BackChannel2.writingClientUids.length, 0);
             done();
         });
     });
@@ -310,7 +325,7 @@ describe('Client', function() {
             assert.strictEqual(BackMaster.linkedFrontMasterChannels[FrontMaster.frontMasterIndex].linkedChannelsCount, 2);
 
             client.unlinkChannel(FrontChannel1.channelId);
-            assert.strictEqual(FrontChannel1.linkedClientUids.length, 0);
+            assert.strictEqual(FrontChannel1.listeningClientUids.length, 0);
             sinon.assert.calledOnce(FrontChannel1_unlinkClientSpy);
 
             setTimeout(() => {
@@ -325,7 +340,7 @@ describe('Client', function() {
             }, 50);
         });
         it('Should have removed the linkedClientUid to the back channel', (done) => {
-            assert.strictEqual(BackChannel1.linkedClientUids.length, 0);
+            assert.strictEqual(BackChannel1.listeningClientUids.length, 0);
             done();
         });
         it('Should have called the removedClientLink method in the back master', (done) => {
@@ -347,8 +362,8 @@ describe('Client', function() {
                 client.unlinkChannel();
 
                 setTimeout(() => {
-                    assert.strictEqual(FrontChannel1.linkedClientUids.length, 0);
-                    assert.strictEqual(FrontChannel2.linkedClientUids.length, 0);
+                    assert.strictEqual(FrontChannel1.listeningClientUids.length, 0);
+                    assert.strictEqual(FrontChannel2.listeningClientUids.length, 0);
 
                     // should no longer have any channel ids for queued encoded updates.
                     assert.strictEqual(client.queuedEncodedUpdates.hasOwnProperty(BackChannel1.channelId), false);
@@ -365,8 +380,8 @@ describe('Client', function() {
             done();
         });
         it('Should have removed the linkedClientUid to both of the back channels', (done) => {
-            assert.strictEqual(BackChannel1.linkedClientUids.length, 0);
-            assert.strictEqual(BackChannel2.linkedClientUids.length, 0);
+            assert.strictEqual(BackChannel1.listeningClientUids.length, 0);
+            assert.strictEqual(BackChannel2.listeningClientUids.length, 0);
             done();
         });
         it('Should have called the removedClientLink method in total of 3 times on the back master', (done) => {

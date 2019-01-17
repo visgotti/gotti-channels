@@ -20,7 +20,8 @@ class BackChannel extends Channel {
     // lookup of frontUid to frontMasterIndex
     private _connectedFrontsData: Map<string, ConnectedFrontData>;
 
-    private _linkedClientUids: Set<string>;
+    private _listeningClientUids: Set<string>;
+    private _writingClientUids: Set<string>;
 
     private _mirroredFrontUids: Set<string>;
 
@@ -53,7 +54,8 @@ class BackChannel extends Channel {
         this._previousState = null;
 
         this._connectedFrontsData = new Map();
-        this._linkedClientUids = new Set();
+        this._listeningClientUids = new Set();
+        this._writingClientUids = new Set();
         this._mirroredFrontUids = new Set();
 
         this.initializeMessageFactories();
@@ -61,7 +63,9 @@ class BackChannel extends Channel {
         this.registerPreConnectedPubs();
 
         // register initially so if theres no hooking logic the user needs the event is still registered and fired.
-        this.onAddClient((...args) => {});
+        this.onAddClientListen((...args) => {});
+        this.onAddClientWrite((...args) => {});
+        this.onRemoveClientWrite((...args) => {});
     }
 
     /**
@@ -73,14 +77,26 @@ class BackChannel extends Channel {
     }
 
     /**
-     * sets the onClientListenHandler function
-     * @param handler - function that gets executed when a new client is succesfully linked/listening to state updates.
+     * @param handler - handler called when a client is added as a writer.
      */
-    public onRemoveClient(handler: (clientUid: string, options?: any) => any) : void {
-        this.listenerCount('remove_client') && this.removeAllListeners('remove_client');
+    public onAddClientWrite(handler: (clientUid: string, options?: any) => void) : void {
+        this.listenerCount('add_client_write') && this.removeAllListeners('add_client_write');
 
-        this.on('remove_client', (clientUid: string, options?: any) => {
+        this.on('add_client_write', (clientUid: string, options?: any) => {
+            this._writingClientUids.add(clientUid);
             handler(clientUid, options);
+        });
+    }
+
+    /**
+     * @param handler - handler called when a client is added as a writer.
+     */
+    public onRemoveClientWrite(handler: (clientUid: string) => void) : void {
+        this.listenerCount('remove_client_write') && this.removeAllListeners('remove_client_write');
+
+        this.on('remove_client_write', (clientUid: string) => {
+            this._writingClientUids.delete(clientUid);
+            handler(clientUid);
         });
     }
 
@@ -91,10 +107,10 @@ class BackChannel extends Channel {
      * @param handler
      */
     //TODO: onRequestAddClient - have another hook that a user can decide if there's an allowed link to the client
-    public onAddClient(handler: (clientUid: string, options?: any) => any) : void {
-        this.listenerCount('add_client') && this.removeAllListeners('add_client');
+    public onAddClientListen(handler: (clientUid: string, options?: any) => any) : void {
+        this.listenerCount('add_client_listen') && this.removeAllListeners('add_client_listen');
 
-        this.on('add_client', (frontUid: string, clientUid: string, encodedState: string, options?: any) => {
+        this.on('add_client_listen', (frontUid: string, clientUid: string, encodedState: string, options?: any) => {
             // if handler returns data we want to send it back as options to front channel.
             const responseOptions = handler(clientUid, options);
             responseOptions ?
@@ -102,6 +118,19 @@ class BackChannel extends Channel {
                 this.push.ACCEPT_LINK[frontUid]([encodedState, clientUid]);
         });
     }
+
+    /**
+     * sets the onClientListenHandler function
+     * @param handler - function that gets executed when a new client is succesfully linked/listening to state updates.
+     */
+    public onRemoveClientListen(handler: (clientUid: string, options?: any) => void) : void {
+        this.listenerCount('remove_client_listen') && this.removeAllListeners('remove_client_listen');
+
+        this.on('remove_client_listen', (clientUid: string, options?: any) => {
+            handler(clientUid, options);
+        });
+    }
+
     /**
      * finds the delta of the new and last state then adds the patch update
      * to the master for it to be queued and then sent out to the needed
@@ -150,7 +179,7 @@ class BackChannel extends Channel {
     private acceptClientLink(frontUid, frontMasterIndex, clientUid, options?) {
 
         // add to set.
-        this._linkedClientUids.add(clientUid);
+        this._listeningClientUids.add(clientUid);
 
         // notify master a client linked (master keeps track of how many back channels the
         // client is connected to and also keeps a lookup to the front master index so it can
@@ -159,7 +188,7 @@ class BackChannel extends Channel {
 
         const encodedState = this.state ? this._previousStateEncoded : '';
 
-        this.emit('add_client', frontUid, clientUid, encodedState, options);
+        this.emit('add_client_listen', frontUid, clientUid, encodedState, options);
     }
 
     /**
@@ -228,8 +257,12 @@ class BackChannel extends Channel {
         return Array.from(this._mirroredFrontUids)
     }
 
-    get linkedClientUids() : Array<string> {
-        return Array.from(this._linkedClientUids);
+    get listeningClientUids() : Array<string> {
+        return Array.from(this._listeningClientUids);
+    }
+
+    get writingClientUids() : Array<string> {
+        return Array.from(this._writingClientUids);
     }
 
     private _onMessage(message: any, frontUid: string) : void {
@@ -287,6 +320,16 @@ class BackChannel extends Channel {
             this.push.ACCEPT_LINK.register(frontUid);
             this.push.BROADCAST_LINKED_FRONTS.register(frontUid);
 
+            this.pull.ADD_CLIENT_WRITE.register(frontUid, (message) => {
+                this.emit('add_client_write',  message[0], message[1])
+            });
+
+            this.pull.REMOVE_CLIENT_WRITE.register(frontUid, (message) => {
+                const clientUid = message[0];
+                const options = message[1];
+                this.emit('remove_client_write', clientUid, options);
+            });
+
             //TODO: these should be seperate actions for room link and client link..
             this.pull.LINK.register(frontUid, (message) => {
                 const clientUid = message[0];
@@ -301,7 +344,6 @@ class BackChannel extends Channel {
 
                 this.acceptClientLink(frontUid, frontMasterIndex, clientUid, options);
                 // notify the master with the front master index of connected channel if its a new front uid
-
             });
 
             this.pull.UNLINK.register(frontUid, (message) => {
@@ -309,7 +351,7 @@ class BackChannel extends Channel {
                 const options = message[1];
                 // makes sure linkedClientUids has the client
                 //  master keeps a correct state of clients linked count.
-                if(this._linkedClientUids.has(clientUid)) {
+                if(this._listeningClientUids.has(clientUid)) {
                     const clientUidSet = this.linkedFrontAndClientUids.get(frontUid);
                     this.linkedFrontAndClientUids.get(frontUid).delete(clientUid);
 
@@ -324,9 +366,9 @@ class BackChannel extends Channel {
                     }
 
                     this.master.removedClientLink(clientUid);
-                    this._linkedClientUids.delete(clientUid);
+                    this._listeningClientUids.delete(clientUid);
 
-                    this.emit('remove_client', clientUid, options);
+                    this.emit('remove_client_listen', clientUid, options);
                 }
             });
         }

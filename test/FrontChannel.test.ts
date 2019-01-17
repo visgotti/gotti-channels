@@ -56,7 +56,7 @@ describe('FrontChannel', function() {
     afterEach(() => {
         FrontChannel1.onConnected(() => {});
         FrontChannel2.onConnected(() => {});
-        BackChannel1.onAddClient((...args) => {});
+        BackChannel1.onAddClientListen((...args) => {});
     });
 
     after(done => {
@@ -123,7 +123,7 @@ describe('FrontChannel', function() {
             const state = { "foo": "bar" };
             BackChannel1.setState(state);
 
-            BackChannel1.onAddClient((clientUid, options) => {
+            BackChannel1.onAddClientListen((clientUid, options) => {
                 assert.strictEqual(clientUid, client.uid);
                 assert.deepStrictEqual(options, { "foo": "bar" });
                 options.foo = 'baz';

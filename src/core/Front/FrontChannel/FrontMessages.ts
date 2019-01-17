@@ -6,6 +6,8 @@ export interface FrontPubs {
     BROADCAST_ALL_BACK: PublishProtocol,
     LINK: PublishProtocol,
     UNLINK: PublishProtocol,
+    ADD_CLIENT_WRITE: PublishProtocol,
+    REMOVE_CLIENT_WRITE: PublishProtocol,
 }
 
 export interface FrontSubs {
@@ -25,6 +27,8 @@ export class FrontMessages extends ChannelMessageFactory {
     public BROADCAST_ALL_BACK: PublishProtocol;
     public LINK: PublishProtocol;
     public UNLINK: PublishProtocol;
+    public ADD_CLIENT_WRITE: PublishProtocol;
+    public REMOVE_CLIENT_WRITE: PublishProtocol;
 
     public SEND_BACK: PushProtocol;
 
@@ -56,6 +60,8 @@ export class FrontMessages extends ChannelMessageFactory {
         this.BROADCAST_ALL_BACK = this.pubCreator(Protocol.BROADCAST_ALL_BACK());
         this.LINK = this.pubCreator(Protocol.LINK(this.frontUid));
         this.UNLINK = this.pubCreator(Protocol.UNLINK(this.frontUid));
+        this.ADD_CLIENT_WRITE = this.pubCreator(Protocol.ADD_CLIENT_WRITE(this.frontUid));
+        this.REMOVE_CLIENT_WRITE = this.pubCreator(Protocol.REMOVE_CLIENT_WRITE(this.frontUid));
 
         //todo figure out cleanest way to do this inside parent class implicitly
         return {
@@ -63,6 +69,8 @@ export class FrontMessages extends ChannelMessageFactory {
             BROADCAST_ALL_BACK: this.BROADCAST_ALL_BACK,
             LINK: this.LINK,
             UNLINK: this.UNLINK,
+            ADD_CLIENT_WRITE: this.ADD_CLIENT_WRITE,
+            REMOVE_CLIENT_WRITE: this.REMOVE_CLIENT_WRITE,
         }
     }
 

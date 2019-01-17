@@ -7,7 +7,7 @@ class Client {
     readonly uid: string;
     public state: any;
     private masterChannel: FrontMasterChannel;
-    private _linkedChannels: Map<string, FrontChannel>;
+    private linkedChannels: Map<string, FrontChannel>;
     private _processorChannel: FrontChannel;
     private _queuedEncodedUpdates: any;
 
@@ -17,7 +17,7 @@ class Client {
         this.masterChannel = masterChannel;
         this.masterChannel.clientConnected(this);
         this._processorChannel = null;
-        this._linkedChannels = new Map();
+        this.linkedChannels = new Map();
         this._queuedEncodedUpdates = {};
         this.state = null;
     }
@@ -30,8 +30,8 @@ class Client {
         return this._processorChannel ? this._processorChannel.channelId : null;
     }
 
-    get linkedChannels() {
-        return Array.from(this._linkedChannels.keys());
+    public isLinkedToChannel(channelId: string) : boolean {
+        return this.linkedChannels.has(channelId);
     }
 
     /**
@@ -53,7 +53,7 @@ class Client {
             const channel = this.masterChannel.frontChannels[channelId];
             if(!channel) throw new Error(`Invalid channelId ${channelId}`);
             const response = await channel.linkClient(this, options);
-            this._linkedChannels.set(channelId, channel);
+            this.linkedChannels.set(channelId, channel);
             this.addStateUpdate(channelId, response.encodedState, STATE_UPDATE_TYPES.SET);
             return response;
         } catch (err) {
@@ -69,7 +69,7 @@ class Client {
      * @param {boolean=false} unlinkOld - if you want to unlink from the old processor channel after you set the new one.
      * @returns {boolean}
      */
-    public setProcessorChannel(channelId: string, unlinkOld=false) : boolean {
+    public setProcessorChannel(channelId: string, unlinkOld=false, options?: any) : boolean {
         const channel = this.masterChannel.frontChannels[channelId];
         // confirm channel id was valid
         if(!channel) throw new Error(`Invalid channelId ${channelId} trying to be set as processor for client ${this.uid}`);
@@ -78,7 +78,11 @@ class Client {
         if(this._processorChannel && channelId === this._processorChannel.channelId) throw new Error(`ChannelId ${channelId} is already set as processor for client ${this.uid}`);
 
         // confirm that the client was previously linked to channel before setting it as processor
-        if(!(this._linkedChannels.has(channelId))) throw new Error(`Please make sure there is a linkage to ${channelId} before setting it as processor for client ${this.uid}`);
+        if(!(this.linkedChannels.has(channelId))) throw new Error(`Please make sure there is a linkage to ${channelId} before setting it as processor for client ${this.uid}`);
+
+        this._processorChannel && this._processorChannel.removeClientWrite(this.uid);
+
+        channel.addClientWrite(this.uid, options);
 
         if(unlinkOld) this.unlinkChannel(this._processorChannel.channelId);
 
@@ -88,7 +92,7 @@ class Client {
     }
 
     public addStateUpdate(channelId, update, type: STATE_UPDATE_TYPES) {
-        if(!(this._linkedChannels.has(channelId))) return false;
+        if(!(this.linkedChannels.has(channelId))) return false;
 
         if(!(channelId in this._queuedEncodedUpdates)) {
             this._queuedEncodedUpdates[channelId] = [];
@@ -139,10 +143,18 @@ class Client {
     }
 
     public unlinkChannel(channelId?, options?) {
-        if(this._linkedChannels.has(channelId)) {
-            this._linkedChannels.get(channelId).unlinkClient(this.uid, options);
+        if(this.linkedChannels.has(channelId)) {
+            const linkedChannel = this.linkedChannels.get(channelId);
+
+            linkedChannel.unlinkClient(this.uid, options);
+
+            // checks to see if the current processor channel is the channel we're unlinking from, if so
+            // send notification that were removing the client write.
+            if(this._processorChannel && linkedChannel.channelId === this._processorChannel.channelId) {
+                linkedChannel.removeClientWrite(this.uid);
+            }
         } else {
-            this._linkedChannels.forEach(channel => {
+            this.linkedChannels.forEach(channel => {
                 channel.unlinkClient(this.uid);
             });
             this.masterChannel.clientDisconnected(this.uid)
@@ -151,10 +163,11 @@ class Client {
 
     public onChannelDisconnect(channelId) {
         if(this._processorChannel && this._processorChannel.channelId === channelId) {
+            this._processorChannel.removeClientWrite(this.uid);
             this._processorChannel = null;
         }
         delete this._queuedEncodedUpdates[channelId];
-        this._linkedChannels.delete(channelId);
+        this.linkedChannels.delete(channelId);
     }
 }
 

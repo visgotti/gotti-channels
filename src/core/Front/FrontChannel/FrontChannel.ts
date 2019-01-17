@@ -23,7 +23,7 @@ class FrontChannel extends Channel {
 
     private linked: boolean;
     private linkedClients: Map<string, Client>;
-    public linkedClientUids: Array<string>;
+    public listeningClientUids: Array<string>;
 
     private clientLinkTimeouts: Map<string, Timeout>;
 
@@ -50,7 +50,8 @@ class FrontChannel extends Channel {
         this.clientLinkTimeouts = new Map();
 
         this.linkedClients = new Map();
-        this.linkedClientUids = [];
+
+        this.listeningClientUids = [];
 
         this.linked = false;
 
@@ -135,7 +136,7 @@ class FrontChannel extends Channel {
                 }
 
                 this.linkedClients.set(clientUid, client);
-                this.linkedClientUids.push(clientUid);
+                this.listeningClientUids.push(clientUid);
                 this.master.linkChannel(this.backMasterIndex);
 
                 return resolve({ encodedState, responseOptions });
@@ -151,9 +152,9 @@ class FrontChannel extends Channel {
      */
     public unlinkClient(clientUid: string, options?: any) {
         if(this.linkedClients.has(clientUid)) {
-            const index = this.linkedClientUids.indexOf(clientUid);
+            const index = this.listeningClientUids.indexOf(clientUid);
             if(index > -1) {
-                this.linkedClientUids.splice(index, 1);
+                this.listeningClientUids.splice(index, 1);
             }
             this.linkedClients.get(clientUid).onChannelDisconnect(this.channelId);
             this.linkedClients.delete(clientUid);
@@ -167,7 +168,25 @@ class FrontChannel extends Channel {
             this.linked = false;
             this.master.unlinkChannel(this.backMasterIndex);
         }
+    }
 
+    /**
+     * sends notification to mirror back channel that it will be receiving messages
+     * from client to process.
+     * @param clientUid
+     * @param options
+     */
+    public addClientWrite(clientUid: string, options?: any) {
+        this.pub.ADD_CLIENT_WRITE([clientUid, options]);
+    }
+
+    /**
+     * sends notification to mirror back channel that it will no longer
+     * be receiving messages from client.
+     * @param clientUid
+     */
+    public removeClientWrite(clientUid: string) {
+        this.pub.REMOVE_CLIENT_WRITE([clientUid]);
     }
 
     /**
@@ -328,6 +347,8 @@ class FrontChannel extends Channel {
 
             this.pub.LINK.register();
             this.pub.UNLINK.register();
+            this.pub.ADD_CLIENT_WRITE.register();
+            this.pub.REMOVE_CLIENT_WRITE.register();
         }
 
         this.push.SEND_BACK.register(backChannelId);

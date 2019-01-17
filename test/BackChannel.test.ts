@@ -184,33 +184,63 @@ describe('BackChannel', function() {
         });
     });
 
-    describe('BackChannel.onRemoveClient', () => {
-        it('correctly registers a handler for the remove_client event', (done) => {
+    describe('BackChannel.onAddClientListen', () => {
+        it('correctly registers a handler for the add_client_listen event', (done) => {
             const mockUid = 'client_foo';
             const mockOptions = {
                 'foo': 'bar'
             };
-            BackChannel1.onRemoveClient((clientUid, options?) => {
+            BackChannel1.onAddClientListen((clientUid, options?) => {
                 assert.strictEqual(clientUid, mockUid);
                 assert.deepStrictEqual(options, mockOptions);
                 done();
             });
-            BackChannel1.emit('remove_client', mockUid, mockOptions);
+            BackChannel1.emit('add_client_listen', FrontChannel1.frontUid, mockUid, 'mock_state', mockOptions);
         });
     });
 
-    describe('BackChannel.onAddClient', () => {
-        it('correctly registers a handler for the add_client event', (done) => {
+    describe('BackChannel.onRemoveClientListen', () => {
+        it('correctly registers a handler for the remove_client_listen event', (done) => {
             const mockUid = 'client_foo';
             const mockOptions = {
                 'foo': 'bar'
             };
-            BackChannel1.onAddClient((clientUid, options?) => {
+            BackChannel1.onRemoveClientListen((clientUid, options?) => {
                 assert.strictEqual(clientUid, mockUid);
                 assert.deepStrictEqual(options, mockOptions);
                 done();
             });
-            BackChannel1.emit('add_client', FrontChannel1.frontUid, mockUid, 'mock_state', mockOptions);
+            BackChannel1.emit('remove_client_listen', mockUid, mockOptions);
+        });
+    });
+
+    describe('BackChannel.onAddClientWrite', () => {
+        it('correctly registers a handler for the add_client_write event', (done) => {
+            const mockUid = 'client_foo';
+            const mockOptions = {
+                'foo': 'bar'
+            };
+            BackChannel1.onAddClientWrite((clientUid, options?) => {
+                assert.strictEqual(clientUid, mockUid);
+                assert.deepStrictEqual(options, mockOptions);
+                assert.strictEqual(BackChannel1.writingClientUids.length, 1);
+                assert.strictEqual(BackChannel1.writingClientUids[0], mockUid);
+                done();
+            });
+            BackChannel1.emit('add_client_write', mockUid, mockOptions);
+        });
+    });
+
+    describe('BackChannel.onRemoveClientWrite', () => {
+        it('correctly registers a handler for the remove_client_write event', (done) => {
+            const mockUid = 'client_foo';
+
+            BackChannel1.onRemoveClientWrite((clientUid) => {
+                assert.strictEqual(clientUid, mockUid);
+                assert.strictEqual(BackChannel1.writingClientUids.length, 0);
+                done();
+            });
+            BackChannel1.emit('remove_client_write', mockUid);
         });
     });
 });

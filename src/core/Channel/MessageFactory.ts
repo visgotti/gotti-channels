@@ -15,6 +15,8 @@ enum MSG_CODES {
     BROADCAST_ALL_BACK,
     LINK,
     UNLINK,
+    ADD_CLIENT_WRITE,
+    REMOVE_CLIENT_WRITE,
 
     // BACK -> FRONT
     ACCEPT_LINK,
@@ -52,6 +54,8 @@ export class Protocol {
     static SEND_BACK(backChannelId) : string  { return Protocol.make(MSG_CODES.SEND_BACK, backChannelId) };
     static LINK(frontUid) : string { return Protocol.make(MSG_CODES.LINK, frontUid) };
     static UNLINK(frontUid) : string { return Protocol.make(MSG_CODES.UNLINK, frontUid) };
+    static ADD_CLIENT_WRITE(frontUid) : string { return Protocol.make(MSG_CODES.ADD_CLIENT_WRITE, frontUid) };
+    static REMOVE_CLIENT_WRITE(frontUid) : string { return Protocol.make(MSG_CODES.REMOVE_CLIENT_WRITE, frontUid) };
 
     // BACK -> FRONTS
     static BROADCAST_LINKED_FRONTS(frontChannelId) : string  { return Protocol.make(MSG_CODES.BROADCAST_LINKED_FRONTS, frontChannelId) };
@@ -171,10 +175,12 @@ export abstract class ChannelMessageFactory extends MessageFactory {
     public abstract CONNECT: PublishProtocol | SubscribeProtocol; //TODO: req/res
     public abstract BROADCAST_ALL_BACK: PublishProtocol | SubscribeProtocol;
 
-    // FONT -> BACK
+    // FRONT -> BACK
     public abstract SEND_BACK: PushProtocol | SubscribeProtocol;
-    public abstract LINK: PublishProtocol | SubscribeProtocol;
-    public abstract UNLINK: PublishProtocol | SubscribeProtocol;
+    public abstract LINK: PublishProtocol | PullProtocol;
+    public abstract UNLINK: PublishProtocol | PullProtocol;
+    public abstract ADD_CLIENT_WRITE: PublishProtocol | PullProtocol;
+    public abstract REMOVE_CLIENT_WRITE: PublishProtocol | PullProtocol;
 
     // BACK -> FRONT
     public abstract CONNECTION_CHANGE: PushProtocol | SubscribeProtocol;
