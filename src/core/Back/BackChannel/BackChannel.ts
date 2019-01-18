@@ -7,9 +7,9 @@ import { Channel } from '../../Channel/Channel';
 import { BackMessages, BackPubs, BackPushes, BackSubs, BackPulls } from './BackMessages';
 import { BackMasterChannel } from '../BackMaster/MasterChannel';
 
-import {ConnectedFrontData, FrontToBackMessage, CONNECTION_STATUS } from '../../types';
+import {ConnectedFrontData, CONNECTION_STATUS } from '../../types';
 
-class BackChannel extends Channel {
+export class BackChannel extends Channel {
     private master: BackMasterChannel;
 
     private pub: BackPubs;
@@ -371,5 +371,3 @@ class BackChannel extends Channel {
         this.pull = pull;
     }
 }
-
-export default BackChannel;

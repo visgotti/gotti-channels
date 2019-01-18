@@ -1,6 +1,6 @@
 import { STATE_UPDATE_TYPES } from './types';
 
-import FrontChannel from './Front/FrontChannel';
+import { FrontChannel } from './Front/FrontChannel/FrontChannel';
 import { FrontMasterChannel } from './Front/FrontMaster/MasterChannel';
 
 class Client {

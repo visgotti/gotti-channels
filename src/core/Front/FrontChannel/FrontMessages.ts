@@ -1,5 +1,5 @@
 import { Protocol, PublishProtocol, SubscribeProtocol, PushProtocol, PullProtocol, ChannelMessageFactory } from '../../Channel/MessageFactory';
-import FrontChannel from './FrontChannel';
+import { FrontChannel } from './FrontChannel';
 
 export interface FrontPubs {
     CONNECT: PublishProtocol,

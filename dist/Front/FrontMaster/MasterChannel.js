@@ -10,7 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const msgpack = require("notepack.io");
 const MasterMessages_1 = require("./MasterMessages");
-const FrontChannel_1 = require("../FrontChannel");
+const FrontChannel_1 = require("../FrontChannel/FrontChannel");
 const Channel_1 = require("../../Channel/Channel");
 class FrontMasterChannel extends Channel_1.Channel {
     constructor(channelIds, totalChannels, frontMasterIndex, messenger) {
@@ -23,7 +23,7 @@ class FrontMasterChannel extends Channel_1.Channel {
         this._connectedBackMasters = new Set(); //todo make this a lookup similar to linked with count of connected channels.
         this._connectedClients = {};
         channelIds.forEach(channelId => {
-            const frontChannel = new FrontChannel_1.default(channelId, totalChannels, messenger, this);
+            const frontChannel = new FrontChannel_1.FrontChannel(channelId, totalChannels, messenger, this);
             this.frontChannels[channelId] = frontChannel;
             this.frontChannelIds.push(channelId);
         });

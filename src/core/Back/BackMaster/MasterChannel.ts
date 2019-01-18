@@ -5,7 +5,7 @@ import { Messenger } from 'centrum-messengers/dist/core/Messenger';
 
 import { MasterMessages, BackMasterPushes, BackMasterPulls } from './MasterMessages';
 
-import BackChannel from '../BackChannel';
+import  { BackChannel } from '../BackChannel/BackChannel';
 import { Channel } from '../../Channel/Channel';
 
 const DEFAULT_PATCH_RATE = 1000 / 20; // 20fps (50ms)
@@ -208,7 +208,7 @@ export class BackMasterChannel extends Channel {
     public removedClientLink(clientUid: string) {
         const clientData = this._linkedClientFrontDataLookup.get(clientUid);
 
-        if( (clientData && --clientData.linkCount) === 0) {
+        if( (clientData && --clientData.linkCount === 0)) {
             this._linkedClientFrontDataLookup.delete(clientUid);
         }
     }

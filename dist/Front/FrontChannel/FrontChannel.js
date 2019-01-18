@@ -344,4 +344,4 @@ class FrontChannel extends Channel_1.Channel {
         return (!(this.clientLinkTimeouts.has(clientUid)) && !(this.linkedClients.has(clientUid)));
     }
 }
-exports.default = FrontChannel;
+exports.FrontChannel = FrontChannel;

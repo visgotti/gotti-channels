@@ -2,7 +2,7 @@ import { Channel } from '../../Channel/Channel';
 import { FrontMasterChannel } from '../FrontMaster/MasterChannel';
 import Client from '../../Client';
 import { Messenger } from 'centrum-messengers/dist/core/Messenger';
-declare class FrontChannel extends Channel {
+export declare class FrontChannel extends Channel {
     private master;
     private connectedChannelIds;
     private _connectionInfo;
@@ -126,4 +126,3 @@ declare class FrontChannel extends Channel {
     private initializeMessageFactories;
     private clientCanLink;
 }
-export default FrontChannel;

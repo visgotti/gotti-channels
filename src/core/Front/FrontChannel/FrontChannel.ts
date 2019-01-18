@@ -9,7 +9,7 @@ import { CONNECTION_STATUS, CONNECTION_CHANGE, STATE_UPDATE_TYPES } from '../../
 import {clearTimeout} from "timers";
 import Timeout = NodeJS.Timeout;
 
-class FrontChannel extends Channel {
+export class FrontChannel extends Channel {
     private master: FrontMasterChannel;
 
     private connectedChannelIds: Set<string>;
@@ -421,5 +421,3 @@ class FrontChannel extends Channel {
         return (!(this.clientLinkTimeouts.has(clientUid)) && !(this.linkedClients.has(clientUid)));
     }
 }
-
-export default FrontChannel;

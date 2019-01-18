@@ -2,7 +2,7 @@ import { Messenger } from 'centrum-messengers/dist/core/Messenger';
 import { Channel } from '../../Channel/Channel';
 import { BackMasterChannel } from '../BackMaster/MasterChannel';
 import { ConnectedFrontData } from '../../types';
-declare class BackChannel extends Channel {
+export declare class BackChannel extends Channel {
     private master;
     private pub;
     private sub;
@@ -13,12 +13,12 @@ declare class BackChannel extends Channel {
     private _writingClientUids;
     private _mirroredFrontUids;
     state: any;
-    private _previousState;
-    private _previousStateEncoded;
+    _previousState: any;
+    _previousStateEncoded: string;
     private linkedFrontAndClientUids;
-    private linkedFrontMasterIndexes;
     private linkedFrontUids;
     private masterIndexToFrontUidLookup;
+    linkedFrontMasterIndexes: Array<number>;
     readonly backMasterIndex: number;
     constructor(channelId: any, messenger: Messenger, master: BackMasterChannel);
     /**
@@ -46,13 +46,6 @@ declare class BackChannel extends Channel {
      * @param handler - function that gets executed when a new client is succesfully linked/listening to state updates.
      */
     onRemoveClientListen(handler: (clientUid: string, options?: any) => void): void;
-    /**
-     * finds the delta of the new and last state then adds the patch update
-     * to the master for it to be queued and then sent out to the needed
-     * front Masters for it to be relayed to the front children who need it.
-     * @returns {boolean}
-     */
-    patchState(): boolean;
     /**
      * called when we receive a link request from the front with no client uid. This means
      * the front is just linking for a reason that doesnt include relaying data to clients.
@@ -121,4 +114,3 @@ declare class BackChannel extends Channel {
      */
     private initializeMessageFactories;
 }
-export default BackChannel;

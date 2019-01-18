@@ -6,9 +6,11 @@ export declare class BackMasterChannel extends Channel {
     private _linkedFrontMasterIndexesArray;
     private _linkedFrontMasterChannels;
     private _connectedFrontMasters;
-    private backChannelIds;
+    private backChannelsArray;
     private _linkedClientFrontDataLookup;
     backChannels: any;
+    sendStateRate: number;
+    private _sendStateUpdatesInterval;
     readonly backMasterIndex: any;
     constructor(channelIds: any, backMasterIndex: any, messenger: Messenger);
     readonly linkedClientFrontDataLookup: Map<string, {
@@ -29,9 +31,8 @@ export declare class BackMasterChannel extends Channel {
      */
     addStatePatch(frontMasterIndexes: any, patchData: any): void;
     /**
-     * sends patch updates to the linked front masters, since the channelId (child channel id)
-     * is present in the message, the front master will be able to correctly push the patched
-     * states to the needed front channels.
+     * patches state of channels which populates the linkedFrontMasterChannels lookup with an array
+     * of encoded patches and sends to based on which channelIds that front master needs.
      */
     sendStatePatches(): void;
     /**
@@ -59,6 +60,12 @@ export declare class BackMasterChannel extends Channel {
      * @param clientUid
      */
     removedClientLink(clientUid: string): void;
+    /**
+     * sets an interval for sending the child state patches automatically.
+     * @param milliseconds
+     */
+    setStateUpdateInterval(milliseconds?: number): void;
+    clearSendStateInterval(): void;
     /** messageQueueData is formatted incoming as
      *  [ channelId,  message, clientId? ]
      */

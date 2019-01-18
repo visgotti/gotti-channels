@@ -1,8 +1,10 @@
 import * as msgpack from 'notepack.io';
 
 import Client from '../src/core/Client';
-import FrontChannel from '../src/core/Front/FrontChannel';
-import BackChannel from '../src/core/Back/BackChannel';
+
+import { FrontChannel } from '../src/core/Front/FrontChannel/FrontChannel';
+import { BackChannel } from '../src/core/Back/BackChannel/BackChannel';
+
 import { STATE_UPDATE_TYPES } from '../src/core/types';
 
 import { FrontMasterChannel } from '../src/core/Front/FrontMaster/MasterChannel';
@@ -40,7 +42,7 @@ describe('Client', function() {
         const frontMessenger = new Messenger({ id: 'testFront', publish: { pubSocketURI: TEST_FRONT_URI } , subscribe: { pubSocketURIs: [TEST_BACK_URI] } });
         const backMessenger = new Messenger({ id: 'testBack', publish: { pubSocketURI: TEST_BACK_URI } , subscribe: { pubSocketURIs: [TEST_FRONT_URI] } });
 
-        FrontMaster = new FrontMasterChannel([0, 1], 2, 0, frontMessenger);
+        FrontMaster = new FrontMasterChannel([0, 1], 0, frontMessenger);
         BackMaster = new BackMasterChannel([0, 1], 0, backMessenger);
 
         FrontChannel1 = FrontMaster.frontChannels[0];

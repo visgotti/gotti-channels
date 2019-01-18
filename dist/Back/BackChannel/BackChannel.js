@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const fossilDelta = require("fossil-delta");
 const msgpack = require("notepack.io");
 const Channel_1 = require("../../Channel/Channel");
 const BackMessages_1 = require("./BackMessages");
@@ -86,31 +85,6 @@ class BackChannel extends Channel_1.Channel {
             handler(clientUid, options);
         });
     }
-    /**
-     * finds the delta of the new and last state then adds the patch update
-     * to the master for it to be queued and then sent out to the needed
-     * front Masters for it to be relayed to the front children who need it.
-     * @returns {boolean}
-     */
-    patchState() {
-        if (!(this.state)) {
-            throw new Error('null state');
-        }
-        if (this.linkedFrontAndClientUids.size > 0) {
-            const currentState = this.state;
-            const currentStateEncoded = msgpack.encode(currentState);
-            if (currentStateEncoded.equals(this._previousStateEncoded)) {
-                return false;
-            }
-            const patches = fossilDelta.create(this._previousStateEncoded, currentStateEncoded);
-            this._previousStateEncoded = currentStateEncoded;
-            // supply master server with patches and the array of linked master indexes that need the patches.
-            this.master.addStatePatch(this.linkedFrontMasterIndexes, [this.channelId, patches]);
-            return true;
-        }
-        return false;
-    }
-    ;
     /**
      * called when we receive a link request from the front with no client uid. This means
      * the front is just linking for a reason that doesnt include relaying data to clients.
@@ -313,4 +287,4 @@ class BackChannel extends Channel_1.Channel {
         this.pull = pull;
     }
 }
-exports.default = BackChannel;
+exports.BackChannel = BackChannel;

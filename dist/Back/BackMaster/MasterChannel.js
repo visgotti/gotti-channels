@@ -1,23 +1,26 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const fossilDelta = require("fossil-delta");
 const msgpack = require("notepack.io");
 const MasterMessages_1 = require("./MasterMessages");
-const BackChannel_1 = require("../BackChannel");
+const BackChannel_1 = require("../BackChannel/BackChannel");
 const Channel_1 = require("../../Channel/Channel");
+const DEFAULT_PATCH_RATE = 1000 / 20; // 20fps (50ms)
 class BackMasterChannel extends Channel_1.Channel {
     constructor(channelIds, backMasterIndex, messenger) {
         super(backMasterIndex, messenger);
+        this.sendStateRate = DEFAULT_PATCH_RATE;
         this.backMasterIndex = backMasterIndex;
         this.backChannels = {};
-        this.backChannelIds = [];
+        this.backChannelsArray = [];
         this._linkedClientFrontDataLookup = new Map();
         this._connectedFrontMasters = new Set();
         this._linkedFrontMasterChannels = {};
         this._linkedFrontMasterIndexesArray = [];
         channelIds.forEach(channelId => {
-            const backChannel = new BackChannel_1.default(channelId, messenger, this);
+            const backChannel = new BackChannel_1.BackChannel(channelId, messenger, this);
             this.backChannels[channelId] = backChannel;
-            this.backChannelIds.push(channelId);
+            this.backChannelsArray.push(backChannel);
         });
         this.initializeMessageFactories();
     }
@@ -46,11 +49,28 @@ class BackMasterChannel extends Channel_1.Channel {
         }
     }
     /**
-     * sends patch updates to the linked front masters, since the channelId (child channel id)
-     * is present in the message, the front master will be able to correctly push the patched
-     * states to the needed front channels.
+     * patches state of channels which populates the linkedFrontMasterChannels lookup with an array
+     * of encoded patches and sends to based on which channelIds that front master needs.
      */
     sendStatePatches() {
+        let length = this.backChannelsArray.length;
+        while (length--) {
+            const backChannel = this.backChannelsArray[length];
+            let frontMasterLength = backChannel.linkedFrontMasterIndexes.length;
+            if (!(frontMasterLength))
+                continue; // back channel had no linked front masters waiting for state updates, can skip.
+            while (frontMasterLength--) { //TODO maybe sending redundant messages to frontChannels instead of checking which channels the front master needs will play better in the long run
+                const currentState = backChannel.state;
+                const currentStateEncoded = msgpack.encode(currentState);
+                //TODO trigger onPatchState event
+                if (currentStateEncoded.equals(backChannel._previousStateEncoded)) {
+                    continue;
+                }
+                const patches = fossilDelta.create(backChannel._previousStateEncoded, currentStateEncoded);
+                backChannel._previousStateEncoded = currentStateEncoded;
+                this._linkedFrontMasterChannels[backChannel.linkedFrontMasterIndexes[frontMasterLength]].encodedPatches.push([backChannel.channelId, patches]);
+            }
+        }
         for (let i = 0; i < this._linkedFrontMasterIndexesArray.length; i++) {
             const frontMasterIndex = this._linkedFrontMasterIndexesArray[i];
             const { encodedPatches } = this._linkedFrontMasterChannels[frontMasterIndex];
@@ -146,6 +166,26 @@ class BackMasterChannel extends Channel_1.Channel {
             this._linkedClientFrontDataLookup.delete(clientUid);
         }
     }
+    /**
+     * sets an interval for sending the child state patches automatically.
+     * @param milliseconds
+     */
+    setStateUpdateInterval(milliseconds = this.sendStateRate) {
+        // clear previous interval in case called setPatchRate more than once
+        if (this._sendStateUpdatesInterval) {
+            clearInterval(this._sendStateUpdatesInterval);
+            this._sendStateUpdatesInterval = undefined;
+        }
+        if (milliseconds !== null && milliseconds !== 0) {
+            this._sendStateUpdatesInterval = setInterval(this.sendStatePatches.bind(this), milliseconds);
+        }
+    }
+    clearSendStateInterval() {
+        if (this._sendStateUpdatesInterval) {
+            clearTimeout(this._sendStateUpdatesInterval);
+        }
+        this._sendStateUpdatesInterval = undefined;
+    }
     /** messageQueueData is formatted incoming as
      *  [ channelId,  message, clientId? ]
      */
@@ -164,6 +204,10 @@ class BackMasterChannel extends Channel_1.Channel {
         this.pull = pull;
     }
     disconnect() {
+        if (this._sendStateUpdatesInterval) {
+            clearInterval(this._sendStateUpdatesInterval);
+            this._sendStateUpdatesInterval = undefined;
+        }
         this.messenger.close();
     }
 }

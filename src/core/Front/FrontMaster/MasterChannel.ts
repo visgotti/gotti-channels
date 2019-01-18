@@ -4,7 +4,7 @@ import { Messenger } from 'centrum-messengers/dist/core/Messenger';
 
 import { MasterMessages, FrontMasterPushes, FrontMasterSubs } from './MasterMessages';
 
-import FrontChannel from '../FrontChannel';
+import { FrontChannel } from '../FrontChannel/FrontChannel';
 import Client from '../../Client';
 import { Channel } from '../../Channel/Channel';
 
@@ -22,7 +22,7 @@ export class FrontMasterChannel extends Channel {
 
     readonly frontMasterIndex;
 
-    constructor(channelIds, totalChannels, frontMasterIndex, messenger: Messenger) {
+    constructor(channelIds, frontMasterIndex, messenger: Messenger) {
         super(frontMasterIndex, messenger);
         this.frontMasterIndex = frontMasterIndex;
 
@@ -35,7 +35,7 @@ export class FrontMasterChannel extends Channel {
         this._connectedClients = {};
 
         channelIds.forEach(channelId => {
-            const frontChannel = new FrontChannel(channelId, totalChannels, messenger, this);
+            const frontChannel = new FrontChannel(channelId, channelIds.length, messenger, this);
             this.frontChannels[channelId] = frontChannel;
             this.frontChannelIds.push(channelId);
         });
