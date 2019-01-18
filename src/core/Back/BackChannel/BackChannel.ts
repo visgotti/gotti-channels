@@ -26,13 +26,14 @@ class BackChannel extends Channel {
     private _mirroredFrontUids: Set<string>;
 
     public state: any;
-    private _previousState: any;
-    private _previousStateEncoded: string;
+    public _previousState: any;
+    public _previousStateEncoded: string;
 
     private linkedFrontAndClientUids: Map<string, Set<string> >;
-    private linkedFrontMasterIndexes: Array<number>;
     private linkedFrontUids: Array<string>;
     private masterIndexToFrontUidLookup: {frontUid: string};
+
+    public linkedFrontMasterIndexes: Array<number>;
 
     readonly backMasterIndex: number;
 
@@ -130,34 +131,6 @@ class BackChannel extends Channel {
             handler(clientUid, options);
         });
     }
-
-    /**
-     * finds the delta of the new and last state then adds the patch update
-     * to the master for it to be queued and then sent out to the needed
-     * front Masters for it to be relayed to the front children who need it.
-     * @returns {boolean}
-     */
-    public patchState() : boolean {
-        if(!(this.state)) { throw new Error ('null state')}
-
-        if(this.linkedFrontAndClientUids.size > 0) {
-            const currentState = this.state;
-            const currentStateEncoded = msgpack.encode(currentState);
-
-            if(currentStateEncoded.equals(this._previousStateEncoded)) {
-                return false;
-            }
-            const patches = fossilDelta.create(this._previousStateEncoded, currentStateEncoded);
-
-            this._previousStateEncoded = currentStateEncoded;
-
-            // supply master server with patches and the array of linked master indexes that need the patches.
-            this.master.addStatePatch(this.linkedFrontMasterIndexes, [this.channelId, patches]);
-
-            return true;
-        }
-        return false;
-    };
 
     /**
      * called when we receive a link request from the front with no client uid. This means

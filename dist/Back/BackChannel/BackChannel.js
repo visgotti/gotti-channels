@@ -188,9 +188,9 @@ class BackChannel extends Channel_1.Channel {
      * @param message
      * @param frontMasterIndex
      */
-    processMessageFromMaster(message, frontMasterIndex) {
+    processMessageFromMaster(message, frontMasterIndex, clientUid) {
         const frontUid = this.masterIndexToFrontUidLookup[frontMasterIndex];
-        this._onMessage(message, frontUid);
+        this._onMessage(message, frontUid, clientUid);
     }
     get connectedFrontsData() {
         return this._connectedFrontsData;
@@ -204,10 +204,11 @@ class BackChannel extends Channel_1.Channel {
     get writingClientUids() {
         return Array.from(this._writingClientUids);
     }
-    _onMessage(message, frontUid) {
-        this.onMessageHandler(message, frontUid);
+    //TODO: replace all instances of onMessage receiving frontUid with frontMaster and use the lookup to get the frontUid.
+    _onMessage(message, frontUid, clientUid) {
+        this.onMessageHandler(message, frontUid, clientUid);
     }
-    onMessageHandler(message, frontUid) {
+    onMessageHandler(message, frontUid, clientUid) {
         throw new Error(`Unimplemented onMessageHandler in back channel ${this.channelId} Use backChannel.onMessage to implement.`);
     }
     /**
@@ -217,12 +218,12 @@ class BackChannel extends Channel_1.Channel {
         // registers sub that handles requests the same regardless of the frontUid.
         this.sub.CONNECT.register(this.onMirrorConnected.bind(this));
         this.sub.BROADCAST_ALL_BACK.register((data) => {
-            const { message, frontUid } = data;
-            this._onMessage(message, frontUid);
+            this._onMessage(data[0], data[1], data[2]);
+            //how it looks on frontChannel -> this.pub.BROADCAST_ALL_BACK([message, this.frontUid, clientUid])
         });
         this.sub.SEND_BACK.register((data) => {
-            const { message, frontUid } = data;
-            this._onMessage(message, frontUid);
+            this._onMessage(data[0], data[1], data[2]);
+            //how it looks on frontChannel -> this.push.SEND_BACK[backChannelId]([message, this.frontUid, clientUid]);
         });
     }
     /**

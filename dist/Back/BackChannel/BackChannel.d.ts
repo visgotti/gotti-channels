@@ -25,7 +25,7 @@ declare class BackChannel extends Channel {
      * sets the onMessageHandler function
      * @param handler - function that gets executed, gets parameters message and frontUid
      */
-    onMessage(handler: (message: any, frontUid: string) => void): void;
+    onMessage(handler: (message: any, frontUid: string, clientUid?: string) => void): void;
     /**
      * @param handler - handler called when a client is added as a writer.
      */
@@ -96,7 +96,7 @@ declare class BackChannel extends Channel {
      * @param message
      * @param frontMasterIndex
      */
-    processMessageFromMaster(message: any, frontMasterIndex: number): void;
+    processMessageFromMaster(message: any, frontMasterIndex: number, clientUid?: any): void;
     readonly connectedFrontsData: Map<string, ConnectedFrontData>;
     readonly mirroredFrontUids: Array<string>;
     readonly listeningClientUids: Array<string>;

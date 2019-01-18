@@ -76,19 +76,20 @@ declare class FrontChannel extends Channel {
      * back channels to process.
      * @param message
      */
-    addMessage(message: any): void;
+    addMessage(message: any, clientUid?: string): void;
     /**
      * sends message to mirror back channel by default if backChannelId is omitted or sends to remote back channel with specified id.
      * @param message - data sent to back channel.
      * @param backChannelId - id of back channel to send message to
      */
-    send(message: any, backChannelId?: string): void;
+    send(message: any, backChannelId?: string, clientUid?: string): void;
     /**
      * sends message to all specified backChannelIds, if omitted it will send broadcast to all connected remote and mirror back channels.
      * @param message
      * @param backChannelIds
+     * @param clientUid - optional argument to signify who sent the message.
      */
-    broadcast(message: any, backChannelIds?: Array<string>): void;
+    broadcast(message: any, backChannelIds?: Array<string>, clientUid?: string): void;
     /**
      * sends out a connection publication then as back channels reply with a connect success publication keeps track and
      * when all replied the promise gets resolved and the connection timeout gets cleared.

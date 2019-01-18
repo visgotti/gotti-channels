@@ -5,6 +5,7 @@ export declare class FrontMasterChannel extends Channel {
     private push;
     private frontChannelIds;
     private _linkedBackMasterLookup;
+    private _linkedBackMasterIndexes;
     private _connectedBackMasters;
     private _connectedClients;
     frontChannels: any;
@@ -29,9 +30,10 @@ export declare class FrontMasterChannel extends Channel {
      * @param message - message to send
      * @param backMasterIndex - server index that the linked back channel lives on.
      */
-    addQueuedMessage(message: any, backMasterIndex: any, channelId: any): void;
+    addQueuedMessage(message: any, backMasterIndex: any, channelId: any, clientUid?: any): void;
     unlinkChannel(backMasterIndex: any): void;
     linkChannel(backMasterIndex: any): void;
+    private updateLinkedBackMasterIndexArray;
     readonly linkedBackMasterLookup: {
         linkedChannelsCount: number;
         queuedMessages: any[];

@@ -60,7 +60,7 @@ export declare class BackMasterChannel extends Channel {
      */
     removedClientLink(clientUid: string): void;
     /** messageQueueData is formatted incoming as
-     *  [ channelId,  message  ]
+     *  [ channelId,  message, clientId? ]
      */
     private handleQueuedMessages;
     /**

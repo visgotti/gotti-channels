@@ -180,32 +180,17 @@ describe('BackMaster', function() {
         });
     });
 
-    describe('BackMaster.addStatePatch', () => {
-        it('Gets called when a linked BackChannel calls patchState', (done) => {
-            BackChannel1.setState({"foo": "bar"});
-
-            client1.linkChannel(FrontChannel1.channelId).then(data => {
-                let decoded = msgpack.decode(Buffer.from(data.encodedState));
-                assert.deepStrictEqual(decoded, {"foo": "bar"});
-
-                BackChannel1.state['foo'] = 'baz';
-                assert.strictEqual(BackChannel1.patchState(), true);
-                sinon.assert.calledOnce(addStatePatchSpy);
-
-                done();
+    describe('BackMaster.sendStatePatches', () => {
+        before((done) => {
+            client1.linkChannel(FrontChannel1.channelId).then(() => {
+               done();
             });
         });
-        it('adds an encoded patched state to the master linked channel lookup', (done) => {
-            assert.strictEqual(BackMaster.linkedFrontMasterChannels[FrontMaster.frontMasterIndex].encodedPatches.length, 1);
-            done();
-        });
-    });
-
-    describe('BackMaster.sendStatePatches', () => {
         it('only linked front channel receives the patches', (done) => {
             const oldState = { "foo": "bar" };
             let received = 0;
             let expectedReceived = 1;
+            BackChannel1.state['foo'] = 'baz';
             BackMaster.sendStatePatches();
             FrontChannel1.onPatchState(patch => {
                 received++;
@@ -221,13 +206,43 @@ describe('BackMaster', function() {
                 received++;
             });
         });
+
+    });
+
+    describe('BackMaster.setStateUpdateInterval', () => {
+       it('should send two state patch updates correctly', (done) => {
+            let received = 0;
+
+           const oldState = { 'foo': 'bar' };
+
+           BackChannel1.setState(oldState);
+           BackChannel1.state['foo'] = 'baz';
+
+           FrontChannel1.onPatchState(patch => {
+               if(received === 0) {
+                   received++;
+                   const newState = applyPatches(oldState, patch);
+                   assert.deepStrictEqual(newState, { 'foo': 'baz' });
+                   assert.strictEqual(received, 1);
+                   BackChannel1.state['foo'] = 'foo';
+               } else if(received === 1) {
+                   received++;
+                   const newState = applyPatches(oldState, patch);
+                   assert.deepStrictEqual(newState, { 'foo': 'foo' });
+                   assert.strictEqual(received, 2);
+                   BackMaster.clearSendStateInterval();
+                   done();
+               }
+           });
+           BackMaster.setStateUpdateInterval(5);
+       });
     });
 
     describe('BackMaster.messageClient', () => {
         it('Should return false if the client is not linked', (done) => {
             client1.unlinkChannel(FrontChannel1.channelId);
             setTimeout(() => {
-                assert.strictEqual(BackMaster.messageClient(client1.uid, { "foo": "bar" } ), false);
+                assert.strictEqual(BackMaster.messageClient(client1.uid, { 'foo': 'bar' } ), false);
                 done();
             }, 20)
 
@@ -236,7 +251,7 @@ describe('BackMaster', function() {
         it('Should return true if the client was linked', (done) => {
             client1.onMessage(() => {});
             client1.linkChannel(FrontChannel1.channelId).then(() => {
-                assert.strictEqual(BackMaster.messageClient(client1.uid, { "foo": "bar" } ), true);
+                assert.strictEqual(BackMaster.messageClient(client1.uid, { 'foo': 'bar' } ), true);
                 done();
             });
         });

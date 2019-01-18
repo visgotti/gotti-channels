@@ -151,11 +151,11 @@ class FrontChannel extends Channel_1.Channel {
      * back channels to process.
      * @param message
      */
-    addMessage(message) {
+    addMessage(message, clientUid) {
         if (!(this.linked)) {
             throw new Error('Front Channel is not linked, can not add messages to master queue.');
         }
-        this.master.addQueuedMessage(message, this.backMasterIndex, this.channelId);
+        this.master.addQueuedMessage(message, this.backMasterIndex, this.channelId, clientUid);
     }
     ;
     /**
@@ -163,23 +163,23 @@ class FrontChannel extends Channel_1.Channel {
      * @param message - data sent to back channel.
      * @param backChannelId - id of back channel to send message to
      */
-    send(message, backChannelId = this.channelId) {
-        let data = { message, frontUid: this.frontUid };
-        this.push.SEND_BACK[backChannelId](data);
+    send(message, backChannelId = this.channelId, clientUid) {
+        this.push.SEND_BACK[backChannelId]([message, this.frontUid, clientUid]);
     }
     /**
      * sends message to all specified backChannelIds, if omitted it will send broadcast to all connected remote and mirror back channels.
      * @param message
      * @param backChannelIds
+     * @param clientUid - optional argument to signify who sent the message.
      */
-    broadcast(message, backChannelIds) {
+    broadcast(message, backChannelIds, clientUid) {
         if (backChannelIds) {
             backChannelIds.forEach(channelId => {
-                this.send(message, channelId);
+                this.send(message, channelId, clientUid);
             });
         }
         else {
-            this.pub.BROADCAST_ALL_BACK({ frontUid: this.frontUid, message });
+            this.pub.BROADCAST_ALL_BACK([message, this.frontUid, clientUid]);
         }
     }
     /**
