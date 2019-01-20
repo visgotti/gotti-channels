@@ -1,4 +1,4 @@
-import { Messenger } from 'centrum-messengers/dist/core/Messenger';
+import { Messenger } from 'gotti-pubsub/dist/Messenger';
 import { Channel } from '../../Channel/Channel';
 import { BackMasterChannel } from '../BackMaster/MasterChannel';
 import { ConnectedFrontData } from '../../types';

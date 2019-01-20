@@ -1,7 +1,7 @@
 import { Channel } from '../../Channel/Channel';
 import { FrontMasterChannel } from '../FrontMaster/MasterChannel';
 import Client from '../../Client';
-import { Messenger } from 'centrum-messengers/dist/core/Messenger';
+import { Messenger } from 'gotti-pubsub/dist/Messenger';
 import { FrontMessages, FrontPubs, FrontSubs, FrontPushes } from './FrontMessages';
 
 import { CONNECTION_STATUS, CONNECTION_CHANGE, STATE_UPDATE_TYPES } from '../../types';

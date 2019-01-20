@@ -1,5 +1,5 @@
 declare const EventEmitter: any;
-import { Messenger } from 'centrum-messengers/dist/core/Messenger';
+import { Messenger } from 'gotti-pubsub/dist/Messenger';
 export declare class Channel extends EventEmitter {
     readonly channelId: string;
     readonly serverId: string;

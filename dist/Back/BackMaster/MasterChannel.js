@@ -162,7 +162,7 @@ class BackMasterChannel extends Channel_1.Channel {
      */
     removedClientLink(clientUid) {
         const clientData = this._linkedClientFrontDataLookup.get(clientUid);
-        if ((clientData && --clientData.linkCount) === 0) {
+        if ((clientData && --clientData.linkCount === 0)) {
             this._linkedClientFrontDataLookup.delete(clientUid);
         }
     }

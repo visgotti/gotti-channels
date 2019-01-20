@@ -9,7 +9,7 @@ import { BackChannel } from '../src/core/Back/BackChannel/BackChannel';
 import { FrontMasterChannel } from '../src/core/Front/FrontMaster/MasterChannel';
 import { BackMasterChannel } from '../src/core/Back/BackMaster/MasterChannel';
 
-import { Messenger } from 'centrum-messengers/dist/core/Messenger';
+import { Messenger } from 'gotti-pubsub/dist/Messenger';
 
 import { applyPatches } from './testHelpers';
 

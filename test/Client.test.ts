@@ -10,7 +10,7 @@ import { STATE_UPDATE_TYPES } from '../src/core/types';
 import { FrontMasterChannel } from '../src/core/Front/FrontMaster/MasterChannel';
 import { BackMasterChannel } from '../src/core/Back/BackMaster/MasterChannel';
 
-import { Messenger } from 'centrum-messengers/dist/core/Messenger';
+import { Messenger } from 'gotti-pubsub/dist/Messenger';
 
 import * as assert from 'assert';
 import * as mocha from 'mocha';

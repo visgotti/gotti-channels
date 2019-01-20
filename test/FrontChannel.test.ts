@@ -1,7 +1,7 @@
 import {clearInterval} from "timers";
 import * as msgpack from 'notepack.io';
 
-import { Messenger } from 'centrum-messengers/dist/core/Messenger';
+import { Messenger } from 'gotti-pubsub/dist/Messenger';
 
 import { FrontChannel } from '../src/core/Front/FrontChannel/FrontChannel';
 import { BackChannel } from '../src/core/Back/BackChannel/BackChannel';

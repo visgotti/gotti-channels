@@ -1,4 +1,4 @@
-import { Messenger } from 'centrum-messengers/dist/core/Messenger';
+import { Messenger } from 'gotti-pubsub/dist/Messenger';
 import { Channel } from '../../Channel/Channel';
 export declare class BackMasterChannel extends Channel {
     private pull;

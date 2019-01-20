@@ -1,6 +1,6 @@
 import * as msgpack from 'notepack.io';
 
-import { Messenger } from 'centrum-messengers/dist/core/Messenger';
+import { Messenger } from 'gotti-pubsub/dist/Messenger';
 
 import { MasterMessages, FrontMasterPushes, FrontMasterSubs } from './MasterMessages';
 

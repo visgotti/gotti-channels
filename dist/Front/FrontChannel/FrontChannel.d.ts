@@ -1,7 +1,7 @@
 import { Channel } from '../../Channel/Channel';
 import { FrontMasterChannel } from '../FrontMaster/MasterChannel';
 import Client from '../../Client';
-import { Messenger } from 'centrum-messengers/dist/core/Messenger';
+import { Messenger } from 'gotti-pubsub/dist/Messenger';
 export declare class FrontChannel extends Channel {
     private master;
     private connectedChannelIds;

@@ -1,5 +1,5 @@
 import { Protocol, PushProtocol, SubscribeProtocol, MasterMessageFactory } from '../../Channel/MessageFactory'
-
+import * as msgpack from 'notepack.io';
 export interface FrontMasterSubs {
     PATCH_STATE: SubscribeProtocol,
     MESSAGE_CLIENT: SubscribeProtocol,
@@ -30,8 +30,8 @@ export class MasterMessages extends MasterMessageFactory {
     }
 
     private initializeSubs(): FrontMasterSubs {
-        this.PATCH_STATE = this.subCreator(Protocol.PATCH_STATE(this.frontMasterIndex), this.frontMasterIndex, 'NONE');
-        this.MESSAGE_CLIENT = this.subCreator(Protocol.MESSAGE_CLIENT(this.frontMasterIndex), this.frontMasterIndex, 'MSGPACK');
+        this.PATCH_STATE = this.subCreator(Protocol.PATCH_STATE(this.frontMasterIndex), this.frontMasterIndex, false);
+        this.MESSAGE_CLIENT = this.subCreator(Protocol.MESSAGE_CLIENT(this.frontMasterIndex), this.frontMasterIndex, msgpack.decode);
 
         return {
             PATCH_STATE: this.PATCH_STATE,

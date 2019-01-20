@@ -1,4 +1,4 @@
-import { Messenger } from 'centrum-messengers/dist/core/Messenger';
+import { Messenger } from 'gotti-pubsub/dist/Messenger';
 import { Channel } from '../../Channel/Channel';
 export declare class FrontMasterChannel extends Channel {
     private sub;
@@ -10,7 +10,7 @@ export declare class FrontMasterChannel extends Channel {
     private _connectedClients;
     frontChannels: any;
     readonly frontMasterIndex: any;
-    constructor(channelIds: any, totalChannels: any, frontMasterIndex: any, messenger: Messenger);
+    constructor(channelIds: any, frontMasterIndex: any, messenger: Messenger);
     readonly connectedBackMasters: number[];
     connect(): Promise<boolean>;
     /**

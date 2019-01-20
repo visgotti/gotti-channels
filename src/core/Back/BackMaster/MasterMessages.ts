@@ -1,4 +1,5 @@
 import { Protocol, PushProtocol, PullProtocol, MasterMessageFactory } from '../../Channel/MessageFactory'
+import * as msgpack from 'notepack.io';
 
 export interface BackMasterPushes {
     PATCH_STATE: PushProtocol,
@@ -26,8 +27,8 @@ export class MasterMessages extends MasterMessageFactory {
         this.pull = this.initializePulls();
     }
     private initializePushes() : BackMasterPushes {
-        this.PATCH_STATE = this.pushCreator(Protocol.PATCH_STATE, 'NONE'); // encoding for states happen in the back channel patchState function
-        this.MESSAGE_CLIENT = this.pushCreator(Protocol.MESSAGE_CLIENT, 'MSGPACK');
+        this.PATCH_STATE = this.pushCreator(Protocol.PATCH_STATE, false); // encoding for states happen in the back channel patchState function
+        this.MESSAGE_CLIENT = this.pushCreator(Protocol.MESSAGE_CLIENT, msgpack.encode);
 
         return {
             PATCH_STATE: this.PATCH_STATE,

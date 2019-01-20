@@ -1,4 +1,4 @@
-import { Messenger } from 'centrum-messengers/dist/core/Messenger';
+import { Messenger } from 'gotti-pubsub/dist/Messenger';
 
 enum MSG_CODES {
     // FRONT MASTER -> BACK MASTER
@@ -90,7 +90,7 @@ abstract class MessageFactory {
         this.messenger = messenger;
     }
 
-    protected pubCreator(protocol, encoder?) {
+    protected pubCreator(protocol, encoder=true) {
         let pub: any = {};
 
         pub = (function (...args) {
@@ -102,7 +102,7 @@ abstract class MessageFactory {
         });
 
         pub.register = () => {
-            pub.publisher = this.messenger.getOrCreatePublish(protocol, null, encoder);
+            pub.publisher = this.messenger.getOrCreatePublish(protocol, encoder);
 
             pub.unregister = () => {
                 this.messenger.removePublish(protocol);
@@ -118,11 +118,11 @@ abstract class MessageFactory {
      * factory create the message name for us.
      * @param protocolFactory - Function used to create the publisher name based on the to parameter passed in.
      */
-    protected pushCreator(protocolFactory: Function, encoder?) {
+    protected pushCreator(protocolFactory: Function, encoder=true) {
         let push: any = {};
 
         push.register = (to) => {
-            push[to] = this.messenger.getOrCreatePublish(protocolFactory(to), null, encoder);
+            push[to] = this.messenger.getOrCreatePublish(protocolFactory(to), encoder);
 
             push.unregister = () => {
                 this.messenger.removePublish(protocolFactory(to));
@@ -139,7 +139,7 @@ abstract class MessageFactory {
      * @param id
      * @returns {any}
      */
-    protected subCreator(protocol, id, decoder?) {
+    protected subCreator(protocol, id, decoder=true) {
         let sub: any = {};
 
         sub.register = (onSubscriptionHandler: SubscriptionHandler) => {
@@ -157,7 +157,7 @@ abstract class MessageFactory {
      * @param protocol
      * @returns {any}
      */
-    protected pullCreator(protocolFactory: Function, decoder?) {
+    protected pullCreator(protocolFactory: Function, decoder=true) {
         let pull: any = {};
 
         pull.register = (from, onSubscriptionHandler: SubscriptionHandler) => {

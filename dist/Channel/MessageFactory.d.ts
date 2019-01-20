@@ -1,4 +1,4 @@
-import { Messenger } from 'centrum-messengers/dist/core/Messenger';
+import { Messenger } from 'gotti-pubsub/dist/Messenger';
 declare enum MSG_CODES {
     SEND_QUEUED = 0,
     PATCH_STATE = 1,
