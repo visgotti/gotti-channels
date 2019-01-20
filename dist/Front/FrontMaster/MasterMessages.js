@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const MessageFactory_1 = require("../../Channel/MessageFactory");
+const msgpack = require("notepack.io");
 class MasterMessages extends MessageFactory_1.MasterMessageFactory {
     constructor(messenger, frontMasterIndex) {
         super(messenger);
@@ -10,8 +11,8 @@ class MasterMessages extends MessageFactory_1.MasterMessageFactory {
         this.sub = this.initializeSubs();
     }
     initializeSubs() {
-        this.PATCH_STATE = this.subCreator(MessageFactory_1.Protocol.PATCH_STATE(this.frontMasterIndex), this.frontMasterIndex, 'NONE');
-        this.MESSAGE_CLIENT = this.subCreator(MessageFactory_1.Protocol.MESSAGE_CLIENT(this.frontMasterIndex), this.frontMasterIndex, 'MSGPACK');
+        this.PATCH_STATE = this.subCreator(MessageFactory_1.Protocol.PATCH_STATE(this.frontMasterIndex), this.frontMasterIndex, false);
+        this.MESSAGE_CLIENT = this.subCreator(MessageFactory_1.Protocol.MESSAGE_CLIENT(this.frontMasterIndex), this.frontMasterIndex, msgpack.decode);
         return {
             PATCH_STATE: this.PATCH_STATE,
             MESSAGE_CLIENT: this.MESSAGE_CLIENT,

@@ -74,6 +74,7 @@ class BackMasterChannel extends Channel_1.Channel {
         for (let i = 0; i < this._linkedFrontMasterIndexesArray.length; i++) {
             const frontMasterIndex = this._linkedFrontMasterIndexesArray[i];
             const { encodedPatches } = this._linkedFrontMasterChannels[frontMasterIndex];
+            //TODO see if i can get channelId as last element
             this.push.PATCH_STATE[frontMasterIndex](msgpack.encode(encodedPatches)); // sends array of patches [ channelId, patch ]
             // clears patches
             encodedPatches.length = 0;
@@ -84,20 +85,21 @@ class BackMasterChannel extends Channel_1.Channel {
      * and is updates when we handle new unlink/link publications from the front channel when the message
      * is supplied with a clientUid notifying that the link/unlink was for a client.
      * @param clientUid - uid of client to send direct message to
-     * @param message - message client receives.
      * @returns {boolean}
      */
-    messageClient(clientUid, message) {
+    messageClient(clientUid, data) {
+        // makes sure first member of data to send is client id.
         if (this._linkedClientFrontDataLookup.has(clientUid)) {
+            data.push(clientUid);
             // if the clientUid is discoverable in the lookup we forward message to the front master so it can relay it to the client.
-            this.push.MESSAGE_CLIENT[this._linkedClientFrontDataLookup.get(clientUid).frontMasterIndex]([clientUid, message]);
+            this.push.MESSAGE_CLIENT[this._linkedClientFrontDataLookup.get(clientUid).frontMasterIndex](data);
             return true;
         }
         return false;
     }
     handleNewFrontMasterConnection(frontMasterIndex) {
         this.pull.SEND_QUEUED.register(frontMasterIndex, (messageQueueData => {
-            this.handleQueuedMessages(messageQueueData, frontMasterIndex);
+            this.handleQueuedMessages(messageQueueData);
         }));
         this.push.PATCH_STATE.register(frontMasterIndex);
         this.push.MESSAGE_CLIENT.register(frontMasterIndex);
@@ -187,12 +189,14 @@ class BackMasterChannel extends Channel_1.Channel {
         this._sendStateUpdatesInterval = undefined;
     }
     /** messageQueueData is formatted incoming as
-     *  [ channelId,  message, clientId? ]
+     *  [data.... clientUid?, channelId always last element ]
      */
-    handleQueuedMessages(messageQueueData, frontMasterIndex) {
+    handleQueuedMessages(messageQueueData) {
         for (let i = 0; i < messageQueueData.length; i++) {
             const data = messageQueueData[i];
-            this.backChannels[data[0]].processMessageFromMaster(data[1], frontMasterIndex, data[2]);
+            // channel id is always last element in array
+            // clientUid will always be second last if present
+            this.backChannels[data[data.length - 1]].processMessageFromMaster(data, data[data.length - 2]);
         }
     }
     /**

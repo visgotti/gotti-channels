@@ -87,7 +87,7 @@ class MessageFactory {
     constructor(messenger) {
         this.messenger = messenger;
     }
-    pubCreator(protocol, encoder) {
+    pubCreator(protocol, encoder = true) {
         let pub = {};
         pub = (function (...args) {
             if (pub.publisher) {
@@ -98,7 +98,7 @@ class MessageFactory {
             }
         });
         pub.register = () => {
-            pub.publisher = this.messenger.getOrCreatePublish(protocol, null, encoder);
+            pub.publisher = this.messenger.getOrCreatePublish(protocol, encoder);
             pub.unregister = () => {
                 this.messenger.removePublish(protocol);
             };
@@ -111,10 +111,10 @@ class MessageFactory {
      * factory create the message name for us.
      * @param protocolFactory - Function used to create the publisher name based on the to parameter passed in.
      */
-    pushCreator(protocolFactory, encoder) {
+    pushCreator(protocolFactory, encoder = true) {
         let push = {};
         push.register = (to) => {
-            push[to] = this.messenger.getOrCreatePublish(protocolFactory(to), null, encoder);
+            push[to] = this.messenger.getOrCreatePublish(protocolFactory(to), encoder);
             push.unregister = () => {
                 this.messenger.removePublish(protocolFactory(to));
                 delete push[to];
@@ -128,7 +128,7 @@ class MessageFactory {
      * @param id
      * @returns {any}
      */
-    subCreator(protocol, id, decoder) {
+    subCreator(protocol, id, decoder = true) {
         let sub = {};
         sub.register = (onSubscriptionHandler) => {
             sub.subscriber = this.messenger.createOrAddSubscription(protocol, id, onSubscriptionHandler, decoder);
@@ -143,7 +143,7 @@ class MessageFactory {
      * @param protocol
      * @returns {any}
      */
-    pullCreator(protocolFactory, decoder) {
+    pullCreator(protocolFactory, decoder = true) {
         let pull = {};
         pull.register = (from, onSubscriptionHandler) => {
             pull.subscriber = this.messenger.createSubscription(protocolFactory(from), protocolFactory(from), onSubscriptionHandler, decoder);

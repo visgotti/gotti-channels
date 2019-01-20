@@ -1,32 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="52f8aeae-be83-469f-bcb7-bd5cada003c1" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dist/Back/BackChannel/BackChannel.d.ts" afterPath="$PROJECT_DIR$/dist/Back/BackChannel/BackChannel.d.ts" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dist/Back/BackMaster/MasterChannel.d.ts" afterPath="$PROJECT_DIR$/dist/Back/BackMaster/MasterChannel.d.ts" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dist/Back/BackMaster/MasterChannel.js" afterPath="$PROJECT_DIR$/dist/Back/BackMaster/MasterChannel.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dist/Channel/Channel.d.ts" afterPath="$PROJECT_DIR$/dist/Channel/Channel.d.ts" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dist/Channel/MessageFactory.d.ts" afterPath="$PROJECT_DIR$/dist/Channel/MessageFactory.d.ts" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dist/Front/FrontChannel/FrontChannel.d.ts" afterPath="$PROJECT_DIR$/dist/Front/FrontChannel/FrontChannel.d.ts" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dist/Front/FrontMaster/MasterChannel.d.ts" afterPath="$PROJECT_DIR$/dist/Front/FrontMaster/MasterChannel.d.ts" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dist/Front/FrontMaster/MasterChannel.js" afterPath="$PROJECT_DIR$/dist/Front/FrontMaster/MasterChannel.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/package-lock.json" afterPath="$PROJECT_DIR$/package-lock.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/package.json" afterPath="$PROJECT_DIR$/package.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/core/Back/BackChannel/BackChannel.ts" afterPath="$PROJECT_DIR$/src/core/Back/BackChannel/BackChannel.ts" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/core/Back/BackMaster/MasterChannel.ts" afterPath="$PROJECT_DIR$/src/core/Back/BackMaster/MasterChannel.ts" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/core/Back/BackMaster/MasterMessages.ts" afterPath="$PROJECT_DIR$/src/core/Back/BackMaster/MasterMessages.ts" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/core/Channel/Channel.ts" afterPath="$PROJECT_DIR$/src/core/Channel/Channel.ts" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/core/Channel/MessageFactory.ts" afterPath="$PROJECT_DIR$/src/core/Channel/MessageFactory.ts" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/core/Front/FrontChannel/FrontChannel.ts" afterPath="$PROJECT_DIR$/src/core/Front/FrontChannel/FrontChannel.ts" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/core/Front/FrontMaster/MasterChannel.ts" afterPath="$PROJECT_DIR$/src/core/Front/FrontMaster/MasterChannel.ts" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/core/Front/FrontMaster/MasterMessages.ts" afterPath="$PROJECT_DIR$/src/core/Front/FrontMaster/MasterMessages.ts" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/BackChannel.test.ts" afterPath="$PROJECT_DIR$/test/BackChannel.test.ts" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/BackMaster.test.ts" afterPath="$PROJECT_DIR$/test/BackMaster.test.ts" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/Client.test.ts" afterPath="$PROJECT_DIR$/test/Client.test.ts" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/FrontChannel.test.ts" afterPath="$PROJECT_DIR$/test/FrontChannel.test.ts" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/FrontMaster.test.ts" afterPath="$PROJECT_DIR$/test/FrontMaster.test.ts" />
-    </list>
+    <list default="true" id="52f8aeae-be83-469f-bcb7-bd5cada003c1" name="Default" comment="" />
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
     <ignored path="$PROJECT_DIR$/tmp/" />
@@ -40,91 +15,71 @@
   <component name="CreatePatchCommitExecutor">
     <option name="PATCH_PATH" value="" />
   </component>
+  <component name="DockManager">
+    <window id="2">
+      <content type="file-editors">
+        <state>
+          <leaf>
+            <file leaf-file-name="MasterChannel.ts" pinned="false" current-in-tab="true">
+              <entry file="file://$PROJECT_DIR$/../gotti-channels/src/core/Front/FrontMaster/MasterChannel.ts">
+                <provider selected="true" editor-type-id="text-editor">
+                  <state relative-caret-position="247">
+                    <caret line="111" column="27" lean-forward="false" selection-start-line="111" selection-start-column="27" selection-end-line="111" selection-end-column="27" />
+                    <folding>
+                      <element signature="e#0#39#0" expanded="true" />
+                    </folding>
+                  </state>
+                </provider>
+              </entry>
+            </file>
+            <file leaf-file-name="BackChannel.ts" pinned="false" current-in-tab="false">
+              <entry file="file://$PROJECT_DIR$/../gotti-channels/src/core/Back/BackChannel/BackChannel.ts">
+                <provider selected="true" editor-type-id="text-editor">
+                  <state relative-caret-position="247">
+                    <caret line="216" column="63" lean-forward="false" selection-start-line="216" selection-start-column="63" selection-end-line="216" selection-end-column="63" />
+                    <folding>
+                      <element signature="e#0#44#0" expanded="true" />
+                    </folding>
+                  </state>
+                </provider>
+              </entry>
+            </file>
+          </leaf>
+        </state>
+      </content>
+    </window>
+  </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FavoritesManager">
     <favorites_list name="CentrumChannels" />
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="FrontChannel.ts" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/core/Front/FrontChannel/FrontChannel.ts">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="247">
-              <caret line="111" column="33" lean-forward="false" selection-start-line="111" selection-start-column="26" selection-end-line="111" selection-end-column="33" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="Client.ts" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/core/Client.ts">
+        <entry file="file://$PROJECT_DIR$/../gotti-channels/src/core/Client.ts">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="247">
-              <caret line="43" column="20" lean-forward="false" selection-start-line="43" selection-start-column="11" selection-end-line="43" selection-end-column="20" />
+              <caret line="64" column="20" lean-forward="false" selection-start-line="64" selection-start-column="20" selection-end-line="64" selection-end-column="20" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="BackMaster.test.ts" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/test/BackMaster.test.ts">
+      <file leaf-file-name="index.ts" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../gotti-channels/src/core/index.ts">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="150">
-              <caret line="10" column="0" lean-forward="true" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="MasterChannel.ts" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/core/Front/FrontMaster/MasterChannel.ts">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="518">
-              <caret line="164" column="51" lean-forward="false" selection-start-line="164" selection-start-column="51" selection-end-line="164" selection-end-column="51" />
-              <folding>
-                <element signature="e#0#39#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="MessageFactory.ts" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/core/Channel/MessageFactory.ts">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1374">
-              <caret line="141" column="51" lean-forward="false" selection-start-line="141" selection-start-column="51" selection-end-line="141" selection-end-column="51" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="MasterMessages.ts" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/core/Front/FrontMaster/MasterMessages.ts">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="30">
-              <caret line="2" column="0" lean-forward="false" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
-              <folding>
-                <element signature="e#0#110#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="BackChannel.ts" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/core/Back/BackChannel/BackChannel.ts">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="45">
-              <caret line="3" column="44" lean-forward="false" selection-start-line="3" selection-start-column="44" selection-end-line="3" selection-end-column="44" />
+            <state relative-caret-position="105">
+              <caret line="7" column="38" lean-forward="false" selection-start-line="7" selection-start-column="38" selection-end-line="7" selection-end-column="38" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
       <file leaf-file-name="BackMessages.ts" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/core/Back/BackChannel/BackMessages.ts">
+        <entry file="file://$PROJECT_DIR$/../gotti-channels/src/core/Back/BackChannel/BackMessages.ts">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-921">
-              <caret line="2" column="0" lean-forward="false" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
+            <state relative-caret-position="306">
+              <caret line="57" column="41" lean-forward="true" selection-start-line="57" selection-start-column="41" selection-end-line="57" selection-end-column="41" />
               <folding>
                 <element signature="e#0#143#0" expanded="true" />
               </folding>
@@ -132,11 +87,55 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="MasterMessages.ts" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/core/Back/BackMaster/MasterMessages.ts">
+      <file leaf-file-name="MessageFactory.ts" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../gotti-channels/src/core/Channel/MessageFactory.ts">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="405">
-              <caret line="27" column="5" lean-forward="false" selection-start-line="27" selection-start-column="5" selection-end-line="27" selection-end-column="5" />
+            <state relative-caret-position="713">
+              <caret line="141" column="51" lean-forward="false" selection-start-line="141" selection-start-column="51" selection-end-line="141" selection-end-column="51" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="package.json" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/../gotti-channels/package.json">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="270">
+              <caret line="18" column="12" lean-forward="true" selection-start-line="18" selection-start-column="12" selection-end-line="18" selection-end-column="12" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="BackChannel.test.ts" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../gotti-channels/test/BackChannel.test.ts">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="285">
+              <caret line="19" column="8" lean-forward="false" selection-start-line="19" selection-start-column="8" selection-end-line="19" selection-end-column="8" />
+              <folding>
+                <element signature="e#0#37#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MasterChannel.ts" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../gotti-channels/src/core/Back/BackMaster/MasterChannel.ts">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="713">
+              <caret line="231" column="5" lean-forward="false" selection-start-line="231" selection-start-column="5" selection-end-line="231" selection-end-column="5" />
+              <folding>
+                <element signature="e#0#44#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MasterMessages.ts" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../gotti-channels/src/core/Back/BackMaster/MasterMessages.ts">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="210">
+              <caret line="14" column="28" lean-forward="true" selection-start-line="14" selection-start-column="28" selection-end-line="14" selection-end-column="28" />
               <folding>
                 <element signature="e#0#105#0" expanded="true" />
               </folding>
@@ -144,14 +143,22 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="BackChannel.test.ts" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/test/BackChannel.test.ts">
+      <file leaf-file-name="Channel.ts" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../gotti-channels/src/core/Channel/Channel.ts">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="419">
-              <caret line="60" column="33" lean-forward="false" selection-start-line="60" selection-start-column="33" selection-end-line="60" selection-end-column="33" />
-              <folding>
-                <element signature="e#0#37#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="225">
+              <caret line="15" column="1" lean-forward="false" selection-start-line="15" selection-start-column="1" selection-end-line="15" selection-end-column="1" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="FrontChannel.ts" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../gotti-channels/src/core/Front/FrontChannel/FrontChannel.ts">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="321">
+              <caret line="203" column="9" lean-forward="true" selection-start-line="203" selection-start-column="9" selection-end-line="203" selection-end-column="9" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -160,40 +167,38 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>listeningClientUids</find>
-      <find>_linkedBackMasterIndexes</find>
-      <find>handleQueuedMessages</find>
-      <find>linked</find>
-      <find>Interval</find>
-      <find>_sendStateUpdatesInterval</find>
-      <find>setState</find>
-      <find>backChannelIds</find>
-      <find>linkedFrontAndClientUids</find>
-      <find>_linkedFrontMasterIndexesArray</find>
-      <find>patchState</find>
-      <find>BackChannel1.state</find>
-      <find>linkedFrontMasterIndexes</find>
-      <find>patch</find>
-      <find>disconnect</find>
-      <find>--</find>
-      <find>spy</find>
-      <find>Spy</find>
-      <find>totalChannels</find>
-      <find>validateConnectAction</find>
-      <find>connect</find>
-      <find>connect(</find>
-      <find>centrum-messengers</find>
-      <find>cebtryn</find>
-      <find>dist/core/Messenger</find>
-      <find>sendState</find>
-      <find>msgpack</find>
-      <find>onMessage</find>
+      <find>get</find>
+      <find>messageClient</find>
+      <find>messag</find>
+      <find>_linkedClientFrontDataLookup</find>
+      <find>processMessage</find>
+      <find>onCl</find>
+      <find>broadcast</find>
+      <find>queue</find>
+      <find>clientUid</find>
+      <find>data, clientUid</find>
+      <find>onClientMessage</find>
+      <find>data</find>
+      <find>cl</find>
+      <find>add</find>
       <find>client</find>
-      <find>client.</find>
+      <find>_onMessage</find>
+      <find>push</find>
+      <find>send</find>
+      <find>BROADCAST_ALL_BACK</find>
+      <find>processMessageFromMaster</find>
+      <find>BROADCAST_ALL_FRONTS</find>
+      <find>sendClie</find>
+      <find>onMessag</find>
+      <find>.send</find>
+      <find>sendLocal</find>
+      <find>onMessage</find>
+      <find>addMessage</find>
+      <find>BackChannel.send</find>
+      <find>addQueued</find>
+      <find>centrum</find>
     </findStrings>
     <replaceStrings>
-      <replace>linkChannel</replace>
-      <replace>linkClient(client1)</replace>
       <replace>unlinkClient(client2.uid)</replace>
       <replace>it.only(</replace>
       <replace>clientUid</replace>
@@ -222,17 +227,16 @@
       <replace>listeningClientUids</replace>
       <replace>gotti-pubsub</replace>
       <replace>dist/Messenger</replace>
+      <replace>clientUid, message</replace>
+      <replace>clientUid, data</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/core/FrontChannel/index.ts" />
-        <option value="$PROJECT_DIR$/test/ChannelCluster.test.ts" />
-        <option value="$PROJECT_DIR$/lib/core/Broker.js" />
         <option value="$PROJECT_DIR$/lib/core/Messengers/Publisher.js" />
         <option value="$PROJECT_DIR$/lib/core/Messengers/Subscriber.js" />
         <option value="$PROJECT_DIR$/dist/base/Channel.d.ts" />
@@ -263,24 +267,27 @@
         <option value="$PROJECT_DIR$/src/core/types.ts" />
         <option value="$PROJECT_DIR$/src/core/Channel/Channel.ts" />
         <option value="$PROJECT_DIR$/src/core/index.ts" />
-        <option value="$PROJECT_DIR$/src/core/Front/FrontChannel/FrontChannel.ts" />
         <option value="$PROJECT_DIR$/src/core/Front/FrontChannel/FrontMessages.ts" />
         <option value="$PROJECT_DIR$/src/core/Back/BackChannel/BackMessages.ts" />
-        <option value="$PROJECT_DIR$/src/core/Client.ts" />
-        <option value="$PROJECT_DIR$/src/core/Back/BackMaster/MasterChannel.ts" />
-        <option value="$PROJECT_DIR$/src/core/Front/FrontMaster/MasterChannel.ts" />
-        <option value="$PROJECT_DIR$/test/FrontChannel.test.ts" />
-        <option value="$PROJECT_DIR$/test/FrontMaster.test.ts" />
         <option value="$PROJECT_DIR$/package.json" />
         <option value="$PROJECT_DIR$/coverage/core/Back/BackChannel/BackChannel.ts.html" />
-        <option value="$PROJECT_DIR$/src/core/Back/BackChannel/BackChannel.ts" />
-        <option value="$PROJECT_DIR$/test/BackChannel.test.ts" />
         <option value="$PROJECT_DIR$/coverage/core/Back/BackMaster/MasterChannel.ts.html" />
-        <option value="$PROJECT_DIR$/test/Client.test.ts" />
         <option value="$PROJECT_DIR$/src/core/Channel/MessageFactory.ts" />
         <option value="$PROJECT_DIR$/src/core/Front/FrontMaster/MasterMessages.ts" />
         <option value="$PROJECT_DIR$/src/core/Back/BackMaster/MasterMessages.ts" />
+        <option value="$PROJECT_DIR$/LICENSE" />
+        <option value="$PROJECT_DIR$/src/core/Client.ts" />
+        <option value="$PROJECT_DIR$/src/core/Back/BackMaster/MasterChannel.ts" />
+        <option value="$PROJECT_DIR$/src/core/Back/BackChannel/BackChannel.ts" />
+        <option value="$PROJECT_DIR$/test/BackChannel.test.ts" />
+        <option value="$PROJECT_DIR$/test/FrontChannel.test.ts" />
         <option value="$PROJECT_DIR$/test/BackMaster.test.ts" />
+        <option value="$PROJECT_DIR$/src/core/Front/FrontChannel/FrontChannel.ts" />
+        <option value="$PROJECT_DIR$/src/core/Front/FrontMaster/MasterChannel.ts" />
+        <option value="$PROJECT_DIR$/test/FrontMaster.test.ts" />
+        <option value="$PROJECT_DIR$/test/Client.test.ts" />
+        <option value="$PROJECT_DIR$/../gotti-channels/package.json" />
+        <option value="$PROJECT_DIR$/../gotti-channels/README.md" />
       </list>
     </option>
   </component>
@@ -291,7 +298,7 @@
     <sorting>DEFINITION_ORDER</sorting>
   </component>
   <component name="NodeModulesDirectoryManager">
-    <handled-path value="$PROJECT_DIR$/node_modules" />
+    <handled-path value="$PROJECT_DIR$/../gotti-channels/node_modules" />
   </component>
   <component name="ProjectFrameBounds">
     <option name="x" value="59" />
@@ -323,7 +330,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="CentrumChannels" />
+              <option name="myItemId" value="gotti-channels" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -333,43 +340,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="CentrumChannels" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="typings" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="CentrumChannels" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="CentrumChannels" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="typings" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="globals" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="mocha" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="CentrumChannels" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="CentrumChannels" />
+              <option name="myItemId" value="gotti-channels" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
@@ -383,7 +354,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="CentrumChannels" />
+              <option name="myItemId" value="gotti-channels" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
@@ -401,7 +372,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="CentrumChannels" />
+              <option name="myItemId" value="gotti-channels" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
@@ -427,7 +398,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="CentrumChannels" />
+              <option name="myItemId" value="gotti-channels" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
@@ -453,7 +424,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="CentrumChannels" />
+              <option name="myItemId" value="gotti-channels" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
@@ -475,7 +446,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="CentrumChannels" />
+              <option name="myItemId" value="gotti-channels" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
@@ -501,7 +472,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="CentrumChannels" />
+              <option name="myItemId" value="gotti-channels" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
@@ -654,12 +625,12 @@
       <workItem from="1547855803132" duration="2627000" />
       <workItem from="1547908951424" duration="593000" />
       <workItem from="1547936676449" duration="2287000" />
-      <workItem from="1548008555365" duration="1273000" />
+      <workItem from="1548008555365" duration="13992000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="349147000" />
+    <option name="totallyTimeSpent" value="361866000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="59" y="21" width="1541" height="879" extended-state="6" />
@@ -724,15 +695,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/package-lock.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/lib/test" />
-    <entry file="file://$PROJECT_DIR$/lib/Serializers.js" />
     <entry file="file://$PROJECT_DIR$/lib/core/Broker.js" />
     <entry file="file://$PROJECT_DIR$/src/core/Front/FrontChannel/index.ts" />
     <entry file="file://$PROJECT_DIR$/src/core/Back/BackMaster/BackChannel.ts" />
@@ -742,106 +704,92 @@
     <entry file="file://$PROJECT_DIR$/src/ChannelCluster.ts" />
     <entry file="file://$PROJECT_DIR$/test/mocks/MasterChannels.ts" />
     <entry file="file://$PROJECT_DIR$/test/old_FrontChannel.ts" />
-    <entry file="file://$PROJECT_DIR$/README.md">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="277">
-          <caret line="24" column="0" lean-forward="true" selection-start-line="24" selection-start-column="0" selection-end-line="24" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/test/BackChannelold.ts" />
-    <entry file="file://$PROJECT_DIR$/coverage/coverage/index.html">
+    <entry file="file://$PROJECT_DIR$/../gotti-channels/coverage/coverage/index.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="135">
           <caret line="9" column="31" lean-forward="false" selection-start-line="9" selection-start-column="31" selection-end-line="9" selection-end-column="31" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/coverage/block-navigation.js">
+    <entry file="file://$PROJECT_DIR$/../gotti-channels/coverage/block-navigation.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-45">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/LICENSE">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="20" column="9" lean-forward="false" selection-start-line="20" selection-start-column="9" selection-end-line="20" selection-end-column="9" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/.gitignore">
+    <entry file="file://$PROJECT_DIR$/../gotti-channels/.gitignore">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="45">
           <caret line="3" column="11" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="3" selection-end-column="11" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/dist/Front/FrontMaster/MasterChannel.d.ts">
+    <entry file="file://$PROJECT_DIR$/../gotti-channels/dist/Front/FrontMaster/MasterChannel.d.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-71">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/dist/Front/FrontMaster/MasterChannel.js">
+    <entry file="file://$PROJECT_DIR$/../gotti-channels/dist/Front/FrontMaster/MasterChannel.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/dist/Client.js">
+    <entry file="file://$PROJECT_DIR$/../gotti-channels/dist/Client.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="180">
           <caret line="12" column="22" lean-forward="false" selection-start-line="12" selection-start-column="22" selection-end-line="12" selection-end-column="22" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/tsconfig.json">
+    <entry file="file://$PROJECT_DIR$/../gotti-channels/tsconfig.json">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="150">
           <caret line="10" column="4" lean-forward="false" selection-start-line="10" selection-start-column="4" selection-end-line="10" selection-end-column="4" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/.npmignore">
+    <entry file="file://$PROJECT_DIR$/../gotti-channels/.npmignore">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="90">
           <caret line="6" column="8" lean-forward="false" selection-start-line="6" selection-start-column="8" selection-end-line="6" selection-end-column="8" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/dist/Back/BackMaster/MasterChannel.d.ts">
+    <entry file="file://$PROJECT_DIR$/../gotti-channels/dist/Back/BackMaster/MasterChannel.d.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/dist/Back/BackMaster/MasterChannel.js">
+    <entry file="file://$PROJECT_DIR$/../gotti-channels/dist/Back/BackMaster/MasterChannel.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/dist/index.js">
+    <entry file="file://$PROJECT_DIR$/../gotti-channels/dist/index.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="105">
           <caret line="7" column="55" lean-forward="false" selection-start-line="7" selection-start-column="55" selection-end-line="7" selection-end-column="55" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/testHelpers.ts">
+    <entry file="file://$PROJECT_DIR$/../gotti-channels/test/testHelpers.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="105">
           <caret line="7" column="1" lean-forward="true" selection-start-line="7" selection-start-column="1" selection-end-line="7" selection-end-column="1" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/coverage/index.html">
+    <entry file="file://$PROJECT_DIR$/../gotti-channels/coverage/index.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="134">
           <caret line="21" column="37" lean-forward="false" selection-start-line="21" selection-start-column="37" selection-end-line="21" selection-end-column="37" />
@@ -849,32 +797,7 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/core/Back/BackChannel/index.ts" />
-    <entry file="file://$PROJECT_DIR$/src/core/Channel/Channel.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="15" column="1" lean-forward="false" selection-start-line="15" selection-start-column="1" selection-end-line="15" selection-end-column="1" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/core/index.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="30">
-          <caret line="2" column="86" lean-forward="false" selection-start-line="2" selection-start-column="86" selection-end-line="2" selection-end-column="86" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test/FrontMaster.test.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="390">
-          <caret line="40" column="46" lean-forward="false" selection-start-line="40" selection-start-column="46" selection-end-line="40" selection-end-column="46" />
-          <folding>
-            <element signature="e#0#37#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/core/Front/FrontChannel/FrontMessages.ts">
+    <entry file="file://$PROJECT_DIR$/../gotti-channels/src/core/Front/FrontChannel/FrontMessages.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="15">
           <caret line="1" column="0" lean-forward="false" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="24" />
@@ -882,27 +805,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/FrontChannel.test.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="20" column="37" lean-forward="false" selection-start-line="20" selection-start-column="37" selection-end-line="20" selection-end-column="37" />
-          <folding>
-            <element signature="e#0#37#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/core/Back/BackMaster/MasterChannel.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="450">
-          <caret line="30" column="0" lean-forward="false" selection-start-line="30" selection-start-column="0" selection-end-line="30" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#44#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/core/types.ts">
+    <entry file="file://$PROJECT_DIR$/../gotti-channels/src/core/types.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="30">
           <caret line="2" column="13" lean-forward="false" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
@@ -910,7 +813,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/coverage/core/Back/BackChannel/BackChannel.ts.html">
+    <entry file="file://$PROJECT_DIR$/../gotti-channels/coverage/core/Back/BackChannel/BackChannel.ts.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="64">
           <caret line="790" column="43" lean-forward="false" selection-start-line="790" selection-start-column="43" selection-end-line="790" selection-end-column="43" />
@@ -918,15 +821,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/package.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="26" column="17" lean-forward="false" selection-start-line="26" selection-start-column="11" selection-end-line="26" selection-end-column="17" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/node_modules/gotti-pubsub/package.json">
+    <entry file="file://$PROJECT_DIR$/../gotti-channels/node_modules/gotti-pubsub/package.json">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="165">
           <caret line="11" column="27" lean-forward="false" selection-start-line="11" selection-start-column="27" selection-end-line="11" selection-end-column="27" />
@@ -934,7 +829,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/coverage/core/Back/BackMaster/MasterChannel.ts.html">
+    <entry file="file://$PROJECT_DIR$/../gotti-channels/coverage/core/Back/BackMaster/MasterChannel.ts.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="245">
           <caret line="584" column="48" lean-forward="false" selection-start-line="584" selection-start-column="48" selection-end-line="584" selection-end-column="48" />
@@ -942,100 +837,196 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/Client.test.ts">
+    <entry file="file://$PROJECT_DIR$/../gotti-channels/src/core/Front/FrontMaster/MasterMessages.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="285">
-          <caret line="47" column="53" lean-forward="false" selection-start-line="47" selection-start-column="53" selection-end-line="47" selection-end-column="53" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/core/Channel/MessageFactory.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1374">
-          <caret line="141" column="51" lean-forward="false" selection-start-line="141" selection-start-column="51" selection-end-line="141" selection-end-column="51" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/core/Back/BackChannel/BackMessages.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-921">
-          <caret line="2" column="0" lean-forward="false" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#143#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/core/Back/BackMaster/MasterMessages.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="405">
-          <caret line="27" column="5" lean-forward="false" selection-start-line="27" selection-start-column="5" selection-end-line="27" selection-end-column="5" />
-          <folding>
-            <element signature="e#0#105#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test/BackChannel.test.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="419">
-          <caret line="60" column="33" lean-forward="false" selection-start-line="60" selection-start-column="33" selection-end-line="60" selection-end-column="33" />
-          <folding>
-            <element signature="e#0#37#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/core/Client.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="247">
-          <caret line="43" column="20" lean-forward="false" selection-start-line="43" selection-start-column="11" selection-end-line="43" selection-end-column="20" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/core/Front/FrontMaster/MasterMessages.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="30">
-          <caret line="2" column="0" lean-forward="false" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
+        <state relative-caret-position="338">
+          <caret line="28" column="41" lean-forward="false" selection-start-line="28" selection-start-column="41" selection-end-line="28" selection-end-column="41" />
           <folding>
             <element signature="e#0#110#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/core/Front/FrontMaster/MasterChannel.ts">
+    <entry file="file://$PROJECT_DIR$/../gotti-channels/LICENSE">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="518">
-          <caret line="164" column="51" lean-forward="false" selection-start-line="164" selection-start-column="51" selection-end-line="164" selection-end-column="51" />
+        <state relative-caret-position="300">
+          <caret line="20" column="9" lean-forward="false" selection-start-line="20" selection-start-column="9" selection-end-line="20" selection-end-column="9" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../gotti-channels/test/FrontMaster.test.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="75">
+          <caret line="19" column="8" lean-forward="false" selection-start-line="19" selection-start-column="8" selection-end-line="19" selection-end-column="8" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../gotti-channels/test/FrontChannel.test.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="300">
+          <caret line="20" column="8" lean-forward="false" selection-start-line="20" selection-start-column="8" selection-end-line="20" selection-end-column="8" />
+          <folding>
+            <element signature="e#0#37#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../gotti-channels/test/Client.test.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="35" column="36" lean-forward="false" selection-start-line="35" selection-start-column="36" selection-end-line="35" selection-end-column="36" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../gotti-channels/typings/index.d.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../gotti-channels/README.md">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="330">
+          <caret line="22" column="57" lean-forward="false" selection-start-line="22" selection-start-column="57" selection-end-line="22" selection-end-column="57" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../gotti-channels/test/BackMaster.test.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="315">
+          <caret line="21" column="8" lean-forward="false" selection-start-line="21" selection-start-column="8" selection-end-line="21" selection-end-column="8" />
+          <folding>
+            <element signature="e#0#37#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../gotti-channels/coverage/dist/FrontChannel/FrontChannel.js.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="258">
+          <caret line="621" column="115" lean-forward="false" selection-start-line="621" selection-start-column="115" selection-end-line="621" selection-end-column="115" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../gotti-channels/coverage/core/BackChannel/BackMessages.ts.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="258">
+          <caret line="332" column="14" lean-forward="false" selection-start-line="332" selection-start-column="14" selection-end-line="332" selection-end-column="14" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../gotti-channels/test/BackChannel.test.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="19" column="8" lean-forward="false" selection-start-line="19" selection-start-column="8" selection-end-line="19" selection-end-column="8" />
+          <folding>
+            <element signature="e#0#37#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../gotti-channels/src/core/Client.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="247">
+          <caret line="64" column="20" lean-forward="false" selection-start-line="64" selection-start-column="20" selection-end-line="64" selection-end-column="20" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../gotti-channels/src/core/Back/BackChannel/BackChannel.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="247">
+          <caret line="216" column="63" lean-forward="false" selection-start-line="216" selection-start-column="63" selection-end-line="216" selection-end-column="63" />
+          <folding>
+            <element signature="e#0#44#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../gotti-channels/src/core/index.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="7" column="38" lean-forward="false" selection-start-line="7" selection-start-column="38" selection-end-line="7" selection-end-column="38" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../gotti-channels/src/core/Back/BackChannel/BackMessages.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="306">
+          <caret line="57" column="41" lean-forward="true" selection-start-line="57" selection-start-column="41" selection-end-line="57" selection-end-column="41" />
+          <folding>
+            <element signature="e#0#143#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../gotti-channels/src/core/Back/BackMaster/MasterChannel.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="713">
+          <caret line="231" column="5" lean-forward="false" selection-start-line="231" selection-start-column="5" selection-end-line="231" selection-end-column="5" />
+          <folding>
+            <element signature="e#0#44#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../gotti-channels/src/core/Back/BackMaster/MasterMessages.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="210">
+          <caret line="14" column="28" lean-forward="true" selection-start-line="14" selection-start-column="28" selection-end-line="14" selection-end-column="28" />
+          <folding>
+            <element signature="e#0#105#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../gotti-channels/src/core/Channel/Channel.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="225">
+          <caret line="15" column="1" lean-forward="false" selection-start-line="15" selection-start-column="1" selection-end-line="15" selection-end-column="1" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../gotti-channels/src/core/Channel/MessageFactory.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="713">
+          <caret line="141" column="51" lean-forward="false" selection-start-line="141" selection-start-column="51" selection-end-line="141" selection-end-column="51" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../gotti-channels/src/core/Front/FrontMaster/MasterChannel.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="247">
+          <caret line="111" column="27" lean-forward="false" selection-start-line="111" selection-start-column="27" selection-end-line="111" selection-end-column="27" />
           <folding>
             <element signature="e#0#39#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/core/Front/FrontChannel/FrontChannel.ts">
+    <entry file="file://$PROJECT_DIR$/../gotti-channels/src/core/Front/FrontChannel/FrontChannel.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="247">
-          <caret line="111" column="33" lean-forward="false" selection-start-line="111" selection-start-column="26" selection-end-line="111" selection-end-column="33" />
+        <state relative-caret-position="321">
+          <caret line="203" column="9" lean-forward="true" selection-start-line="203" selection-start-column="9" selection-end-line="203" selection-end-column="9" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/core/Back/BackChannel/BackChannel.ts">
+    <entry file="file://$PROJECT_DIR$/../gotti-channels/package.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="45">
-          <caret line="3" column="44" lean-forward="false" selection-start-line="3" selection-start-column="44" selection-end-line="3" selection-end-column="44" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test/BackMaster.test.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="10" column="0" lean-forward="true" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
+        <state relative-caret-position="270">
+          <caret line="18" column="12" lean-forward="true" selection-start-line="18" selection-start-column="12" selection-end-line="18" selection-end-column="12" />
           <folding />
         </state>
       </provider>

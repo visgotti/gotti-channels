@@ -184,12 +184,12 @@ describe('FrontChannel', function() {
     describe('FrontChannel.addMessage', () => {
         it('Throws error because theres no links to any back channels', (done) => {
             FrontChannel1.unlinkClient(client.uid);
-            assert.throws(() => { FrontChannel1.addMessage({"foo": "bar"}) });
+            assert.throws(() => { FrontChannel1.addMessage([{"foo": "bar"}]) });
             done();
         });
         it('Doesnt throw after linking.', (done) => {
             FrontChannel1.linkClient(client).then(() => {
-                assert.doesNotThrow(() => { FrontChannel1.addMessage({"foo": "bar"}) });
+                assert.doesNotThrow(() => { FrontChannel1.addMessage([{"foo": "bar"}]) });
                 done();
             });
         });
@@ -198,23 +198,19 @@ describe('FrontChannel', function() {
     describe('FrontChannel.send', () => {
         it('sends correct data to mirrored back channel when no backChannelId is passed in as a param', (done) => {
             const sent = 'test';
-            BackChannel1.onMessage((message, frontUid) => {
-                assert.strictEqual(message, sent);
-                assert.strictEqual(frontUid, FrontChannel1.frontUid);
-                assert.strictEqual(BackChannel1.channelId, FrontChannel1.channelId);
+            BackChannel1.onMessage((message) => {
+                assert.strictEqual(message[0], sent);
                 done();
             });
-            FrontChannel1.send(sent);
+            FrontChannel1.send([sent]);
         });
         it('sends correct data to remote back channel if channel id is specified', (done) => {
             const sent = 'test2';
-            BackChannel2.onMessage((message, frontUid) => {
-                assert.strictEqual(message, sent);
-                assert.strictEqual(frontUid, FrontChannel1.frontUid);
-                assert.notStrictEqual(BackChannel2.channelId, FrontChannel1.channelId);
+            BackChannel2.onMessage((message) => {
+                assert.strictEqual(message[0], sent);
                 done();
             });
-            FrontChannel1.send(sent, BackChannel2.channelId);
+            FrontChannel1.send([sent], BackChannel2.channelId);
         });
     });
 
@@ -222,52 +218,48 @@ describe('FrontChannel', function() {
         it('sends to all back channels if no backChannelIds were passed in as second param', (done) => {
             let received = 0;
             let expectedReceived = 2;
-            BackChannel1.onMessage((message, frontUid) => {
-                received += message;
+            BackChannel1.onMessage((message) => {
+                received += message[0];
                 if (received === expectedReceived) {
                     setTimeout(() => {
                         assert.strictEqual(received, expectedReceived);
-                        assert.strictEqual(frontUid, FrontChannel1.frontUid);
                         done();
                     }, 50)
                 }
             });
-            BackChannel2.onMessage((message, frontUid) => {
-                received += message;
+            BackChannel2.onMessage((message) => {
+                received += message[0];
                 if (received === expectedReceived) {
                     setTimeout(() => {
                         assert.strictEqual(received, expectedReceived);
-                        assert.strictEqual(frontUid, FrontChannel1.frontUid);
                         done();
                     }, 50)
                 }
             });
-            FrontChannel1.broadcast(1);
+            FrontChannel1.broadcast([1]);
         });
         it('only sends to back channels with channelIds passed in as second param', (done) => {
             let received = 0;
             let expectedReceived = 2;
-            BackChannel1.onMessage((message, frontUid) => {
-                received += message;
+            BackChannel1.onMessage((message) => {
+                received += message[0];
                 if (received === expectedReceived) {
                     setTimeout(() => {
                         assert.strictEqual(received, expectedReceived);
-                        assert.strictEqual(frontUid, FrontChannel1.frontUid);
                         done();
                     }, 50)
                 }
             });
-            BackChannel2.onMessage((message, frontUid) => {
-                received += message;
+            BackChannel2.onMessage((message) => {
+                received += message[0];
                 if (received === expectedReceived) {
                     setTimeout(() => {
                         assert.strictEqual(received, expectedReceived);
-                        assert.strictEqual(frontUid, FrontChannel1.frontUid);
                         done();
                     }, 50)
                 }
             });
-            FrontChannel1.broadcast(1, [BackChannel1.channelId, BackChannel2.channelId]);
+            FrontChannel1.broadcast([1], [BackChannel1.channelId, BackChannel2.channelId]);
         })
     });
 });

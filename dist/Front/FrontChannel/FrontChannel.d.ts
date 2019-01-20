@@ -36,7 +36,7 @@ export declare class FrontChannel extends Channel {
      * sets the onMessageHandler function
      * @param handler - function that gets executed, gets parameters message and channelId
      */
-    onMessage(handler: (message: any, channelId: string) => void): void;
+    onMessage(handler: (data: any) => void): void;
     /**
      * Sends link 'request' to back channel. It will respond with the back channel's current
      * state asynchronously, if we call link with a clientUid it will behave the same but
@@ -75,21 +75,24 @@ export declare class FrontChannel extends Channel {
      * the back master will iterate through the messages received and dispatch them to the child
      * back channels to process.
      * @param message
+     * @param clientUid that's used for protocol check if its from a clientUid or not.
      */
-    addMessage(message: any, clientUid?: string): void;
+    addMessage(data: Array<any>, clientUid?: string): void;
     /**
      * sends message to mirror back channel by default if backChannelId is omitted or sends to remote back channel with specified id.
      * @param message - data sent to back channel.
      * @param backChannelId - id of back channel to send message to
+     * @param fromClient - optional parameter that allows the back channel to know if
+     * the message was sent by a client by checking if last element is null or not
      */
-    send(message: any, backChannelId?: string, clientUid?: string): void;
+    send(data: Array<any>, backChannelId?: string, fromClient?: string): void;
     /**
      * sends message to all specified backChannelIds, if omitted it will send broadcast to all connected remote and mirror back channels.
      * @param message
      * @param backChannelIds
-     * @param clientUid - optional argument to signify who sent the message.
+     * @param fromClient - optional parameter that allows the back channel to know if the message was sent by a client
      */
-    broadcast(message: any, backChannelIds?: Array<string>, clientUid?: string): void;
+    broadcast(data: Array<any>, backChannelIds?: Array<string>, fromClient?: string): void;
     /**
      * sends out a connection publication then as back channels reply with a connect success publication keeps track and
      * when all replied the promise gets resolved and the connection timeout gets cleared.

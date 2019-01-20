@@ -150,36 +150,41 @@ class FrontChannel extends Channel_1.Channel {
      * the back master will iterate through the messages received and dispatch them to the child
      * back channels to process.
      * @param message
+     * @param clientUid that's used for protocol check if its from a clientUid or not.
      */
-    addMessage(message, clientUid) {
+    addMessage(data, clientUid = '') {
         if (!(this.linked)) {
             throw new Error('Front Channel is not linked, can not add messages to master queue.');
         }
-        this.master.addQueuedMessage(message, this.backMasterIndex, this.channelId, clientUid);
+        this.master.addQueuedMessage(data, this.channelId, this.backMasterIndex, clientUid);
     }
     ;
     /**
      * sends message to mirror back channel by default if backChannelId is omitted or sends to remote back channel with specified id.
      * @param message - data sent to back channel.
      * @param backChannelId - id of back channel to send message to
+     * @param fromClient - optional parameter that allows the back channel to know if
+     * the message was sent by a client by checking if last element is null or not
      */
-    send(message, backChannelId = this.channelId, clientUid) {
-        this.push.SEND_BACK[backChannelId]([message, this.frontUid, clientUid]);
+    send(data, backChannelId = this.channelId, fromClient = '') {
+        data.push(fromClient);
+        this.push.SEND_BACK[backChannelId](data);
     }
     /**
      * sends message to all specified backChannelIds, if omitted it will send broadcast to all connected remote and mirror back channels.
      * @param message
      * @param backChannelIds
-     * @param clientUid - optional argument to signify who sent the message.
+     * @param fromClient - optional parameter that allows the back channel to know if the message was sent by a client
      */
-    broadcast(message, backChannelIds, clientUid) {
+    broadcast(data, backChannelIds, fromClient = '') {
         if (backChannelIds) {
-            backChannelIds.forEach(channelId => {
-                this.send(message, channelId, clientUid);
-            });
+            for (let i = 0; i < backChannelIds.length; i++) {
+                this.send(data, backChannelIds[i]);
+            }
         }
         else {
-            this.pub.BROADCAST_ALL_BACK([message, this.frontUid, clientUid]);
+            data.push(fromClient);
+            this.pub.BROADCAST_ALL_BACK(data);
         }
     }
     /**
@@ -244,10 +249,10 @@ class FrontChannel extends Channel_1.Channel {
         this.onPatchStateHandler(patch);
     }
     onPatchStateHandler(patch) { }
-    _onMessage(message, channelId) {
-        this.onMessageHandler(message, channelId);
+    _onMessage(data) {
+        this.onMessageHandler(data);
     }
-    onMessageHandler(message, channelId) {
+    onMessageHandler(data) {
         throw new Error(`Unimplemented onMessageHandler in front channel ${this.channelId} Use frontChannel.onMessage to implement.`);
     }
     _onConnectionChange(backChannelId, backMasterIndex, change) {
@@ -271,9 +276,9 @@ class FrontChannel extends Channel_1.Channel {
         // channelId of connected backChannel was the same so register pub/subs meant for mirrored channels.
         if (backChannelId === this.channelId) {
             this.backMasterIndex = backMasterIndex;
-            this.sub.BROADCAST_LINKED_FRONTS.register(message => {
+            this.sub.BROADCAST_LINKED_FRONTS.register(data => {
                 //TODO: maybe this should be handled in a seperate onMirroredMessage or something similar.. will do if it seems needed.
-                this._onMessage(message, this.channelId);
+                this._onMessage(data);
             });
             this.sub.ACCEPT_LINK.register((data) => {
                 // data[0] - encodedState
@@ -314,14 +319,14 @@ class FrontChannel extends Channel_1.Channel {
     registerPreConnectedSubs() {
         //todo: create some sort of front SERVER class wrapper so we can optimaly handle backChannel -> front SERVER messages (things that not every channel need to handle)
         this.sub.SEND_FRONT.register(data => {
-            this._onMessage(data.message, data.channelId);
+            this._onMessage(data);
         });
         this.sub.CONNECTION_CHANGE.register(data => {
             //todo: refactor to look cleaner for when I eventually pass in state.
             this._onConnectionChange(data.channelId, data.backMasterIndex, data.connectionStatus);
         });
         this.sub.BROADCAST_ALL_FRONTS.register(data => {
-            this._onMessage(data.message, data.channelId);
+            this._onMessage(data);
         });
     }
     /**

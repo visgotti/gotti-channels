@@ -36,7 +36,7 @@ class Client {
     onMessage(handler) {
         this.onMessageHandler = handler;
     }
-    onMessageHandler(message) { throw 'Unimplemented'; }
+    onMessageHandler(data) { throw 'Unimplemented'; }
     ;
     /**
      * Sets connected channel of client also links it.
@@ -105,21 +105,21 @@ class Client {
      * Message that will be received by every server.
      * @param message
      */
-    sendGlobal(message) {
+    sendGlobal(data) {
         if (!(this._processorChannel)) {
             throw new Error('Client must have a channel set as its processor channel to send messages. See Client.setProcessor');
         }
-        this._processorChannel.broadcast(message, null, this.uid);
+        this._processorChannel.broadcast(data, null, this.uid);
     }
     /**
      * sends message to back channel with processorId.
      * @param message
      */
-    sendLocal(message) {
+    sendLocal(data) {
         if (!(this._processorChannel)) {
             throw new Error('Client must have a channel set as its processor channel to send messages. See Client.setProcessor');
         }
-        this._processorChannel.addMessage(message, this.uid);
+        this._processorChannel.addMessage(data, this.uid);
     }
     unlinkChannel(channelId, options) {
         if (this.linkedChannels.has(channelId)) {

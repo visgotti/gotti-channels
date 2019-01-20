@@ -27,10 +27,13 @@ export declare class FrontMasterChannel extends Channel {
     sendQueuedMessages(): void;
     /**
      * adds a message to the queue for a specific back Master Channel
-     * @param message - message to send
+     * @param data - message to send
+     * @param channel id - used as the last element in index to allow for back master to dispatch correctly. always last index
      * @param backMasterIndex - server index that the linked back channel lives on.
+     * @param fromClient - allows back channel to know if it was a client message by checking second to
+     * last index when receiving queuedMessages
      */
-    addQueuedMessage(message: any, backMasterIndex: any, channelId: any, clientUid?: any): void;
+    addQueuedMessage(data: Array<any>, channelId: any, backMasterIndex: any, fromClient?: string): void;
     unlinkChannel(backMasterIndex: any): void;
     linkChannel(backMasterIndex: any): void;
     private updateLinkedBackMasterIndexArray;

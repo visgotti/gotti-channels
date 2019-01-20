@@ -40,10 +40,9 @@ export declare class BackMasterChannel extends Channel {
      * and is updates when we handle new unlink/link publications from the front channel when the message
      * is supplied with a clientUid notifying that the link/unlink was for a client.
      * @param clientUid - uid of client to send direct message to
-     * @param message - message client receives.
      * @returns {boolean}
      */
-    messageClient(clientUid: any, message: any): boolean;
+    messageClient(clientUid: any, data: Array<any>): boolean;
     private handleNewFrontMasterConnection;
     onChannelConnection(frontMasterIndex: number): void;
     linkedChannelFrom(frontMasterIndex: number): void;
@@ -67,7 +66,7 @@ export declare class BackMasterChannel extends Channel {
     setStateUpdateInterval(milliseconds?: number): void;
     clearSendStateInterval(): void;
     /** messageQueueData is formatted incoming as
-     *  [ channelId,  message, clientId? ]
+     *  [data.... clientUid?, channelId always last element ]
      */
     private handleQueuedMessages;
     /**

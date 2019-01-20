@@ -90,14 +90,19 @@ class FrontMasterChannel extends Channel_1.Channel {
     }
     /**
      * adds a message to the queue for a specific back Master Channel
-     * @param message - message to send
+     * @param data - message to send
+     * @param channel id - used as the last element in index to allow for back master to dispatch correctly. always last index
      * @param backMasterIndex - server index that the linked back channel lives on.
+     * @param fromClient - allows back channel to know if it was a client message by checking second to
+     * last index when receiving queuedMessages
      */
-    addQueuedMessage(message, backMasterIndex, channelId, clientUid) {
+    addQueuedMessage(data, channelId, backMasterIndex, fromClient = '') {
         if (!(this._linkedBackMasterLookup[backMasterIndex])) {
             throw `The Back Master at index ${backMasterIndex} was not linked`;
         }
-        this._linkedBackMasterLookup[backMasterIndex].queuedMessages.push([channelId, message, clientUid]);
+        data.push(fromClient);
+        data.push(channelId);
+        this._linkedBackMasterLookup[backMasterIndex].queuedMessages.push(data);
     }
     unlinkChannel(backMasterIndex) {
         if (--(this._linkedBackMasterLookup[backMasterIndex].linkedChannelsCount) === 0) {
@@ -138,11 +143,9 @@ class FrontMasterChannel extends Channel_1.Channel {
             }
         });
         this.sub.MESSAGE_CLIENT.register((data) => {
-            const clientUid = data[0];
-            const message = data[1];
             //TODO: add optional protocol to array?
-            if (this._connectedClients[clientUid]) {
-                this._connectedClients[clientUid].onMessageHandler(message);
+            if (this._connectedClients[data[0]]) {
+                this._connectedClients[data[0]].onMessageHandler(data);
             }
         });
     }

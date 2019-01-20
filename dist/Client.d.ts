@@ -15,7 +15,7 @@ declare class Client {
      * method to be overridden to handle direct client messages from back channels.
      */
     onMessage(handler: any): void;
-    onMessageHandler(message: any): void;
+    onMessageHandler(data: any): void;
     /**
      * Sets connected channel of client also links it.
      * @param channelId
@@ -39,12 +39,12 @@ declare class Client {
      * Message that will be received by every server.
      * @param message
      */
-    sendGlobal(message: any): void;
+    sendGlobal(data: Array<any>): void;
     /**
      * sends message to back channel with processorId.
      * @param message
      */
-    sendLocal(message: any): void;
+    sendLocal(data: Array<any>): void;
     unlinkChannel(channelId?: any, options?: any): void;
     onChannelDisconnect(channelId: any): void;
 }

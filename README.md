@@ -1,31 +1,34 @@
-project status
+Just like how I redid my messenger project, I wanted to refactor the old centurm-channels project
+to promote custom protocols, now all messaging functions take arrays as parameters and will send them
+over the network flatly. It appends its own protocols at the end of your array which works very efficiently
+and allows you to design your own protocols starting from index 0.
 
-I've gone to implement a Master Front and Back channel, this can kind of be thought of
-as a hub that lives in front of all the front and back channels, and those front and back
-channels have links together that basically streams messages back and forth to eachother
-at a defined interval.
+The back channel now fires off an onClientMessage as well as an onMessage for messages that were
+sent without the client flag.
 
-Back channels only have 1 instance of themselves and store state of an application and run application processes.
-Front channels are hubs that live on a separate machine or process. That are meant to be load balanced and those
-front servers will be the ones communicating and forwarding client data to the mirrored back server of said front server.
-The back channel collects and queues these data forwards from all linked front channels and processes them at a defined interval.
-Rinse and repeat, as long as it has linked channels, it will do this processes. It's trivial to add a new link, all it is.
+They will look like
 
-    frontChannel.link();
+        client = new Client('test_client');
 
-    should call it asynchronously to retrieve state data
+        // link to channel first
+        await client.linkChannel('test_channel');
 
-    await encodedState = frontChannel.link();
+        // then set it as processor (not async any channel can start processing any client data, it's really just a ping to let the back channel know)
+        client.setProcessorChannel('test_channel');
 
-
-This state is sent back encoded by default because although you may want to process it and do something with it, the idea
-of the Front Channel is really not supposed to do stuff like that if it doesn't have to. If it's doing its job right if it's
-efficiently sending messages back and forth fast from client to the back channel. So any state data may it be patches or
-the state itself, will be encoded upon retrieval.
+        // now you can send messages
+        client.sendLocal(['protocol', 'data', 'moreData', 'moreMoreData']);
 
 
-Obviously it's not that simple and there needs to be some setup and config. But I'm trying my best to make that process simple and pain
-free as possible. Channel links are rock solid but connection states are still a little iffy since I'm still not quite sure how I want to handle
-channel/server disconnects. I envision a system where you can add/remove channels to a cluster dynamically if needed, but for now we're going
-to have to settle for statically defined clusters. Which may sound bad, but if you know what you're building for it's very trivial to set it up
-efficiently.
+        // over on the back channel you receive them like -
+        onClientMessage((clientUid, message) => {
+            console.log(clientUid) // 'test_client'
+            console.log(message[0]) // 'protocol'
+            console.log(message[1]) // 'data'
+            console.log(message[2]) // 'moreData'
+            console.log(message[3]) // 'moreMoreData'
+            console.log(message[4]) // 'test_client'
+        });
+
+the string at index 4 was appended by the front channel when sending the message across. This is so the back channel knows to run the onClientMessage
+and you can hook into it and run logic on the client with whatever protocols you define.

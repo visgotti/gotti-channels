@@ -142,13 +142,13 @@ describe('FrontChannel', function() {
 
     describe('FrontMaster.addQueuedMessage, FrontMaster.sendQueuedMessages', () => {
         it('FrontMaster.addQueuedMessage fails because none of the channels linked to the back', (done) => {
-            assert.throws(() => { FrontMaster.addQueuedMessage({"foo": "bar"}, BackMaster.backMasterIndex, FrontChannel1.channelId)});
+            assert.throws(() => { FrontMaster.addQueuedMessage([{"foo": "bar"}], BackMaster.backMasterIndex, FrontChannel1.channelId)});
             done();
         });
         it('doesnt fail after linking one of the channels', (done) => {
             BackChannel1.setState({ "foo": "baz" });
             FrontChannel1.linkClient(client).then(() => {
-                assert.doesNotThrow(() => { FrontMaster.addQueuedMessage({"foo": "bar"}, BackMaster.backMasterIndex, FrontChannel1.channelId)} );
+                assert.doesNotThrow(() => { FrontMaster.addQueuedMessage([{"foo": "bar"}], FrontChannel1.channelId, BackMaster.backMasterIndex)} );
                 done();
             });
         });
@@ -157,14 +157,15 @@ describe('FrontChannel', function() {
             done();
         });
         it('message in the message queue has correct data', (done) => {
-            assert.strictEqual(FrontMaster.linkedBackMasterLookup[BackMaster.backMasterIndex].queuedMessages[0][0], FrontChannel1.channelId);
-            assert.deepStrictEqual(FrontMaster.linkedBackMasterLookup[BackMaster.backMasterIndex].queuedMessages[0][1], {"foo": "bar"});
+            assert.deepStrictEqual(FrontMaster.linkedBackMasterLookup[BackMaster.backMasterIndex].queuedMessages[0][0], {"foo": "bar"});
+            assert.deepStrictEqual(FrontMaster.linkedBackMasterLookup[BackMaster.backMasterIndex].queuedMessages[0][1], ''); // empty since its not from client
+            assert.deepStrictEqual(FrontMaster.linkedBackMasterLookup[BackMaster.backMasterIndex].queuedMessages[0][2], FrontChannel1.channelId); //where the channel needs to be delivered to when it reaches back channel
+
             done();
         });
         it('FrontMaster.sendQueuedMessages empties queue and BackChannel1 receives the message', (done) => {
-            BackChannel1.onMessage((message, frontUid) => {
-                assert.deepStrictEqual(message, {"foo": "bar"});
-                assert.strictEqual(frontUid, FrontChannel1.frontUid);
+            BackChannel1.onMessage((message) => {
+                assert.deepStrictEqual(message[0], {"foo": "bar"});
                 done();
             });
             FrontMaster.sendQueuedMessages();

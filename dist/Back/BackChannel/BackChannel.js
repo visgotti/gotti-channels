@@ -38,6 +38,9 @@ class BackChannel extends Channel_1.Channel {
     onMessage(handler) {
         this.onMessageHandler = handler;
     }
+    onClientMessage(handler) {
+        this.onClientMessageHandler = handler;
+    }
     /**
      * @param handler - handler called when a client is added as a writer.
      */
@@ -118,7 +121,7 @@ class BackChannel extends Channel_1.Channel {
      * @param frontUid - uid of front channel to send message to
      */
     send(message, frontUid) {
-        this.push.SEND_FRONT[frontUid]({ message, channelId: this.channelId });
+        this.push.SEND_FRONT[frontUid](message);
     }
     /**
      * sends message to supplied front channels based on frontUids or if omitted broadcasts to all front channels regardless of channel Id.
@@ -126,16 +129,14 @@ class BackChannel extends Channel_1.Channel {
      * @param frontUids
      */
     broadcast(message, frontUids) {
+        console.log('pubbing!');
         if (frontUids) {
-            frontUids.forEach(frontUid => {
-                this.send(message, frontUid);
-            });
+            for (let i = 0; i < frontUids.length; i++) {
+                this.send(message, frontUids[i]);
+            }
         }
         else {
-            this.pub.BROADCAST_ALL_FRONTS({
-                message,
-                channelId: this.channelId,
-            });
+            this.pub.BROADCAST_ALL_FRONTS(message);
         }
     }
     /**
@@ -160,11 +161,10 @@ class BackChannel extends Channel_1.Channel {
      * Function that's called from the back master when it receives queued messages
      * from a the front master server.
      * @param message
-     * @param frontMasterIndex
+     * @param clientUid - optional parameter that would have been in n-2 position of array
      */
-    processMessageFromMaster(message, frontMasterIndex, clientUid) {
-        const frontUid = this.masterIndexToFrontUidLookup[frontMasterIndex];
-        this._onMessage(message, frontUid, clientUid);
+    processMessageFromMaster(data, clientUid) {
+        this._onMessage(data, clientUid);
     }
     get connectedFrontsData() {
         return this._connectedFrontsData;
@@ -179,10 +179,18 @@ class BackChannel extends Channel_1.Channel {
         return Array.from(this._writingClientUids);
     }
     //TODO: replace all instances of onMessage receiving frontUid with frontMaster and use the lookup to get the frontUid.
-    _onMessage(message, frontUid, clientUid) {
-        this.onMessageHandler(message, frontUid, clientUid);
+    _onMessage(data, clientUid) {
+        if (clientUid) {
+            this.onClientMessageHandler(clientUid, data);
+        }
+        else {
+            this.onMessageHandler(data);
+        }
     }
-    onMessageHandler(message, frontUid, clientUid) {
+    onMessageHandler(data) {
+        throw new Error(`Unimplemented onMessageHandler in back channel ${this.channelId} Use backChannel.onMessage to implement.`);
+    }
+    onClientMessageHandler(clientUid, data) {
         throw new Error(`Unimplemented onMessageHandler in back channel ${this.channelId} Use backChannel.onMessage to implement.`);
     }
     /**
@@ -192,11 +200,11 @@ class BackChannel extends Channel_1.Channel {
         // registers sub that handles requests the same regardless of the frontUid.
         this.sub.CONNECT.register(this.onMirrorConnected.bind(this));
         this.sub.BROADCAST_ALL_BACK.register((data) => {
-            this._onMessage(data[0], data[1], data[2]);
+            this._onMessage(data, data[data.length - 1]);
             //how it looks on frontChannel -> this.pub.BROADCAST_ALL_BACK([message, this.frontUid, clientUid])
         });
         this.sub.SEND_BACK.register((data) => {
-            this._onMessage(data[0], data[1], data[2]);
+            this._onMessage(data, data[data.length - 1]);
             //how it looks on frontChannel -> this.push.SEND_BACK[backChannelId]([message, this.frontUid, clientUid]);
         });
     }

@@ -91,12 +91,11 @@ describe('BackChannel', function() {
 
     describe('BackChannel.send', () => {
         it('tests it sends to correct frontUid with correct data', (done) => {
-            FrontChannel1.onMessage((message, channelId) => {
-                assert.strictEqual(channelId, BackChannel1.channelId);
-                assert.deepStrictEqual(message, { "foo": "bar"});
+            FrontChannel1.onMessage((message) => {
+                assert.deepStrictEqual(message[0], { "foo": "bar"});
                 done();
             });
-            BackChannel1.send({ "foo": "bar"}, FrontChannel1.frontUid)
+            BackChannel1.send([{ "foo": "bar"}], FrontChannel1.frontUid)
         });
     });
 
@@ -106,9 +105,8 @@ describe('BackChannel', function() {
             // each front channel should get it
             const expectedReceived = 2;
 
-            FrontChannel1.onMessage((message, channelId) => {
-                assert.strictEqual(channelId, BackChannel1.channelId);
-                actualReceived += message;
+            FrontChannel1.onMessage((message) => {
+                actualReceived += message[0];
                 if(actualReceived === expectedReceived) {
                     setTimeout(() => {
                         assert.strictEqual(actualReceived, expectedReceived);
@@ -117,9 +115,8 @@ describe('BackChannel', function() {
                 }
             });
 
-            FrontChannel2.onMessage((message, channelId) => {
-                assert.strictEqual(channelId, BackChannel1.channelId);
-                actualReceived += message;
+            FrontChannel2.onMessage((message) => {
+                actualReceived += message[0];
                 if(actualReceived === expectedReceived) {
                     setTimeout(() => {
                         assert.strictEqual(actualReceived, expectedReceived);
@@ -127,20 +124,19 @@ describe('BackChannel', function() {
                     }, 50)
                 }
             });
-            BackChannel1.broadcast(1);
+            BackChannel1.broadcast([1]);
         });
 
         it('only sends to front channels specified by uid as the second parameter.', (done) => {
             let actualReceived = 0;
 
-            FrontChannel2.onMessage((message, channelId) => {
-                actualReceived+=message;
-                assert.strictEqual(channelId, BackChannel1.channelId)
+            FrontChannel2.onMessage((message) => {
+                actualReceived+=message[0];
                 assert.strictEqual(actualReceived, 1);
                 done();
             });
 
-            BackChannel1.broadcast(1, [FrontChannel2.frontUid]);
+            BackChannel1.broadcast([1], [FrontChannel2.frontUid]);
         });
     });
 
@@ -149,12 +145,10 @@ describe('BackChannel', function() {
             let actualReceived = 0;
             let expectedReceive = 0;
 
-            FrontChannel1.onMessage((message, channelId) => {
-                assert.strictEqual(FrontChannel1.channelId, channelId);
-                assert.strictEqual(FrontChannel1.channelId, BackChannel1.channelId);
-                actualReceived+=message;
+            FrontChannel1.onMessage((message) => {
+                actualReceived+=message[0];
             });
-            BackChannel1.broadcastLinked(1);
+            BackChannel1.broadcastLinked([1]);
 
             setTimeout(() => {
                 assert.strictEqual(actualReceived, expectedReceive);
@@ -167,10 +161,8 @@ describe('BackChannel', function() {
 
             BackChannel1.setState({ "foo": "bar" });
 
-            FrontChannel1.onMessage((message, channelId) => {
-                assert.strictEqual(FrontChannel1.channelId, channelId);
-                assert.strictEqual(FrontChannel1.channelId, BackChannel1.channelId);
-                actualReceived+=message;
+            FrontChannel1.onMessage((message) => {
+                actualReceived+=message[0];
 
                 setTimeout(() => {
                     assert.strictEqual(actualReceived, expectedReceive);
@@ -179,7 +171,7 @@ describe('BackChannel', function() {
             });
 
             FrontChannel1.linkClient(client).then(() => {
-                BackChannel1.broadcastLinked(1);
+                BackChannel1.broadcastLinked([1]);
             });
         });
     });

@@ -59,27 +59,27 @@ export declare class Protocol {
 declare abstract class MessageFactory {
     protected messenger: Messenger;
     constructor(messenger: any);
-    protected pubCreator(protocol: any, encoder?: any): any;
+    protected pubCreator(protocol: any, encoder?: boolean): any;
     /**
      * push will use the same messenger publisher so any registered subs will receive it but since the recipients
      * can change dynamically we want to be able to just give a 'to' parameter to create push and have the protocol
      * factory create the message name for us.
      * @param protocolFactory - Function used to create the publisher name based on the to parameter passed in.
      */
-    protected pushCreator(protocolFactory: Function, encoder?: any): any;
+    protected pushCreator(protocolFactory: Function, encoder?: boolean): any;
     /**
      * used for subscriptions with multiple handlers. (multiple channels listening for the same broadcast)
      * @param protocol
      * @param id
      * @returns {any}
      */
-    protected subCreator(protocol: any, id: any, decoder?: any): any;
+    protected subCreator(protocol: any, id: any, decoder?: boolean): any;
     /**
      * used for subscriptions with only one handler. (single handler listening for unique broadcast)
      * @param protocol
      * @returns {any}
      */
-    protected pullCreator(protocolFactory: Function, decoder?: any): any;
+    protected pullCreator(protocolFactory: Function, decoder?: boolean): any;
 }
 export declare abstract class ChannelMessageFactory extends MessageFactory {
     abstract CONNECT: PublishProtocol | SubscribeProtocol;

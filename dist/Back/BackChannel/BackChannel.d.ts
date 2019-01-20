@@ -25,7 +25,8 @@ export declare class BackChannel extends Channel {
      * sets the onMessageHandler function
      * @param handler - function that gets executed, gets parameters message and frontUid
      */
-    onMessage(handler: (message: any, frontUid: string, clientUid?: string) => void): void;
+    onMessage(handler: (data: Array<any>) => void): void;
+    onClientMessage(handler: (clientUid: string, data: Array<any>) => void): void;
     /**
      * @param handler - handler called when a client is added as a writer.
      */
@@ -87,15 +88,16 @@ export declare class BackChannel extends Channel {
      * Function that's called from the back master when it receives queued messages
      * from a the front master server.
      * @param message
-     * @param frontMasterIndex
+     * @param clientUid - optional parameter that would have been in n-2 position of array
      */
-    processMessageFromMaster(message: any, frontMasterIndex: number, clientUid?: any): void;
+    processMessageFromMaster(data: any, clientUid?: string): void;
     readonly connectedFrontsData: Map<string, ConnectedFrontData>;
     readonly mirroredFrontUids: Array<string>;
     readonly listeningClientUids: Array<string>;
     readonly writingClientUids: Array<string>;
     private _onMessage;
     private onMessageHandler;
+    private onClientMessageHandler;
     /**
      * subscriptions that we want to register before front channels start connecting.
      */

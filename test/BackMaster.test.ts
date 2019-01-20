@@ -242,29 +242,28 @@ describe('BackMaster', function() {
         it('Should return false if the client is not linked', (done) => {
             client1.unlinkChannel(FrontChannel1.channelId);
             setTimeout(() => {
-                assert.strictEqual(BackMaster.messageClient(client1.uid, { 'foo': 'bar' } ), false);
+                assert.strictEqual(BackMaster.messageClient(client1.uid, [{ 'foo': 'bar' }] ), false);
                 done();
             }, 20)
-
         });
 
         it('Should return true if the client was linked', (done) => {
             client1.onMessage(() => {});
             client1.linkChannel(FrontChannel1.channelId).then(() => {
-                assert.strictEqual(BackMaster.messageClient(client1.uid, { 'foo': 'bar' } ), true);
+                assert.strictEqual(BackMaster.messageClient(client1.uid, [{ 'foo': 'bar' }] ), true);
                 done();
             });
         });
         it('Should succesfully call the clients onMessageHandler', (done) => {
             let called = 0;
             client1.onMessage(message => {
-                called+=message;
+                called += message[0];
                 setTimeout(() => {
                    assert.strictEqual(called, 1);
                    done();
                 }, 30);
             });
-            assert.strictEqual(BackMaster.messageClient(client1.uid, 1), true);
+            assert.strictEqual(BackMaster.messageClient(client1.uid, [1]), true);
         });
     });
 });

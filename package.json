@@ -1,7 +1,7 @@
 {
-  "name": "centrum",
+  "name": "gotti-channels",
   "version": "0.2.25",
-  "description": "Isolated channel communication for centrum servers.",
+  "description": "Isolated channel communication for gotti.js",
   "main": "./dist/index.js",
   "scripts": {
     "build": "tsc",

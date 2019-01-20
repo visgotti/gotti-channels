@@ -158,7 +158,7 @@ describe('Client', function() {
     describe('client.setProcessorChannel', () => {
         it('should throw error when trying to send messages without processor channel set', (done) => {
             BackChannel1.onMessage(() => {});
-            assert.throws(() => { client.sendLocal("test") }, 'Client must have a channel set as its processor channel to send messages. See Client.setProcessor');
+            assert.throws(() => { client.sendLocal(["test"]) }, 'Client must have a channel set as its processor channel to send messages. See Client.setProcessor');
             done();
         });
         it('throws an error if the client wasnt linked first', (done) => {
@@ -270,11 +270,11 @@ describe('Client', function() {
         it('only sends to processor channel with correct data format', (done) => {
             let received = 0;
             const expectedReceived = 1;
-            BackChannel1.onMessage((message, frontUid, clientUid) => {
-                assert.strictEqual(message, 1);
-                assert.strictEqual(frontUid, FrontChannel1.frontUid);
+            BackChannel1.onClientMessage((clientUid, message) => {
+                assert.ok(message.length === 3);
+                assert.strictEqual(message[0], 1);
                 assert.strictEqual(clientUid, client.uid);
-                received+=message;
+                received+=message[0];
                 if(received === expectedReceived) {
                     setTimeout(() => {
                         assert.strictEqual(received, expectedReceived);
@@ -283,11 +283,11 @@ describe('Client', function() {
                 }
             });
             // shouldnt reach this
-            BackChannel2.onMessage(message => {
-                received+=message;
+            BackChannel2.onClientMessage((clientUid, message) => {
+                received+=message[0];
             });
 
-            client.sendLocal(1);
+            client.sendLocal([1]);
             FrontMaster.sendQueuedMessages();
         });
     });
@@ -295,11 +295,12 @@ describe('Client', function() {
         it('is received by all back channels', (done) => {
             let received = 0;
             const expectedReceived = 2;
-            BackChannel1.onMessage((message, frontUid, clientUid) => {
-                assert.strictEqual(message, 1);
-                assert.strictEqual(frontUid, FrontChannel1.frontUid);
+            BackChannel1.onClientMessage((clientUid, message) => {
+                assert.ok(message.length === 3);
                 assert.strictEqual(clientUid, client.uid);
-                received+=message;
+                assert.strictEqual(message[0], 1);
+                assert.strictEqual(message[1], 2);
+                received+=message[0];
                 if(received === expectedReceived) {
                     setTimeout(() => {
                         assert.strictEqual(received, expectedReceived);
@@ -308,13 +309,12 @@ describe('Client', function() {
                 }
             });
 
-            BackChannel2.onMessage((message, frontUid, clientUid) => {
-                assert.strictEqual(message, 1);
-                assert.strictEqual(frontUid, FrontChannel1.frontUid);
+            BackChannel2.onClientMessage((clientUid, message) => {
+                assert.ok(message.length === 3);
                 assert.strictEqual(clientUid, client.uid);
-
-                received+=message;
-
+                assert.strictEqual(message[0], 1);
+                assert.strictEqual(message[1], 2);
+                received+=message[0];
                 if(received === expectedReceived) {
                     setTimeout(() => {
                         assert.strictEqual(received, expectedReceived);
@@ -322,7 +322,7 @@ describe('Client', function() {
                     }, 20);
                 }
             });
-            client.sendGlobal(1);
+            client.sendGlobal([1, 2]);
         });
     });
     describe('client.unlink', () => {
