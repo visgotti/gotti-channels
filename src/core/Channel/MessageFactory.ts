@@ -1,4 +1,4 @@
-import { Messenger } from 'gotti-pubsub/dist/Messenger';
+import { Messenger } from 'gotti-pubsub/dist';
 
 enum MSG_CODES {
     // FRONT MASTER -> BACK MASTER
