@@ -1,7 +1,7 @@
 import { Channel } from '../../Channel/Channel';
 import { FrontMasterChannel } from '../FrontMaster/MasterChannel';
 import Client from '../../Client';
-import { Messenger } from 'gotti-pubsub/dist/Messenger';
+import { Messenger } from 'gotti-pubsub/dist';
 import { FrontMessages, FrontPubs, FrontSubs, FrontPushes } from './FrontMessages';
 
 import { CONNECTION_STATUS, CONNECTION_CHANGE, STATE_UPDATE_TYPES } from '../../types';
@@ -11,6 +11,8 @@ import Timeout = NodeJS.Timeout;
 
 export class FrontChannel extends Channel {
     private master: FrontMasterChannel;
+
+    private messenger: Messenger;
 
     private connectedChannelIds: Set<string>;
     private _connectionInfo: any;
@@ -40,8 +42,10 @@ export class FrontChannel extends Channel {
     readonly clientTimeout: number;
 
     constructor(channelId, totalChannels, messenger: Messenger,  master: FrontMasterChannel) {
-        super(channelId, messenger);
+        super(channelId);
         this.master = master;
+
+        this.messenger = messenger;
 
         this.CONNECTION_STATUS = CONNECTION_STATUS.DISCONNECTED;
 

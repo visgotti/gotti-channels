@@ -24,7 +24,7 @@
   "license": "MIT",
   "dependencies": {
     "fossil-delta": "^1.0.2",
-    "gotti-pubsub": "^0.1.0",
+    "gotti-pubsub": "^0.1.21",
     "notepack.io": "^2.2.0",
     "zeromq": "^5.1.0"
   },

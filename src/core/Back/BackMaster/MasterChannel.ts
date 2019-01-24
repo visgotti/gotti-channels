@@ -1,7 +1,7 @@
 import * as fossilDelta from 'fossil-delta';
 import * as msgpack from 'notepack.io';
 
-import { Messenger } from 'gotti-pubsub/dist/Messenger';
+import { Messenger } from 'gotti-pubsub/dist';
 
 import { MasterMessages, BackMasterPushes, BackMasterPulls } from './MasterMessages';
 
@@ -29,8 +29,8 @@ export class BackMasterChannel extends Channel {
 
     readonly backMasterIndex;
 
-    constructor(channelIds, backMasterIndex, messenger: Messenger) {
-        super(backMasterIndex, messenger);
+    constructor(backMasterIndex) {
+        super(backMasterIndex);
         this.backMasterIndex = backMasterIndex;
         this.backChannels = {};
         this.backChannelsArray = [];
@@ -39,14 +39,28 @@ export class BackMasterChannel extends Channel {
         this._linkedFrontMasterChannels = {} as { linkedChannelsCount: number, encodedPatches: Array<any> };
         this._linkedFrontMasterIndexesArray = [];
 
+        this.messenger = null;
+    }
+
+    public initialize(masterURI, frontMasterURIs: Array<string>) {
+        this.messenger = new Messenger('b' + this.backMasterIndex);
+        this.messenger.initializeSubscriber(frontMasterURIs);
+        this.messenger.initializePublisher(masterURI);
+    }
+
+    //TODO: add more or remove channels
+    public addChannels(channelIds) {
+        if(this.messenger === null) throw 'initialize messenger before adding channels';
+
         channelIds.forEach(channelId => {
-            const backChannel = new BackChannel(channelId, messenger, this);
+            const backChannel = new BackChannel(channelId, this.messenger, this);
             this.backChannels[channelId] = backChannel;
             this.backChannelsArray.push(backChannel);
         });
 
         this.initializeMessageFactories();
     }
+
 
     get linkedClientFrontDataLookup() {
         return this._linkedClientFrontDataLookup;

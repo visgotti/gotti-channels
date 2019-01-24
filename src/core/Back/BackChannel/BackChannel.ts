@@ -1,16 +1,18 @@
 import * as fossilDelta from 'fossil-delta';
 import * as msgpack from 'notepack.io';
 
-import { Messenger } from 'gotti-pubsub/dist/Messenger';
+import { Messenger } from 'gotti-pubsub/dist';
 
 import { Channel } from '../../Channel/Channel';
 import { BackMessages, BackPubs, BackPushes, BackSubs, BackPulls } from './BackMessages';
 import { BackMasterChannel } from '../BackMaster/MasterChannel';
 
-import {ConnectedFrontData, CONNECTION_STATUS } from '../../types';
+import { ConnectedFrontData, CONNECTION_STATUS } from '../../types';
 
 export class BackChannel extends Channel {
     private master: BackMasterChannel;
+
+    private messenger: Messenger;
 
     private pub: BackPubs;
     private sub: BackSubs;
@@ -38,8 +40,9 @@ export class BackChannel extends Channel {
     readonly backMasterIndex: number;
 
     constructor(channelId, messenger: Messenger, master: BackMasterChannel) {
-        super(channelId, messenger);
+        super(channelId);
         this.master = master;
+        this.messenger = messenger;
         this.backMasterIndex = this.master.backMasterIndex;
 
         // frontUid defines a unique channel that lives on a frontMaster which is identified

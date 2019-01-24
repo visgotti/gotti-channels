@@ -1,6 +1,6 @@
 import * as msgpack from 'notepack.io';
 
-import { Messenger } from 'gotti-pubsub/dist/Messenger';
+import { Messenger } from 'gotti-pubsub/dist';
 
 import { MasterMessages, FrontMasterPushes, FrontMasterSubs } from './MasterMessages';
 
@@ -22,8 +22,8 @@ export class FrontMasterChannel extends Channel {
 
     readonly frontMasterIndex;
 
-    constructor(channelIds, frontMasterIndex, messenger: Messenger) {
-        super(frontMasterIndex, messenger);
+    constructor(frontMasterIndex) {
+        super(frontMasterIndex);
         this.frontMasterIndex = frontMasterIndex;
 
         this.frontChannels = {};
@@ -34,8 +34,20 @@ export class FrontMasterChannel extends Channel {
         this._connectedBackMasters = new Set(); //todo make this a lookup similar to linked with count of connected channels.
         this._connectedClients = {};
 
+        this.messenger = null;
+    }
+
+    public initialize(masterURI, backMasterURIs: Array<string>) {
+        this.messenger = new Messenger(this.frontMasterIndex);
+        this.messenger.initializeSubscriber(backMasterURIs);
+        this.messenger.initializePublisher(masterURI);
+    }
+
+    //TODO: add more or remove channels
+    public addChannels(channelIds) {
+        if(this.messenger === null) throw 'initialize messenger before adding channels';
         channelIds.forEach(channelId => {
-            const frontChannel = new FrontChannel(channelId, channelIds.length, messenger, this);
+            const frontChannel = new FrontChannel(channelId, channelIds.length, this.messenger, this);
             this.frontChannels[channelId] = frontChannel;
             this.frontChannelIds.push(channelId);
         });

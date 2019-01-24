@@ -8,8 +8,6 @@ import { BackChannel } from '../src/core/Back/BackChannel/BackChannel';
 import { FrontMasterChannel } from '../src/core/Front/FrontMaster/MasterChannel';
 import { BackMasterChannel } from '../src/core/Back/BackMaster/MasterChannel';
 
-import { Messenger } from 'gotti-pubsub/dist/Messenger';
-
 import * as assert from 'assert';
 import * as mocha from 'mocha';
 
@@ -29,16 +27,21 @@ describe('BackChannel', function() {
     let client: Client;
 
     before('Initialize a centrum messenger for the Front Channels and the Back Channels', (done) => {
-        const frontMessenger = new Messenger({ id: 'testFront', publish: { pubSocketURI: TEST_FRONT_URI } , subscribe: { pubSocketURIs: [TEST_BACK_URI] } });
-        const backMessenger = new Messenger({ id: 'testBack', publish: { pubSocketURI: TEST_BACK_URI } , subscribe: { pubSocketURIs: [TEST_FRONT_URI] } });
 
-        FrontMaster = new FrontMasterChannel([0, 1], 0, frontMessenger);
-        BackMaster = new BackMasterChannel([0, 1], 0, backMessenger);
+        FrontMaster = new FrontMasterChannel(0);
+        BackMaster = new BackMasterChannel(0);
+
+        FrontMaster.initialize(TEST_FRONT_URI, [TEST_BACK_URI]);
+        FrontMaster.addChannels([0, 1]);
+
+        BackMaster.initialize(TEST_BACK_URI, [TEST_FRONT_URI]);
+        BackMaster.addChannels([0, 1]);
 
         FrontChannel1 = FrontMaster.frontChannels[0];
         FrontChannel2 = FrontMaster.frontChannels[1];
         BackChannel1 = BackMaster.backChannels[0];
         BackChannel2 = BackMaster.backChannels[1];
+
         client = new Client('1', FrontMaster);
 
         assert.strictEqual(FrontChannel1.channelId, 0);
