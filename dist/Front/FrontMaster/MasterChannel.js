@@ -49,7 +49,7 @@ class FrontMasterChannel extends Channel_1.Channel {
             try {
                 let awaitingConnections = this.frontChannelIds.length;
                 for (let i = 0; i < this.frontChannelIds.length; i++) {
-                    const connected = yield this.frontChannels[i].connect();
+                    const connected = yield this.frontChannels[this.frontChannelIds[i]].connect();
                     // makes sure we connected to at least 1 back master index.
                     if (connected && connected.backMasterIndexes.length) {
                         connected.backMasterIndexes.forEach(backMasterIndex => {
