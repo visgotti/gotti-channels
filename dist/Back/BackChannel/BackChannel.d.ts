@@ -44,6 +44,7 @@ export declare class BackChannel extends Channel {
      * @param handler
      */
     onAddClientListen(handler: (clientUid: string, options?: any) => any): void;
+    private onAddClientListenHandler;
     /**
      * sets the onClientListenHandler function
      * @param handler - function that gets executed when a new client is succesfully linked/listening to state updates.
@@ -55,15 +56,6 @@ export declare class BackChannel extends Channel {
      * @param frontUid
      */
     private acceptLink;
-    /**
-     * gets called when a link publish message is received and a new unique client
-     * has been linked to given channel.
-     * @param frontUid - unique front channel sending link request.
-     * @param frontMasterIndex - front master index the client is connected to.
-     * @param clientUid - uid of client.
-     * @param options - additional options client passed upon link request
-     */
-    private acceptClientLink;
     /**
      * sends message to specific front channel based on frontUid
      * @param message - data sent to back channel.
