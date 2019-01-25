@@ -399,8 +399,10 @@ export class FrontChannel extends Channel {
         });
 
         this.sub.CONNECTION_CHANGE.register(data => {
-            //todo: refactor to look cleaner for when I eventually pass in state.
-            this._onConnectionChange(data.channelId, data.backMasterIndex, data.connectionStatus);
+            // only handle if not from redundant connect response
+            if(!(this.connectedChannelIds.has(data.channelId))) {
+                this._onConnectionChange(data.channelId, data.backMasterIndex, data.connectionStatus);
+            }
         });
 
         this.sub.BROADCAST_ALL_FRONTS.register(data => {

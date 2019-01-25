@@ -12,6 +12,7 @@ export declare class BackChannel extends Channel {
     private _connectedFrontsData;
     private _listeningClientUids;
     private _writingClientUids;
+    private mainFrontUid;
     private _mirroredFrontUids;
     state: any;
     _previousState: any;
@@ -70,6 +71,12 @@ export declare class BackChannel extends Channel {
      */
     send(message: any, frontUid: string): void;
     /**
+     * sends message to the mainFrontUid front channel (see onFrontChannelConnected)
+     * @param message - data sent to back channel.
+     * @param frontUid - uid of front channel to send message to
+     */
+    sendMainFront(message: any): void;
+    /**
      * sends message to supplied front channels based on frontUids or if omitted broadcasts to all front channels regardless of channel Id.
      * @param message
      * @param frontUids
@@ -111,7 +118,7 @@ export declare class BackChannel extends Channel {
      * initializes channel pub and sub  handlers when we receive a connect message from front channel.
      * @param frontData - { channelId, frontUid, frontMasterIndex }
      */
-    private onMirrorConnected;
+    private onFrontChannelConnected;
     /**
      * initializes needed message factories for front channels.
      */

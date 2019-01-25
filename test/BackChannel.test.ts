@@ -26,7 +26,7 @@ describe('BackChannel', function() {
 
     let client: Client;
 
-    before('Initialize a centrum messenger for the Front Channels and the Back Channels', (done) => {
+    before('Initialize a messenger for the Front Channels and the Back Channels', (done) => {
 
         FrontMaster = new FrontMasterChannel(0);
         BackMaster = new BackMasterChannel(0);

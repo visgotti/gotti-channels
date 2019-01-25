@@ -10,6 +10,7 @@ class BackChannel extends Channel_1.Channel {
         this.master = master;
         this.messenger = messenger;
         this.backMasterIndex = this.master.backMasterIndex;
+        this.mainFrontUid = null;
         // frontUid defines a unique channel that lives on a frontMaster which is identified
         // by frontMasterIndex (index of the server in the cluster) but it's literally
         // just the id of the server all the channels live on.
@@ -125,6 +126,14 @@ class BackChannel extends Channel_1.Channel {
         this.push.SEND_FRONT[frontUid](message);
     }
     /**
+     * sends message to the mainFrontUid front channel (see onFrontChannelConnected)
+     * @param message - data sent to back channel.
+     * @param frontUid - uid of front channel to send message to
+     */
+    sendMainFront(message) {
+        this.push.SEND_FRONT[this.mainFrontUid](message);
+    }
+    /**
      * sends message to supplied front channels based on frontUids or if omitted broadcasts to all front channels regardless of channel Id.
      * @param message
      * @param frontUids
@@ -199,7 +208,7 @@ class BackChannel extends Channel_1.Channel {
      */
     registerPreConnectedSubs() {
         // registers sub that handles requests the same regardless of the frontUid.
-        this.sub.CONNECT.register(this.onMirrorConnected.bind(this));
+        this.sub.CONNECT.register(this.onFrontChannelConnected.bind(this));
         this.sub.BROADCAST_ALL_BACK.register((data) => {
             this._onMessage(data, data[data.length - 1]);
             //how it looks on frontChannel -> this.pub.BROADCAST_ALL_BACK([message, this.frontUid, clientUid])
@@ -220,11 +229,21 @@ class BackChannel extends Channel_1.Channel {
      * initializes channel pub and sub  handlers when we receive a connect message from front channel.
      * @param frontData - { channelId, frontUid, frontMasterIndex }
      */
-    onMirrorConnected(frontData) {
+    onFrontChannelConnected(frontData) {
         const { channelId, frontUid, frontMasterIndex } = frontData;
-        //notify back master a new front channel connected so it can keep track of front master connections
-        this.master.onChannelConnection(frontMasterIndex);
+        //redundant check since the frontUid already connected so all we need to do is let the front channel know its connected
+        if ((this._connectedFrontsData.has(frontUid))) {
+            // create push then remove since this wont be done again unless theres a disconnection.
+            this.push.CONNECTION_CHANGE.register(frontUid);
+            this.push.CONNECTION_CHANGE[frontUid]({ channelId: this.channelId, backMasterIndex: this.backMasterIndex, connectionStatus: types_1.CONNECTION_STATUS.CONNECTED });
+            this.push.CONNECTION_CHANGE.unregister();
+            return;
+        }
         if (channelId === this.channelId) {
+            //if we havent set a main front uid yet we will upon first mirror channel connected.
+            if (this.mainFrontUid === null) {
+                this.mainFrontUid = frontUid;
+            }
             // add to mirror set since its same channelId
             this._mirroredFrontUids.add(frontUid);
             // add the frontUid to masterIndexLookup for when processing future requests and need to know frontUid.
@@ -275,6 +294,8 @@ class BackChannel extends Channel_1.Channel {
                 }
             });
         }
+        //notify back master a new front channel connected so it can keep track of front master connections
+        this.master.onChannelConnection(frontMasterIndex);
         // keep connected data stored for all fronts.
         this._connectedFrontsData.set(frontUid, frontData);
         // register send pusher for unique frontuid.
