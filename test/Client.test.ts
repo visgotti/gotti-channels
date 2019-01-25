@@ -30,8 +30,8 @@ describe('Client', function() {
     // SPIES
     let BackMaster_addedClientLinkSpy;
     let BackMaster_removedClientLinkSpy;
-    let BackChannel1_acceptClientLinkSpy;
-    let BackChannel2_acceptClientLinkSpy;
+    let BackChannel1_onAddClientListenHandlerSpy;
+    let BackChannel2_onAddClientListenHandlerSpy;
     let FrontChannel1_unlinkClientSpy;
     let FrontMaster_clientConnected;
     let FrontMaster_clientDisconnected;
@@ -53,8 +53,7 @@ describe('Client', function() {
 
         BackMaster_addedClientLinkSpy = sinon.spy(BackMaster, 'addedClientLink');
         BackMaster_removedClientLinkSpy = sinon.spy(BackMaster, 'removedClientLink');
-        BackChannel1_acceptClientLinkSpy = sinon.spy(BackChannel1, 'acceptClientLink');
-        BackChannel2_acceptClientLinkSpy = sinon.spy(BackChannel2, 'acceptClientLink');
+        BackChannel2_onAddClientListenHandlerSpy = sinon.spy(BackChannel2, 'onAddClientListenHandler');
         FrontChannel1_unlinkClientSpy = sinon.spy(FrontChannel1, 'unlinkClient');
         FrontMaster_clientConnected = sinon.spy(FrontMaster, 'clientConnected');
         FrontMaster_clientDisconnected = sinon.spy(FrontMaster, 'clientDisconnected');
@@ -111,14 +110,17 @@ describe('Client', function() {
             BackChannel1.onAddClientListen((clientUid, options) => {
                 receivedClientUid = clientUid;
                 receivedOptions = options;
+                return 'baz';
             });
+
+            BackChannel1_onAddClientListenHandlerSpy = sinon.spy(BackChannel1, 'onAddClientListenHandler');
 
             client.linkChannel(FrontChannel1.channelId, mockOptions).then(data => {
                 const { encodedState, responseOptions } = data;
                 const state = msgpack.decode(Buffer.from(encodedState));
                 assert.deepStrictEqual(state, { "foo": "bar" });
 
-                assert.strictEqual(responseOptions, undefined);
+                assert.strictEqual(responseOptions, 'baz');
                 assert.strictEqual(receivedClientUid, client.uid);
                 assert.deepStrictEqual(receivedOptions, mockOptions);
                 assert.strictEqual(FrontChannel1.listeningClientUids.length, 1);
@@ -133,12 +135,9 @@ describe('Client', function() {
             assert.strictEqual(BackChannel1.listeningClientUids[0], client.uid);
             done();
         });
-        it('should have called the acceptClientLink method in back channel', (done) => {
-            sinon.assert.calledOnce(BackChannel1_acceptClientLinkSpy);
-            done();
-        });
-        it('Should have called the addedClientLink method in the back master', (done) => {
-            sinon.assert.calledOnce(BackMaster_addedClientLinkSpy);
+        it('should have called the onAddClientListenHandlerSpy method in back channel', (done) => {
+            sinon.assert.calledOnce(BackChannel1_onAddClientListenHandlerSpy);
+            assert.ok(BackChannel1_onAddClientListenHandlerSpy.returned('baz'));
             done();
         });
         it('Should have correct lookup data in back master linked client data lookup', (done) => {

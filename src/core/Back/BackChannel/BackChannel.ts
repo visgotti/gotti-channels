@@ -74,7 +74,6 @@ export class BackChannel extends Channel {
         this.registerPreConnectedPubs();
 
         // register initially so if theres no hooking logic the user needs the event is still registered and fired.
-        this.onAddClientListen((...args) => {});
         this.onAddClientWrite((...args) => {});
         this.onRemoveClientWrite((...args) => {});
     }
@@ -123,15 +122,11 @@ export class BackChannel extends Channel {
      */
     //TODO: onRequestAddClient - have another hook that a user can decide if there's an allowed link to the client
     public onAddClientListen(handler: (clientUid: string, options?: any) => any) : void {
-        this.listenerCount('add_client_listen') && this.removeAllListeners('add_client_listen');
+        this.onAddClientListenHandler = handler;
+    }
 
-        this.on('add_client_listen', (frontUid: string, clientUid: string, encodedState: string, options?: any) => {
-            // if handler returns data we want to send it back as options to front channel.
-            const responseOptions = handler(clientUid, options);
-            responseOptions ?
-                this.push.ACCEPT_LINK[frontUid]([encodedState, clientUid, responseOptions]) :
-                this.push.ACCEPT_LINK[frontUid]([encodedState, clientUid]);
-        });
+    private onAddClientListenHandler(clientUid: string, options?: any) {
+        return true;
     }
 
     /**
@@ -154,29 +149,6 @@ export class BackChannel extends Channel {
     private acceptLink(frontUid) {
         this.push.ACCEPT_LINK[frontUid](this._previousStateEncoded);
     };
-
-    /**
-     * gets called when a link publish message is received and a new unique client
-     * has been linked to given channel.
-     * @param frontUid - unique front channel sending link request.
-     * @param frontMasterIndex - front master index the client is connected to.
-     * @param clientUid - uid of client.
-     * @param options - additional options client passed upon link request
-     */
-    private acceptClientLink(frontUid, frontMasterIndex, clientUid, options?) {
-
-        // add to set.
-        this._listeningClientUids.add(clientUid);
-
-        // notify master a client linked (master keeps track of how many back channels the
-        // client is connected to and also keeps a lookup to the front master index so it can
-        // send direct messages to the client by sending it to the front master.
-        this.master.addedClientLink(clientUid, frontMasterIndex);
-
-        const encodedState = this.state ? this._previousStateEncoded : '';
-
-        this.emit('add_client_listen', frontUid, clientUid, encodedState, options);
-    }
 
     /**
      * sends message to specific front channel based on frontUid
@@ -202,7 +174,6 @@ export class BackChannel extends Channel {
      * @param frontUids
      */
     public broadcast(message: any, frontUids?: Array<string>) {
-        console.log('pubbing!');
         if(frontUids) {
             for(let i = 0; i < frontUids.length; i++) {
                 this.send(message, frontUids[i]);
@@ -346,15 +317,29 @@ export class BackChannel extends Channel {
             this.pull.LINK.register(frontUid, (message) => {
                 const clientUid = message[0];
                 const options = message[1];
-                if(!(this.linkedFrontAndClientUids.has(frontUid))) {
-                    this.linkedFrontAndClientUids.set(frontUid, new Set());
-                    this.master.linkedChannelFrom(frontMasterIndex);
-                    this.linkedFrontMasterIndexes.push(frontMasterIndex);
-                    this.linkedFrontUids = Array.from(this.linkedFrontAndClientUids.keys());
-                }
-                this.linkedFrontAndClientUids.get(frontUid).add(clientUid);
+                const linkedOptions = this.onAddClientListenHandler(clientUid, options);
 
-                this.acceptClientLink(frontUid, frontMasterIndex, clientUid, options);
+                if(linkedOptions) {
+                    // add to set.
+                    this._listeningClientUids.add(clientUid);
+
+                    // notify master a client linked (master keeps track of how many back channels the
+                    // client is connected to and also keeps a lookup to the front master index so it can
+                    // send direct messages to the client by sending it to the front master.
+                    this.master.addedClientLink(clientUid, frontMasterIndex);
+
+                    const encodedState = this.state ? this._previousStateEncoded : '';
+
+                    this.push.ACCEPT_LINK[frontUid]([encodedState, clientUid, linkedOptions]);
+
+                    if(!(this.linkedFrontAndClientUids.has(frontUid))) {
+                        this.linkedFrontAndClientUids.set(frontUid, new Set());
+                        this.master.linkedChannelFrom(frontMasterIndex);
+                        this.linkedFrontMasterIndexes.push(frontMasterIndex);
+                        this.linkedFrontUids = Array.from(this.linkedFrontAndClientUids.keys());
+                    }
+                    this.linkedFrontAndClientUids.get(frontUid).add(clientUid);
+                }
                 // notify the master with the front master index of connected channel if its a new front uid
             });
 

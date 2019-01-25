@@ -179,21 +179,6 @@ describe('BackChannel', function() {
         });
     });
 
-    describe('BackChannel.onAddClientListen', () => {
-        it('correctly registers a handler for the add_client_listen event', (done) => {
-            const mockUid = 'client_foo';
-            const mockOptions = {
-                'foo': 'bar'
-            };
-            BackChannel1.onAddClientListen((clientUid, options?) => {
-                assert.strictEqual(clientUid, mockUid);
-                assert.deepStrictEqual(options, mockOptions);
-                done();
-            });
-            BackChannel1.emit('add_client_listen', FrontChannel1.frontUid, mockUid, 'mock_state', mockOptions);
-        });
-    });
-
     describe('BackChannel.onRemoveClientListen', () => {
         it('correctly registers a handler for the remove_client_listen event', (done) => {
             const mockUid = 'client_foo';

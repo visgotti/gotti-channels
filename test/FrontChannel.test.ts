@@ -57,7 +57,7 @@ describe('FrontChannel', function() {
     afterEach(() => {
         FrontChannel1.onConnected(() => {});
         FrontChannel2.onConnected(() => {});
-        BackChannel1.onAddClientListen((...args) => {});
+        BackChannel1.onAddClientListen((...args) => { return true });
     });
 
     after(done => {
@@ -165,9 +165,9 @@ describe('FrontChannel', function() {
         });
 
         it('does fire off the onPatchState when its linked', (done) => {
-
             let called = null;
             FrontChannel1.linkClient(client).then(() => {
+                console.log('yo');
                 FrontChannel1.onPatchState((patch) => {
                     called = patch;
                 });
