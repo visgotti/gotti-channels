@@ -176,9 +176,10 @@ export class FrontMasterChannel extends Channel {
         });
 
         this.sub.MESSAGE_CLIENT.register((data) => {
-            //TODO: add optional protocol to array?
-            if(this._connectedClients[data[0]]) {
-                this._connectedClients[data[0]].onMessageHandler(data);
+            // clientuid always last element in message
+            const client = this._connectedClients[data[data.length - 1]];
+            if(client) {
+                client.onMessageHandler(data);
             }
         });
     }
