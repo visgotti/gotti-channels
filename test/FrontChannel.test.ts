@@ -71,12 +71,17 @@ describe('FrontChannel', function() {
     describe('FrontChannel.connect', () => {
         let connections = 0;
         it('tests asynchronous connection of 1 channel', (done) => {
+
+            BackChannel1.connectionOptions = { "foo": "bar" };
+            BackChannel2.connectionOptions = { "foo": "baz" };
+
             FrontChannel1.connect().then((connected: any) => {
                 connections++;
-                assert.strictEqual(connected.channelIds.length, 2);
+                assert.strictEqual(connected.channels.length, 2);
                 assert.strictEqual(connected.backMasterIndexes.length, 1);
-                assert.strictEqual(connected.channelIds.indexOf(BackChannel1.channelId) > -1, true);
-                assert.strictEqual(connected.channelIds.indexOf(BackChannel2.channelId) > -1, true);
+                assert.deepStrictEqual(FrontMaster.backChannelOptions[BackChannel1.channelId], { "foo": "bar" });
+                assert.deepStrictEqual(FrontMaster.backChannelOptions[BackChannel2.channelId],  {"foo": "baz"});
+
                 assert.strictEqual(connected.backMasterIndexes[0], BackMaster.backMasterIndex);
                 assert.strictEqual(connections, 1);
 
@@ -90,6 +95,7 @@ describe('FrontChannel', function() {
 
         it('updates the connectionInfo getter correctly', (done) => {
             // 2 because theres two back channels it connects to.
+            assert.strictEqual(Object.keys(FrontChannel1.connectionInfo.channelsOptions).length, 2);
             assert.strictEqual(FrontChannel1.connectionInfo.connectedChannelIds.length, 2);
             assert.strictEqual(FrontChannel1.connectionInfo.connectionStatus, CONNECTION_STATUS.CONNECTED);
             assert.strictEqual(FrontChannel1.connectionInfo.isLinked, false);
@@ -167,7 +173,6 @@ describe('FrontChannel', function() {
         it('does fire off the onPatchState when its linked', (done) => {
             let called = null;
             FrontChannel1.linkClient(client).then(() => {
-                console.log('yo');
                 FrontChannel1.onPatchState((patch) => {
                     called = patch;
                 });

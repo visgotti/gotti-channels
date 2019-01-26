@@ -20,6 +20,8 @@ export class FrontMasterChannel extends Channel {
 
     public frontChannels: any;
 
+    public backChannelOptions: {[channelId: string]: any} = {};
+
     readonly frontMasterIndex;
 
     constructor(frontMasterIndex) {
@@ -73,7 +75,10 @@ export class FrontMasterChannel extends Channel {
                     });
                     awaitingConnections--;
                     if(awaitingConnections === 0) {
-                        return true;
+                        return {
+                            success: true,
+                            backChannelOptions: this.backChannelOptions,
+                        };
                     }
                 } else {
                     throw new Error('Error connecting.');

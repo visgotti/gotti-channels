@@ -112,6 +112,7 @@ export declare class FrontChannel extends Channel {
      * if its the same channelId
      * @param backChannelId
      * @param backMasterIndex - index of the Back Channel's master.
+     * @param options - options set on back channel to share with front channel on connection
      */
     private _onConnected;
     private onConnectedHandler;

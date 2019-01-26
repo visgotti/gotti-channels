@@ -76,7 +76,16 @@ describe('FrontChannel', function() {
                 actual++;
             });
 
-            FrontMaster.connect().then(() => {
+            BackChannel1.connectionOptions = {"foo": "bar"}
+
+            FrontMaster.connect().then((connected) => {
+                assert.strictEqual(connected.success, true);
+                assert.ok(connected.backChannelOptions[BackChannel1.channelId]);
+                assert.ok(connected.backChannelOptions[BackChannel2.channelId]);
+
+                assert.deepStrictEqual(connected.backChannelOptions[BackChannel1.channelId], {"foo": "bar"});
+                assert.deepStrictEqual(connected.backChannelOptions[BackChannel2.channelId], {});
+
                 assert.strictEqual(FrontMaster.connectedBackMasters.length, 1);
                 assert.strictEqual(FrontMaster.connectedBackMasters[0], BackMaster.backMasterIndex);
                 assert.strictEqual(expected, actual);

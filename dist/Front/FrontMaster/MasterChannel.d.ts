@@ -8,12 +8,20 @@ export declare class FrontMasterChannel extends Channel {
     private _connectedBackMasters;
     private _connectedClients;
     frontChannels: any;
+    backChannelOptions: {
+        [channelId: string]: any;
+    };
     readonly frontMasterIndex: any;
     constructor(frontMasterIndex: any);
     initialize(masterURI: any, backMasterURIs: Array<string>): void;
     addChannels(channelIds: any): void;
     readonly connectedBackMasters: number[];
-    connect(): Promise<boolean>;
+    connect(): Promise<{
+        success: boolean;
+        backChannelOptions: {
+            [channelId: string]: any;
+        };
+    }>;
     /**
      * Gets called in client when initialized
      * @param client

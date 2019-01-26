@@ -14,6 +14,8 @@ export class BackChannel extends Channel {
 
     private messenger: Messenger;
 
+    private _connectionOptions: any = {};
+    private setConnectionOptions: boolean = false;
     private pub: BackPubs;
     private sub: BackSubs;
     private push: BackPushes;
@@ -45,8 +47,13 @@ export class BackChannel extends Channel {
 
     readonly backMasterIndex: number;
 
-    constructor(channelId, messenger: Messenger, master: BackMasterChannel) {
+    constructor(channelId, messenger: Messenger, master: BackMasterChannel, connectionOptions?) {
         super(channelId);
+        if(connectionOptions) {
+            this._connectionOptions = connectionOptions;
+            this.setConnectionOptions = true;
+        }
+
         this.master = master;
         this.messenger = messenger;
         this.backMasterIndex = this.master.backMasterIndex;
@@ -76,6 +83,14 @@ export class BackChannel extends Channel {
         // register initially so if theres no hooking logic the user needs the event is still registered and fired.
         this.onAddClientWrite((...args) => {});
         this.onRemoveClientWrite((...args) => {});
+    }
+
+    set connectionOptions(options) {
+        if(this.setConnectionOptions) {
+            throw new Error('Can not set connection options once set.');
+        }
+        this.setConnectionOptions = true;
+        this._connectionOptions = options;
     }
 
     /**
@@ -284,7 +299,7 @@ export class BackChannel extends Channel {
         if((this._connectedFrontsData.has(frontUid)))  {
             // create push then remove since this wont be done again unless theres a disconnection.
             this.push.CONNECTION_CHANGE.register(frontUid);
-            this.push.CONNECTION_CHANGE[frontUid]({ channelId: this.channelId, backMasterIndex: this.backMasterIndex, connectionStatus: CONNECTION_STATUS.CONNECTED });
+            this.push.CONNECTION_CHANGE[frontUid]({ channelId: this.channelId, backMasterIndex: this.backMasterIndex, connectionStatus: CONNECTION_STATUS.CONNECTED, options: this._connectionOptions });
             this.push.CONNECTION_CHANGE.unregister();
             return;
         }
@@ -382,7 +397,7 @@ export class BackChannel extends Channel {
 
         // create push then remove since this wont be done again unless theres a disconnection.
         this.push.CONNECTION_CHANGE.register(frontUid);
-        this.push.CONNECTION_CHANGE[frontUid]({ channelId: this.channelId, backMasterIndex: this.backMasterIndex, connectionStatus: CONNECTION_STATUS.CONNECTED });
+        this.push.CONNECTION_CHANGE[frontUid]({ channelId: this.channelId, backMasterIndex: this.backMasterIndex, connectionStatus: CONNECTION_STATUS.CONNECTED, options: this._connectionOptions });
         this.push.CONNECTION_CHANGE.unregister();
     }
 

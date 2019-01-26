@@ -40,6 +40,7 @@ describe('BackChannel', function() {
         FrontChannel1 = FrontMaster.frontChannels[0];
         FrontChannel2 = FrontMaster.frontChannels[1];
         BackChannel1 = BackMaster.backChannels[0];
+
         BackChannel2 = BackMaster.backChannels[1];
 
         client = new Client('1', FrontMaster);

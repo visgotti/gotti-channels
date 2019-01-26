@@ -16,6 +16,7 @@ const Channel_1 = require("../../Channel/Channel");
 class FrontMasterChannel extends Channel_1.Channel {
     constructor(frontMasterIndex) {
         super(frontMasterIndex);
+        this.backChannelOptions = {};
         this.frontMasterIndex = frontMasterIndex;
         this.frontChannels = {};
         this.frontChannelIds = [];
@@ -59,7 +60,10 @@ class FrontMasterChannel extends Channel_1.Channel {
                         });
                         awaitingConnections--;
                         if (awaitingConnections === 0) {
-                            return true;
+                            return {
+                                success: true,
+                                backChannelOptions: this.backChannelOptions,
+                            };
                         }
                     }
                     else {
@@ -155,9 +159,10 @@ class FrontMasterChannel extends Channel_1.Channel {
             }
         });
         this.sub.MESSAGE_CLIENT.register((data) => {
-            //TODO: add optional protocol to array?
-            if (this._connectedClients[data[0]]) {
-                this._connectedClients[data[0]].onMessageHandler(data);
+            // clientuid always last element in message
+            const client = this._connectedClients[data[data.length - 1]];
+            if (client) {
+                client.onMessageHandler(data);
             }
         });
     }

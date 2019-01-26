@@ -261,18 +261,18 @@ export class FrontChannel extends Channel {
                 return reject(`Timed out waiting for ${(this.connectedChannelIds.size - this.totalChannels)} connections`);
             }, timeout);
 
-            let connectedChannelIds = new Set();
             let connectedBackMasterIndexes = new Set();
 
-            this.on('connected', (channelId, backMasterIndex) => {
-
-                connectedChannelIds.add(channelId);
+            this.on('connected', (channelId, backMasterIndex, options) => {
                 connectedBackMasterIndexes.add(backMasterIndex);
 
+                this.master.backChannelOptions[channelId] = options;
+
                 // run user defined handler. (set with onConnectedHandler())
-                this.onConnectedHandler(channelId, backMasterIndex);
+                this.onConnectedHandler(channelId, backMasterIndex, options);
 
                 this.connectedChannelIds.add(channelId);
+
                 if (this.connectedChannelIds.size === this.totalChannels) {
 
                     // dont need to listen for connected emition
@@ -282,10 +282,9 @@ export class FrontChannel extends Channel {
                     this.removeAllListeners('connected');
 
                     this.CONNECTION_STATUS = CONNECTION_STATUS.CONNECTED;
-
                     return resolve({
-                        channelIds: Array.from(connectedChannelIds.values()),
-                        backMasterIndexes: Array.from(connectedBackMasterIndexes.values())
+                        channels: Array.from(this.connectedChannelIds.values()),
+                        backMasterIndexes: Array.from(connectedBackMasterIndexes.values()),
                     });
                 }
             });
@@ -294,7 +293,8 @@ export class FrontChannel extends Channel {
 
     get connectionInfo(): any {
         return {
-            connectedChannelIds: Array.from(this.connectedChannelIds),
+            channelsOptions: this.master.backChannelOptions,
+            connectedChannelIds: Array.from(this.connectedChannelIds.values()),
             connectionStatus: this.CONNECTION_STATUS,
             isLinked: this.linked,
         }
@@ -322,9 +322,9 @@ export class FrontChannel extends Channel {
         throw new Error(`Unimplemented onMessageHandler in front channel ${this.channelId} Use frontChannel.onMessage to implement.`);
     }
 
-    private _onConnectionChange(backChannelId, backMasterIndex, change: CONNECTION_CHANGE) {
+    private _onConnectionChange(backChannelId, backMasterIndex, change: CONNECTION_CHANGE, options?) {
         if(change === CONNECTION_CHANGE.CONNECTED) {
-            this._onConnected(backChannelId, backMasterIndex);
+            this._onConnected(backChannelId, backMasterIndex, options);
         } else if(change === CONNECTION_CHANGE.DISCONNECTED) {
             this._onDisconnect(backChannelId, backMasterIndex);
         } else {
@@ -337,8 +337,10 @@ export class FrontChannel extends Channel {
      * if its the same channelId
      * @param backChannelId
      * @param backMasterIndex - index of the Back Channel's master.
+     * @param options - options set on back channel to share with front channel on connection
      */
-    private _onConnected(backChannelId, backMasterIndex) {
+    private _onConnected(backChannelId, backMasterIndex, options?) {
+
         // channelId of connected backChannel was the same so register pub/subs meant for mirrored channels.
         if(backChannelId === this.channelId) {
             this.backMasterIndex = backMasterIndex;
@@ -363,10 +365,10 @@ export class FrontChannel extends Channel {
 
         this.push.SEND_BACK.register(backChannelId);
 
-        this.emit('connected', backChannelId, backMasterIndex);
+        this.emit('connected', backChannelId, backMasterIndex, options);
     }
 
-    private onConnectedHandler(backChannelId, backMasterIndex) : void {};
+    private onConnectedHandler(backChannelId, backMasterIndex, options={}) : void {};
 
     private validateConnectAction(REQUEST_STATUS: CONNECTION_STATUS) : { success: boolean, error?: string } {
         let validated = { success: true, error: null };
@@ -401,7 +403,7 @@ export class FrontChannel extends Channel {
         this.sub.CONNECTION_CHANGE.register(data => {
             // only handle if not from redundant connect response
             if(!(this.connectedChannelIds.has(data.channelId))) {
-                this._onConnectionChange(data.channelId, data.backMasterIndex, data.connectionStatus);
+                this._onConnectionChange(data.channelId, data.backMasterIndex, data.connectionStatus, data.options);
             }
         });
 

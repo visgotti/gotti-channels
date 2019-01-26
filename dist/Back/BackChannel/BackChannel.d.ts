@@ -5,6 +5,8 @@ import { ConnectedFrontData } from '../../types';
 export declare class BackChannel extends Channel {
     private master;
     private messenger;
+    private _connectionOptions;
+    private setConnectionOptions;
     private pub;
     private sub;
     private push;
@@ -22,7 +24,8 @@ export declare class BackChannel extends Channel {
     private masterIndexToFrontUidLookup;
     linkedFrontMasterIndexes: Array<number>;
     readonly backMasterIndex: number;
-    constructor(channelId: any, messenger: Messenger, master: BackMasterChannel);
+    constructor(channelId: any, messenger: Messenger, master: BackMasterChannel, connectionOptions?: any);
+    connectionOptions: any;
     /**
      * sets the onMessageHandler function
      * @param handler - function that gets executed, gets parameters message and frontUid
