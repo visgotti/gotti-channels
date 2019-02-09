@@ -116,6 +116,9 @@ export class BackMasterChannel extends Channel {
                 const patches = fossilDelta.create(backChannel._previousStateEncoded, currentStateEncoded);
 
                 backChannel._previousStateEncoded = currentStateEncoded;
+
+                // behemoth of a line but most of these lookups are critical and only happen once so traded readibility for some micro optimization
+                // all this does is send the patches to all front channels listening to it.
                 this._linkedFrontMasterChannels[backChannel.linkedFrontMasterIndexes[frontMasterLength]].encodedPatches.push([backChannel.channelId, patches]);
             }
         }

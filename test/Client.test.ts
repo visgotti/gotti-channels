@@ -291,6 +291,32 @@ describe('Client', function() {
             FrontMaster.sendQueuedMessages();
         });
     });
+
+    describe('client.sendLocalImmediate', () => {
+        it('sends to processor channel without the front master sending queued messages', (done) => {
+            let received = 0;
+            const expectedReceived = 1;
+            BackChannel1.onClientMessage((clientUid, message) => {
+                assert.ok(message.length === 2); // doesnt have the third areaid parameter cause it uses a unique zmq publish for the channel and doesnt go through the master
+                assert.strictEqual(message[0], 1);
+                assert.strictEqual(clientUid, client.uid);
+                received+=message[0];
+                if(received === expectedReceived) {
+                    setTimeout(() => {
+                        assert.strictEqual(received, expectedReceived);
+                        done();
+                    }, 20);
+                }
+            });
+            // shouldnt reach this
+            BackChannel2.onClientMessage((clientUid, message) => {
+                received+=message[0];
+            });
+
+            client.sendLocalImmediate([1]);
+        });
+    });
+
     describe('client.sendGlobal', () => {
         it('is received by all back channels', (done) => {
             let received = 0;

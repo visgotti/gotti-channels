@@ -9,6 +9,7 @@ class Client {
     private masterChannel: FrontMasterChannel;
     private linkedChannels: Map<string, FrontChannel>;
     private _processorChannel: FrontChannel;
+    private processorChannelId: string = '';
     private _queuedEncodedUpdates: any;
 
     constructor(uid: string, masterChannel: FrontMasterChannel) {
@@ -27,7 +28,7 @@ class Client {
     }
 
     get processorChannel() {
-        return this._processorChannel ? this._processorChannel.channelId : null;
+        return this._processorChannel ? this.processorChannelId : null;
     }
 
     public isLinkedToChannel(channelId: string) : boolean {
@@ -89,6 +90,7 @@ class Client {
         if(unlinkOld) this.unlinkChannel(this._processorChannel.channelId);
 
         this._processorChannel = channel;
+        this.processorChannelId = this._processorChannel.channelId;
 
         return true;
     }
@@ -122,7 +124,7 @@ class Client {
     }
 
     /**
-     * sends message to back channel with processorId.
+     * queues message on front channel to send back channel
      * @param message
      */
     public sendLocal(data: Array<any>) {
@@ -130,6 +132,17 @@ class Client {
             throw new Error('Client must have a channel set as its processor channel to send messages. See Client.setProcessor');
         }
         this._processorChannel.addMessage(data, this.uid);
+    }
+
+    /**
+     * sends message instantly
+     * @param message
+     */
+    public sendLocalImmediate(data: Array<any>) {
+        if(!(this._processorChannel)) {
+            throw new Error('Client must have a channel set as its processor channel to send messages. See Client.setProcessor');
+        }
+        this._processorChannel.send(data, this.processorChannelId, this.uid);
     }
 
     public unlinkChannel(channelId?, options?) {
@@ -155,6 +168,7 @@ class Client {
         if(this._processorChannel && this._processorChannel.channelId === channelId) {
             this._processorChannel.removeClientWrite(this.uid);
             this._processorChannel = null;
+            this.processorChannelId = '';
         }
         delete this._queuedEncodedUpdates[channelId];
         this.linkedChannels.delete(channelId);
