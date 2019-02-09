@@ -6,6 +6,7 @@ declare class Client {
     private masterChannel;
     private linkedChannels;
     private _processorChannel;
+    private processorChannelId;
     private _queuedEncodedUpdates;
     constructor(uid: string, masterChannel: FrontMasterChannel);
     readonly queuedEncodedUpdates: any;
@@ -41,10 +42,15 @@ declare class Client {
      */
     sendGlobal(data: Array<any>): void;
     /**
-     * sends message to back channel with processorId.
+     * queues message on front channel to send back channel
      * @param message
      */
     sendLocal(data: Array<any>): void;
+    /**
+     * sends message instantly
+     * @param message
+     */
+    sendLocalImmediate(data: Array<any>): void;
     unlinkChannel(channelId?: any, options?: any): void;
     onChannelDisconnect(channelId: any): void;
 }

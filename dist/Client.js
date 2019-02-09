@@ -11,6 +11,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const types_1 = require("./types");
 class Client {
     constructor(uid, masterChannel) {
+        this.processorChannelId = '';
         if (!(uid))
             throw new Error('Invalid client uid.');
         this.uid = uid;
@@ -25,7 +26,7 @@ class Client {
         return this._queuedEncodedUpdates;
     }
     get processorChannel() {
-        return this._processorChannel ? this._processorChannel.channelId : null;
+        return this._processorChannel ? this.processorChannelId : null;
     }
     isLinkedToChannel(channelId) {
         return this.linkedChannels.has(channelId);
@@ -85,6 +86,7 @@ class Client {
         if (unlinkOld)
             this.unlinkChannel(this._processorChannel.channelId);
         this._processorChannel = channel;
+        this.processorChannelId = this._processorChannel.channelId;
         return true;
     }
     addStateUpdate(channelId, update, type) {
@@ -112,7 +114,7 @@ class Client {
         this._processorChannel.broadcast(data, null, this.uid);
     }
     /**
-     * sends message to back channel with processorId.
+     * queues message on front channel to send back channel
      * @param message
      */
     sendLocal(data) {
@@ -120,6 +122,16 @@ class Client {
             throw new Error('Client must have a channel set as its processor channel to send messages. See Client.setProcessor');
         }
         this._processorChannel.addMessage(data, this.uid);
+    }
+    /**
+     * sends message instantly
+     * @param message
+     */
+    sendLocalImmediate(data) {
+        if (!(this._processorChannel)) {
+            throw new Error('Client must have a channel set as its processor channel to send messages. See Client.setProcessor');
+        }
+        this._processorChannel.send(data, this.processorChannelId, this.uid);
     }
     unlinkChannel(channelId, options) {
         if (this.linkedChannels.has(channelId)) {
@@ -142,6 +154,7 @@ class Client {
         if (this._processorChannel && this._processorChannel.channelId === channelId) {
             this._processorChannel.removeClientWrite(this.uid);
             this._processorChannel = null;
+            this.processorChannelId = '';
         }
         delete this._queuedEncodedUpdates[channelId];
         this.linkedChannels.delete(channelId);
