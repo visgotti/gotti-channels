@@ -9,6 +9,9 @@ import { CONNECTION_STATUS, CONNECTION_CHANGE, STATE_UPDATE_TYPES } from '../../
 import {clearTimeout} from "timers";
 import Timeout = NodeJS.Timeout;
 
+
+export type LinkResponse = { responseOptions: any, encodedState: any };
+
 export class FrontChannel extends Channel {
     private master: FrontMasterChannel;
 
@@ -111,7 +114,7 @@ export class FrontChannel extends Channel {
      * @param options (optional) if you want to send data as a client connects
      * @returns {Promise<T>}
      */
-    public async linkClient(client: Client, options?: any) : Promise<any> {
+    public async linkClient(client: Client, options?: any) : Promise<LinkResponse> {
 
         const clientUid = client.uid;
         if(!(this.linked)) this.linked = true;

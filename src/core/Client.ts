@@ -3,6 +3,8 @@ import { STATE_UPDATE_TYPES } from './types';
 import { FrontChannel } from './Front/FrontChannel/FrontChannel';
 import { FrontMasterChannel } from './Front/FrontMaster/MasterChannel';
 
+import { LinkResponse } from './Front/FrontChannel/FrontChannel';
+
 class Client {
     readonly uid: string;
     public state: any;
@@ -49,7 +51,7 @@ class Client {
      * @param channelId
      * @param options to send to back channel
      */
-    public async linkChannel(channelId: string, options?: any) {
+    public async linkChannel(channelId: string, options?: any) : Promise<LinkResponse> {
         try {
             const channel = this.masterChannel.frontChannels[channelId];
             if(!channel) throw new Error(`Invalid channelId ${channelId}`);
