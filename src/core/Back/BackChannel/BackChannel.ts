@@ -334,7 +334,7 @@ export class BackChannel extends Channel {
                 const options = message[1];
                 const linkedOptions = this.onAddClientListenHandler(clientUid, options);
 
-                if(linkedOptions) {
+                if(linkedOptions && !this._listeningClientUids.has(clientUid)) {
                     // add to set.
                     this._listeningClientUids.add(clientUid);
 
