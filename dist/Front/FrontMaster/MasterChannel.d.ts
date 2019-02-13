@@ -34,6 +34,7 @@ export declare class FrontMasterChannel extends Channel {
      */
     clientDisconnected(uid: any): boolean;
     sendQueuedMessages(): void;
+    getQueuedMessages(): {};
     /**
      * adds a message to the queue for a specific back Master Channel
      * @param data - message to send

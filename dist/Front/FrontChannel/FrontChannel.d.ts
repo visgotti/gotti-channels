@@ -2,6 +2,10 @@ import { Channel } from '../../Channel/Channel';
 import { FrontMasterChannel } from '../FrontMaster/MasterChannel';
 import Client from '../../Client';
 import { Messenger } from 'gotti-pubsub/dist';
+export declare type LinkResponse = {
+    responseOptions: any;
+    encodedState: any;
+};
 export declare class FrontChannel extends Channel {
     private master;
     private messenger;
@@ -48,7 +52,7 @@ export declare class FrontChannel extends Channel {
      * @param options (optional) if you want to send data as a client connects
      * @returns {Promise<T>}
      */
-    linkClient(client: Client, options?: any): Promise<any>;
+    linkClient(client: Client, options?: any): Promise<LinkResponse>;
     /**
      * sends unlink message, it will decrement or remove the client lookup data on the back,
      * the back channel checks if there are any clients left with a link to the front master

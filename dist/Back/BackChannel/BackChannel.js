@@ -252,7 +252,7 @@ class BackChannel extends Channel_1.Channel {
                 const clientUid = message[0];
                 const options = message[1];
                 const linkedOptions = this.onAddClientListenHandler(clientUid, options);
-                if (linkedOptions) {
+                if (linkedOptions && !this._listeningClientUids.has(clientUid)) {
                     // add to set.
                     this._listeningClientUids.add(clientUid);
                     // notify master a client linked (master keeps track of how many back channels the

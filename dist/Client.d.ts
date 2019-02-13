@@ -1,5 +1,6 @@
 import { STATE_UPDATE_TYPES } from './types';
 import { FrontMasterChannel } from './Front/FrontMaster/MasterChannel';
+import { LinkResponse } from './Front/FrontChannel/FrontChannel';
 declare class Client {
     readonly uid: string;
     state: any;
@@ -22,7 +23,7 @@ declare class Client {
      * @param channelId
      * @param options to send to back channel
      */
-    linkChannel(channelId: string, options?: any): Promise<any>;
+    linkChannel(channelId: string, options?: any): Promise<LinkResponse>;
     /**
      * setProcessorChannel will set the channel in which a client will relay its messages through.
      * The processor channel will forward the clients messages to the mirrored back channel in which
