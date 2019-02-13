@@ -120,6 +120,17 @@ export class FrontMasterChannel extends Channel {
         }
     }
 
+    public getQueuedMessages() {
+        let messages = {};
+        let length = this._linkedBackMasterIndexes.length;
+        while(length--) {
+            const masterIndex = this._linkedBackMasterIndexes[length];
+            const queuedMessages = this._linkedBackMasterLookup[masterIndex].queuedMessages;
+            messages[masterIndex] = queuedMessages;
+        }
+        return messages;
+    }
+
     /**
      * adds a message to the queue for a specific back Master Channel
      * @param data - message to send
