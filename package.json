@@ -1,6 +1,6 @@
 {
   "name": "gotti-channels",
-  "version": "0.2.52",
+  "version": "0.2.53",
   "description": "Isolated channel communication for gotti.js",
   "main": "./dist/index.js",
   "scripts": {

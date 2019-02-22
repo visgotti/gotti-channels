@@ -112,9 +112,6 @@ class BackMasterChannel extends Channel_1.Channel {
         return false;
     }
     handleNewFrontMasterConnection(frontMasterIndex) {
-        this.pull.SEND_QUEUED.register(frontMasterIndex, (messageQueueData => {
-            this.handleQueuedMessages(messageQueueData);
-        }));
         this.push.PATCH_STATE.register(frontMasterIndex);
         this.push.MESSAGE_CLIENT.register(frontMasterIndex);
     }
@@ -220,6 +217,9 @@ class BackMasterChannel extends Channel_1.Channel {
         const { push, pull } = new MasterMessages_1.MasterMessages(this.messenger);
         this.push = push;
         this.pull = pull;
+        this.pull.SEND_QUEUED.register(this.backMasterIndex, (messageQueueData => {
+            this.handleQueuedMessages(messageQueueData);
+        }));
     }
     disconnect() {
         if (this._sendStateUpdatesInterval) {
