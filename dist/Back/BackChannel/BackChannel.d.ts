@@ -40,6 +40,8 @@ export declare class BackChannel extends Channel {
      * @param handler - handler called when a client is added as a writer.
      */
     onRemoveClientWrite(handler: (clientUid: string, options?: any) => void): void;
+    onAddedClientListener(handler: (clientUid: string, options?: any) => any): void;
+    private onAddedClientListenerHandler;
     /**
      * handler that is called when a client is linked to the back channel.
      * if it returns anything data it will be sent back to the front channel asynchronously

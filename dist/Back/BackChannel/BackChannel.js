@@ -75,6 +75,12 @@ class BackChannel extends Channel_1.Channel {
             handler(clientUid, options);
         });
     }
+    onAddedClientListener(handler) {
+        this.onAddedClientListenerHandler = handler;
+    }
+    onAddedClientListenerHandler(clientUid, options) {
+        return true;
+    }
     /**
      * handler that is called when a client is linked to the back channel.
      * if it returns anything data it will be sent back to the front channel asynchronously
@@ -268,6 +274,7 @@ class BackChannel extends Channel_1.Channel {
                         this.linkedFrontUids = Array.from(this.linkedFrontAndClientUids.keys());
                     }
                     this.linkedFrontAndClientUids.get(frontUid).add(clientUid);
+                    this.onAddedClientListenerHandler(clientUid, linkedOptions);
                 }
                 // notify the master with the front master index of connected channel if its a new front uid
             });

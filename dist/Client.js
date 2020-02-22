@@ -108,30 +108,29 @@ class Client {
      * @param message
      */
     sendGlobal(data) {
-        if (!(this._processorChannel)) {
-            throw new Error('Client must have a channel set as its processor channel to send messages. See Client.setProcessor');
+        if (this._processorChannel) {
+            this._processorChannel.broadcast(data, null, this.uid);
         }
-        this._processorChannel.broadcast(data, null, this.uid);
     }
     /**
      * queues message on front channel to send back channel
      * @param message
      */
     sendLocal(data) {
-        if (!(this._processorChannel)) {
-            throw new Error('Client must have a channel set as its processor channel to send messages. See Client.setProcessor');
+        if (this._processorChannel) {
+            this._processorChannel.addMessage(data, this.uid);
         }
-        this._processorChannel.addMessage(data, this.uid);
     }
     /**
      * sends message instantly
      * @param message
      */
     sendLocalImmediate(data) {
-        if (!(this._processorChannel)) {
-            throw new Error('Client must have a channel set as its processor channel to send messages. See Client.setProcessor');
+        if (this._processorChannel) {
+            this._processorChannel.send(data, this.processorChannelId, this.uid);
         }
-        this._processorChannel.send(data, this.processorChannelId, this.uid);
+    }
+    logBuffered(data) {
     }
     unlinkChannel(channelId, options) {
         if (this.linkedChannels.has(channelId)) {

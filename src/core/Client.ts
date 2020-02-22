@@ -119,10 +119,9 @@ class Client {
      * @param message
      */
     public sendGlobal(data: Array<any>) {
-        if(!(this._processorChannel)) {
-            throw new Error('Client must have a channel set as its processor channel to send messages. See Client.setProcessor');
+        if(this._processorChannel) {
+            this._processorChannel.broadcast(data, null, this.uid);
         }
-        this._processorChannel.broadcast(data, null, this.uid);
     }
 
     /**
@@ -130,10 +129,9 @@ class Client {
      * @param message
      */
     public sendLocal(data: Array<any>) {
-        if(!(this._processorChannel)) {
-            throw new Error('Client must have a channel set as its processor channel to send messages. See Client.setProcessor');
+        if(this._processorChannel) {
+            this._processorChannel.addMessage(data, this.uid);
         }
-        this._processorChannel.addMessage(data, this.uid);
     }
 
     /**
@@ -141,10 +139,12 @@ class Client {
      * @param message
      */
     public sendLocalImmediate(data: Array<any>) {
-        if(!(this._processorChannel)) {
-            throw new Error('Client must have a channel set as its processor channel to send messages. See Client.setProcessor');
+        if(this._processorChannel) {
+            this._processorChannel.send(data, this.processorChannelId, this.uid);
         }
-        this._processorChannel.send(data, this.processorChannelId, this.uid);
+    }
+
+    private logBuffered(data) {
     }
 
     public unlinkChannel(channelId?, options?) {
