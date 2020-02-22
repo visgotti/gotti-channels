@@ -52,7 +52,6 @@ declare class Client {
      * @param message
      */
     sendLocalImmediate(data: Array<any>): void;
-    private logBuffered;
     unlinkChannel(channelId?: any, options?: any): void;
     onChannelDisconnect(channelId: any): void;
 }

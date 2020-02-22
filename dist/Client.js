@@ -130,8 +130,6 @@ class Client {
             this._processorChannel.send(data, this.processorChannelId, this.uid);
         }
     }
-    logBuffered(data) {
-    }
     unlinkChannel(channelId, options) {
         if (this.linkedChannels.has(channelId)) {
             const linkedChannel = this.linkedChannels.get(channelId);
